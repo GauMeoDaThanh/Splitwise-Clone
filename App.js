@@ -1,13 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
+import Register from "./screens/register";
 
 export default function App() {
-  return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-fuchsia-900">Hello world</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  return <Register></Register>;
 }
 
 const styles = StyleSheet.create({
