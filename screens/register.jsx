@@ -1,6 +1,5 @@
 import React from "react";
 import { TextInput, Button, SafeAreaView, View } from "react-native";
-import { withExpoSnack } from "nativewind";
 
 const Register = () => {
   return (
@@ -12,4 +11,4 @@ const Register = () => {
   );
 };
 
-export default withExpoSnack(Register);
+export default Register;
