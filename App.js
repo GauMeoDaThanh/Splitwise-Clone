@@ -1,12 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
+import LoginScreen from "./screens/LoginScreen";
+import SignUpScreen from "./screens/SignUpScreen";
+import AppNavigation from "./navigation/appNavigation";
 
 export default function App() {
   return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-fuchsia-900">Hello world</Text>
-      <StatusBar style="auto" />
-    </View>
+    <AppNavigation></AppNavigation>
   );
 }
 
