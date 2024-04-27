@@ -1,9 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
-import Register from "./screens/registerForm";
-import Login from "./screens/signinForm";
+import LoginScreen from "./screens/LoginScreen";
+import SignUpScreen from "./screens/SignUpScreen";
+import AppNavigation from "./navigation/appNavigation";
 
 export default function App() {
-  return <Login></Login>;
+  return (
+    <AppNavigation></AppNavigation>
+  );
 }
 
 const styles = StyleSheet.create({
