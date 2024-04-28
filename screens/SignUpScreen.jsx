@@ -10,16 +10,22 @@ const SignUpScreen = () => {
     const [name, setName] = useState();
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
-    const handleSignUp = () => {
-        const authenticateService = new AuthenticateService();
-        authenticateService.handleSignUp(email, password);
-        Alert.alert(
-            'Signup successfully',
-            'Your account has been created successfully!',
-            [
-                { text: 'OK', onPress: () => navigation.navigate('Login') },
-            ]
-        );
+    const handleSignUp = async () => {
+        try {
+            const authenticateService = new AuthenticateService();
+            await authenticateService.handleSignUp(email, password);
+            Alert.alert(
+                'Alert',
+                'Check your authentication email to log in with your registered account',
+                [
+                    { text: 'OK', onPress: () => navigation.navigate('Login') },
+                ]
+            );
+        }
+        catch (e) {
+            console.error("Sign up failed:", error);
+            Alert.alert("Sign up failed:", "An error occurred during sign up.");
+        }
 }
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);

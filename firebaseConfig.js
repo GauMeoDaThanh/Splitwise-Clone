@@ -22,4 +22,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 export { auth };
 export { db }
+export {app}
 
+// IOS:
+// 1081554393645-v38dus4umgiv1qgnku7lu74v38pnmaks.apps.googleusercontent.com
+// Android
+// 1081554393645-e9jee40u5192mcva77aehflppjtdo3vj.apps.googleusercontent.com

@@ -15,16 +15,30 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.anonymous.SplitwiseClone",
+      "supportsTablet": true,
+      "infoPlist": [
+        {
+          "CFBundleURLSchemes": [
+            "com.googleusercontent.apps.1081554393645-v38dus4umgiv1qgnku7lu74v38pnmaks"
+          ]
+        }
+      ]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.SplitwiseClone"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e03f0926-eef5-4ddd-98dd-d124b6e70c17"
+      }
     }
   }
 }
