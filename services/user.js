@@ -8,7 +8,12 @@ import {
   doc,
   setDoc,
 } from "firebase/firestore";
-import { ref, getStorage, getDownloadURL, put } from "firebase/storage";
+import {
+  ref,
+  getStorage,
+  getDownloadURL,
+  uploadBytesResumable,
+} from "firebase/storage";
 
 const initUser = {
   email: "",
@@ -21,7 +26,7 @@ const initUser = {
 class UserService {
   constructor(user = null) {
     if (UserService.instace == null) {
-      this.user = user || initUser;
+      this.user = initUser;
       UserService.instace = this;
     }
     return UserService.instace;
@@ -56,23 +61,58 @@ class UserService {
     querySnapshot.forEach((doc) => {
       console.log(doc.id, " => ", doc.data());
     });
+    return querySnapshot.docs[0].data();
   }
-  async setAvatarUrl(uid, uri) {
-    console.log(`start set avatar url for ${uid}`);
-    const storageRef = ref(storage, `avatars/${uid}`);
-    const response = await fetch(uri);
-    const blob = await response.blob();
+  async uploadAvatar(uid, imgUri) {
     try {
-      await put(storageRef, blob);
+      console.log("start upload avatar");
+      const storageRef = ref(storage, `avatars/${uid}`);
+      const fetchReponse = await fetch(imgUri);
+      const blob = await fetchReponse.blob();
+
+      const uploadTask = uploadBytesResumable(storageRef, blob);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(`Upload is ${progress}% done`);
+        },
+        (error) => {
+          console.error(error);
+        },
+        () => {
+          const userRef = doc(db, "users", uid);
+          getDownloadURL(storageRef).then((downloadURL) => {
+            console.log("File available at", downloadURL);
+            setDoc(userRef, { avatarUrl: downloadURL }, { merge: true });
+          });
+        }
+      );
     } catch (e) {
       console.error(e);
     }
   }
-  async getAvatarUrl(uid) {
-    console.log(`start get avatar url for ${uid}`);
-    const storageRef = ref(storage, `avatars/${uid}`);
-    const url = await getDownloadURL(storageRef);
-    console.log("File available at", url);
+  async getAvatar(uid) {
+    try {
+      const q = query(collection(db, "users"), where("uid", "==", uid));
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs[0].data().avatarUrl;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async setUsername(uid, username) {
+    console.log("start update username");
+    const userRef = doc(db, "users", uid);
+    try {
+      await setDoc(userRef, { username }, { merge: true });
+      console.log(`Document with ID ${uid} updated with username ${username}`);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 
