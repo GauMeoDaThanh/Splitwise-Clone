@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "reset-cache": "react-native start --reset-cache",
+    "clear:cache": "del /q node_modules\\.cache"
   },
   "dependencies": {
     "expo": "~50.0.14",
@@ -14,11 +16,15 @@
     "firebase": "^10.11.0",
     "nativewind": "^2.0.11",
     "react": "18.2.0",
-    "react-native": "0.73.6"
+    "react-native": "0.73.6",
+    "react-native-tailwindcss": "^1.1.11",
+    "tailwind-rn": "^4.2.0",
+    "typescript": "^5.3.0",
+    "@types/react": "~18.2.45"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "tailwindcss": "^3.3.2"
+    "tailwindcss": "^3.4.3"
   },
   "private": true
 }

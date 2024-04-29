@@ -1,20 +1,28 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import FriendsScreen from "./screens/FriendsScreen";
+import React from 'react';
+// import './output.css';
+// import { View, Text } from 'react-native-tailwindcss';
 
+import { tw } from 'tailwind-rn';
 export default function App() {
   return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-fuchsia-900">Hello world</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <FriendsScreen></FriendsScreen>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 100,
+  },
+  innerContainer: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
