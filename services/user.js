@@ -25,18 +25,20 @@ const initUser = {
 
 class UserService {
   constructor(user = null) {
-    if (UserService.instace == null) {
+    if (UserService.instance == null) {
       this.user = initUser;
-      UserService.instace = this;
+      UserService.instance = this;
     }
-    return UserService.instace;
+    return UserService.instance;
   }
+
   static getInstance() {
-    if (!UserService.instace) {
-      UserService.instace = new UserService();
+    if (!UserService.instance) {
+      UserService.instance = new UserService();
     }
-    return UserService.instace;
+    return UserService.instance;
   }
+
   async createUser(uid, username, email) {
     console.log("start add user");
     this.user = {
@@ -54,6 +56,7 @@ class UserService {
       console.error("Error adding document: ", e);
     }
   }
+
   async getUser(uid) {
     console.log(`start get user ${uid}`);
     const q = query(collection(db, "users"), where("uid", "==", uid));
@@ -63,6 +66,7 @@ class UserService {
     });
     return querySnapshot.docs[0].data();
   }
+
   async uploadAvatar(uid, imgUri) {
     try {
       console.log("start upload avatar");
@@ -94,10 +98,13 @@ class UserService {
       console.error(e);
     }
   }
+
   async getAvatar(uid) {
     try {
+      console.log("begin to get avatar");
       const q = query(collection(db, "users"), where("uid", "==", uid));
       const querySnapshot = await getDocs(q);
+      console.log(querySnapshot.docs[0].data().avatarUrl);
       return querySnapshot.docs[0].data().avatarUrl;
     } catch (e) {
       console.error(e);
@@ -112,6 +119,22 @@ class UserService {
       console.log(`Document with ID ${uid} updated with username ${username}`);
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async getUserIDWithMail(mail) {
+    try {
+      console.log("start get user with mail");
+      const q = query(collection(db, "users"), where("email", "==", mail));
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.docs.length === 0) {
+        console.log("Khong tim thay User");
+        return null;
+      } else {
+        return querySnapshot.docs[0].data().uid;
+      }
+    } catch (e) {
+      console.log(e);
     }
   }
 }
