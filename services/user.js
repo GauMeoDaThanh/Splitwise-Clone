@@ -7,6 +7,7 @@ import {
   addDoc,
   doc,
   setDoc,
+  getDoc,
 } from "firebase/firestore";
 import {
   ref,
@@ -59,12 +60,15 @@ class UserService {
 
   async getUser(uid) {
     console.log(`start get user ${uid}`);
-    const q = query(collection(db, "users"), where("uid", "==", uid));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
-    });
-    return querySnapshot.docs[0].data();
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      console.log(userSnap.data());
+      return userSnap.data();
+    } else {
+      console.log("Khong tim thay");
+      return null;
+    }
   }
 
   async uploadAvatar(uid, imgUri) {
