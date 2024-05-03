@@ -4,6 +4,7 @@ import UserService from "./services/user";
 import FriendService from "./services/friend";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
+import AppNavigation from "./navigation/appNavigation";
 
 const uid = "lkdfasjlfka";
 
@@ -35,13 +36,14 @@ export default function App() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-red-900">Test User</Text>
-      <Button title="Click me check user" onPress={handlePress}></Button>
-      <Button title="Choose Image" onPress={chooseImage}></Button>
-      {imageUri && (
-        <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
-      )}
-    </View>
+    // <View className="flex-1 items-center justify-center">
+    //   <Text className="text-red-900">Test User</Text>
+    //   <Button title="Click me check user" onPress={handlePress}></Button>
+    //   <Button title="Choose Image" onPress={chooseImage}></Button>
+    //   {imageUri && (
+    //     <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
+    //   )}
+    // </View>
+    <AppNavigation></AppNavigation>
   );
 }
