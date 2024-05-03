@@ -11,12 +11,12 @@ import AppNavigation from "./navigation/appNavigation";
 import { tw } from 'tailwind-rn';
 export default function App() {
   return (
-    // <SafeAreaView style={styles.container}>
-    //   <View style={styles.container}>
-    //     <FriendsScreen></FriendsScreen>
-    //   </View>
-    // </SafeAreaView>
-    <AppNavigation></AppNavigation>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <FriendsScreen></FriendsScreen>
+      </View>
+    </SafeAreaView>
+    // <AppNavigation></AppNavigation>
   );
 }
 

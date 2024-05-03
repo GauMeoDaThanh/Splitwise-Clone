@@ -1,10 +1,32 @@
 import { useNavigation } from "@react-navigation/native";
 import React, {useState} from "react";
 import { Text, TextInput, SafeAreaView, View, TouchableOpacity, Image, ScrollView } from "react-native";
+import AuthenticateService from "../services/authentication";
+import { Alert } from 'react-native';
 
 const SignUpScreen = () => {
     const navigation = useNavigation();
     const [showPassword, setShowPassword] = useState(false);
+    const [name, setName] = useState();
+    const [email, setEmail] = useState();
+    const [password, setPassword] = useState();
+    const handleSignUp = async () => {
+        try {
+            const authenticateService = new AuthenticateService();
+            await authenticateService.handleSignUp(email, password);
+            Alert.alert(
+                'Alert',
+                'Check your authentication email to log in with your registered account',
+                [
+                    { text: 'OK', onPress: () => navigation.navigate('Login') },
+                ]
+            );
+        }
+        catch (e) {
+            console.error("Sign up failed:", error);
+            Alert.alert("Sign up failed:", "An error occurred during sign up.");
+        }
+}
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -22,15 +44,18 @@ const SignUpScreen = () => {
                 <View className ="flex-1 bg-white px-8 pt-8"
                         style = {{borderTopLeftRadius:50, borderTopRightRadius:50}}>
                     <View className="form space-y-2">
-                        <Text className = "text-gray-700 ">Full Name</Text>
+                        <Text className = "text-gray-700 ">Name</Text>
                         <TextInput 
                             className = "p-2 bg-gray-100 text-gray-700 rounded-2xl mb-3"
-                            placeholder="Enter Full Name"
+                            placeholder="Enter Name"
+                            onChangeText={setName}
+
                         />
                         <Text className = "text-gray-700 ">Email Address</Text>
                         <TextInput 
                             className = "p-2 bg-gray-100 text-gray-700 rounded-2xl mb-3"
                             placeholder="Enter Email"
+                            onChangeText={setEmail}
                         />
                         <Text className = "text-gray-700 ">Password</Text>
                         <View className="relative">
@@ -38,6 +63,7 @@ const SignUpScreen = () => {
                                 className = "p-2 bg-gray-100 text-gray-700 rounded-2xl mb-3"
                                 secureTextEntry={!showPassword}
                                 placeholder="Enter Password"
+                                onChangeText={setPassword}
                             />
                             <TouchableOpacity onPress={toggleShowPassword}
                                             style={{position: 'absolute', top: 10, right: 10}}>
@@ -46,14 +72,14 @@ const SignUpScreen = () => {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <Text className = "text-gray-700">Phone</Text>
+                        {/* <Text className = "text-gray-700">Phone</Text>
                         <TextInput 
                             className = "p-2 bg-gray-100 text-gray-700 rounded-2xl mb-8"
                             placeholder="Enter Phone"
-                        />
-                        <TouchableOpacity className = "py-3 rounded-xl" style={{backgroundColor: "#1DC29F"}}>
+                        /> */}
+                        <TouchableOpacity className = "py-3 rounded-xl" style={{backgroundColor: "#1DC29F"}} onPress={handleSignUp}>
                             <Text className = "font-xl font-bold text-center text-gray-700 ml-4">Sign Up</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> 
                     </View>
                     <Text className="text-xl text-gray-700 font-bold text-center py-5">
                         Or

@@ -1,9 +1,28 @@
 import { useNavigation } from "@react-navigation/native";
 import React, {useState} from "react";
-import {Text, TextInput, SafeAreaView, View,TouchableOpacity, Image, ScrollView} from "react-native";
+import { Text, TextInput, SafeAreaView, View, TouchableOpacity, Image, ScrollView } from "react-native";
+import AuthenticateService from "../services/authentication";
+import { sendPasswordResetEmail } from "firebase/auth";
+
+const authenticateService = new AuthenticateService()
 const LoginScreen = () => {
     const navigation = useNavigation();
     const [showPassword, setShowPassword] = useState(false);
+    const [email, setEmail] = React.useState("");
+    const [password, setPassword] = React.useState("");
+
+    const SignIn = () => {
+        authenticateService.handleSignIn(email, password);
+    }
+    const signInWithFacebook = () => {
+        authenticateService.handleSignInWithFacebook();
+    }
+    const signInWithGoogle = () => {
+        authenticateService.handleSignInWithGoogle();
+    }
+    const sendPasswordResetEmail = (email) => {
+        authenticateService.handleSendPasswordReset(email);
+    }
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -25,6 +44,7 @@ const LoginScreen = () => {
                         <TextInput 
                             className = "p-2 bg-gray-100 text-gray-700 rounded-2xl mb-3"
                             placeholder="Enter Email"
+                            onChangeText={setEmail}
                         >
                         </TextInput>
                         <Text className = "text-gray-700 ">Password</Text>
@@ -33,6 +53,7 @@ const LoginScreen = () => {
                                 className = "p-2 bg-gray-100 text-gray-700 rounded-2xl"
                                 secureTextEntry={!showPassword}
                                 placeholder="Enter Password"
+                                onChangeText={setPassword}
                             />
                             <TouchableOpacity onPress={toggleShowPassword}
                                             style={{position: 'absolute', top: 10, right: 10}}>
@@ -41,21 +62,21 @@ const LoginScreen = () => {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity className = "flex items-end mb-5">
+                        <TouchableOpacity className = "flex items-end mb-5" onPress={sendPasswordResetEmail}>
                             <Text className = "text-gray-700 ml-4">Forgot Password?</Text>
                         </TouchableOpacity>
                         <TouchableOpacity 
                             className = "py-3 rounded-xl" style={{backgroundColor: "#1DC29F"}}
-                            onPress={()=>{}}
+                            onPress={SignIn}
                         >
-                            <Text className = "font-xl font-bold text-center text-gray-700 ml-4">Login</Text>
+                            <Text className="font-xl font-bold text-center text-gray-700 ml-4">Login</Text>
                         </TouchableOpacity>
                     </View>
                     <Text className="text-xl text-gray-700 font-bold text-center py-5">
                         Or
                     </Text>
                     <View className = "flex-row justify-center space-x-2">
-                        <TouchableOpacity className = "p-2 bg-gray-100 rounded-2xl mr-6">
+                        <TouchableOpacity className="p-2 bg-gray-100 rounded-2xl mr-6" onPress={signInWithGoogle}>
                             <Image source={require('../assets/icons/google_icon.png')}
                                 style={{width: 30, height: 30}}
                             />
@@ -65,7 +86,7 @@ const LoginScreen = () => {
                                 style={{width: 30, height: 30}}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity className = "p-2 bg-gray-100 rounded-2xl ">
+                        <TouchableOpacity className="p-2 bg-gray-100 rounded-2xl " onPress={signInWithFacebook}>
                             <Image source={require('../assets/icons/facebook_icon.png')}
                                 style={{width: 30, height: 30}}
                             />
