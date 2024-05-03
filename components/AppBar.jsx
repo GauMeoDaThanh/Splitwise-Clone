@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { TouchableOpacity, StyleSheet, Text, View, Image, TextInput } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 
 const AppBar = () => {
   const [searchText, setSearchText] = useState("");
@@ -24,6 +25,11 @@ const AppBar = () => {
 
   const handleBlur = () => {
     setShowSearchInput(false);
+  };
+
+  const navigation = useNavigation();
+  const handleAddFriendPress = () => {
+    navigation.navigate('AddFriendScreen');
   };
 
   return (
@@ -51,7 +57,7 @@ const AppBar = () => {
           onBlur={handleBlur}
         />
       )}
-      <TouchableOpacity style={styles.item}>
+      <TouchableOpacity style={styles.item} onPress={handleAddFriendPress}>
         <Image
           source={{uri: 'https://cdn.iconscout.com/icon/free/png-256/free-add-person-1780869-1514184.png',}}
           style={{width: 26, height: 20, marginHorizontal: 10 }}

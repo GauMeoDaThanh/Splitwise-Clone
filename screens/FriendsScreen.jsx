@@ -19,7 +19,7 @@ const FriendsScreen = (props) => {
   ];
 
   return (
-    <View style={[styles.container, { flex: 100 }]}>
+    <View style={[styles.container, { flex: 100, backgroundColor:'white' }]}>
       <View style={{ flex: 7, borderBottomColor: "#CCCCCC", borderBottomWidth: 1}}>
         <AppBar></AppBar>
       </View>
