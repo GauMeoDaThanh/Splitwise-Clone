@@ -16,8 +16,9 @@ export default function App() {
     // UserService.getInstance().getAvatar(uid);
     // UserService.getInstance().createUser("abc", "Huyen", "huyen1@gmail.com");
 
-    // await FriendService.getInstance().addFriend(uid, "huyen2@gmail.com");
-    FriendService.getInstance().deleteFriend(uid, "abc");
+    await FriendService.getInstance().addFriend(uid, "huyen1@gmail.com");
+    // FriendService.getInstance().deleteFriend(uid, "abc");
+    UserService.getInstance().getUser(uid);
   };
 
   const chooseImage = async () => {
