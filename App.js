@@ -4,7 +4,7 @@ import FriendsScreen from "./screens/FriendsScreen";
 import React from 'react';
 import LoginScreen from "./screens/LoginScreen";
 import SignUpScreen from "./screens/SignUpScreen";
-import AppNavigation from "./navigation/appNavigation";
+import AppNavigation from "./navigation/AppNavigation";
 // import './output.css';
 // import { View, Text } from 'react-native-tailwindcss';
 
