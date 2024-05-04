@@ -52,15 +52,15 @@ export default function App() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-red-900">Test User</Text>
-      <Button title="Click me check user" onPress={handlePress}></Button>
-      <Button title="Choose Image" onPress={chooseImage}></Button>
-      {imageUri && (
-        <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
-      )}
-    </View>
-    // <AppNavigation></AppNavigation>
+    // <View className="flex-1 items-center justify-center">
+    //   <Text className="text-red-900">Test User</Text>
+    //   <Button title="Click me check user" onPress={handlePress}></Button>
+    //   <Button title="Choose Image" onPress={chooseImage}></Button>
+    //   {imageUri && (
+    //     <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
+    //   )}
+    // </View>
+    <AppNavigation></AppNavigation>
     // <SafeAreaView style={styles.container}>
     //   <View style={styles.container}>
     //     <FriendsScreen></FriendsScreen>
