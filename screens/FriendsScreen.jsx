@@ -3,8 +3,10 @@ import { ScrollView, TouchableOpacity, Image, StyleSheet, Text, View } from "rea
 import AppBar from "../components/AppBar";
 import BottomAppBar from "../components/BottomAppBar";
 import CardFriend from "../components/CardFriend";
+import ButtonAddExpense from "../components/ButtonAddExpense";
 
-const FriendsScreen = (props) => {
+
+const FriendsScreen = () => {
    // Danh sách các bạn bè
    const friendsList = [
     { name: "Tấn Dũng", avatar: require("../assets/icons/account.png") },
@@ -18,8 +20,10 @@ const FriendsScreen = (props) => {
     { name: "Jane Doe", avatar: require("../assets/icons/account.png") },
   ];
 
+ 
+
   return (
-    <View style={[styles.container, { flex: 100 }]}>
+    <View style={[styles.container, { flex: 100, backgroundColor:'white', position: 'relative' }]}>
       <View style={{ flex: 7, borderBottomColor: "#CCCCCC", borderBottomWidth: 1}}>
         <AppBar></AppBar>
       </View>
@@ -33,12 +37,16 @@ const FriendsScreen = (props) => {
           </TouchableOpacity>
         </View>
       {/* Danh sách bạn bè */}
-      <View style={{ flex: 70 }}>
+      <View style={{ flex: 70, position: 'relative'}}>
         <ScrollView>
           {friendsList.map((friend, index) => (
             <CardFriend key={index} name={friend.name} avatar={friend.avatar} />
           ))}
         </ScrollView>
+        
+        {/* <TouchableOpacity > */}
+        <ButtonAddExpense ></ButtonAddExpense>
+    {/* </TouchableOpacity> */}
       </View>
       <View style={{ flex: 10, borderTopColor: "#CCCCCC", borderTopWidth: 1 }}>
         <BottomAppBar />

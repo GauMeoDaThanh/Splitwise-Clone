@@ -1,32 +1,29 @@
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
-import FriendsScreen from "./screens/FriendsScreen";
 import React from 'react';
-import LoginScreen from "./screens/LoginScreen";
-import SignUpScreen from "./screens/SignUpScreen";
 import AppNavigation from "./navigation/AppNavigation";
-// import './output.css';
-// import { View, Text } from 'react-native-tailwindcss';
+import { SafeAreaView, View, Dimensions } from 'react-native';
+import AppNavigation from './navigation/AppNavigation';
 
-import { tw } from 'tailwind-rn';
-export default function App() {
+const App = () => {
+  // Lấy kích thước của màn hình thiết bị
+  const screenWidth = Dimensions.get('screen').width;
+  const screenHeight = Dimensions.get('screen').height;
+
+  // Tính toán các style dựa trên kích thước của màn hình
+  const containerStyle = {
+    flex: 1, // Đảm bảo view đầy đủ chiều cao và chiều rộng của màn hình
+    width: screenWidth,
+    height: screenHeight,
+  };
+
   return (
-    // <SafeAreaView style={styles.container}>
-    //   <View style={styles.container}>
-    //     <FriendsScreen></FriendsScreen>
-    //   </View>
-    // </SafeAreaView>
-    <AppNavigation></AppNavigation>
+    <SafeAreaView style={containerStyle}>
+      <View style={containerStyle}>
+        <AppNavigation />
+      </View>
+    </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 100,
-  },
-  innerContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
