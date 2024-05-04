@@ -16,9 +16,10 @@ export default function App() {
     // UserService.getInstance().getAvatar(uid);
     // UserService.getInstance().createUser("abc", "Huyen", "huyen1@gmail.com");
 
-    await FriendService.getInstance().addFriend(uid, "huyen1@gmail.com");
+    // await FriendService.getInstance().addFriend(uid, "ddat828@gmail.com");
+    await FriendService.getInstance().getFriendsAvatarAndName(uid);
     // FriendService.getInstance().deleteFriend(uid, "abc");
-    UserService.getInstance().getUser(uid);
+    // UserService.getInstance().getUser(uid);
   };
 
   const chooseImage = async () => {
