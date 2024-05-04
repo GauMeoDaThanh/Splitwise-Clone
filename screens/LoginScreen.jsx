@@ -41,12 +41,16 @@ const LoginScreen = () => {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity className = "flex items-end mb-5">
+                        <TouchableOpacity 
+                            className = "flex items-end mb-5"
+                            onPress={()=>navigation.navigate("ForgotPassword")}
+                        >
                             <Text className = "text-gray-700 ml-4">Forgot Password?</Text>
                         </TouchableOpacity>
+
                         <TouchableOpacity 
                             className = "py-3 rounded-xl" style={{backgroundColor: "#1DC29F"}}
-                            onPress={()=>{}}
+                            onPress={()=>navigation.navigate('Account')}
                         >
                             <Text className = "font-xl font-bold text-center text-gray-700 ml-4">Login</Text>
                         </TouchableOpacity>
@@ -86,3 +90,4 @@ const LoginScreen = () => {
     );
 };
 export default LoginScreen;
+
