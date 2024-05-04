@@ -1,13 +1,27 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Button, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  Image,
+  SafeAreaView,
+} from "react-native";
 import UserService from "./services/user";
 import FriendService from "./services/friend";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
+import FriendsScreen from "./screens/FriendsScreen";
+import React from "react";
+import LoginScreen from "./screens/LoginScreen";
+import SignUpScreen from "./screens/SignUpScreen";
 import AppNavigation from "./navigation/appNavigation";
+// import './output.css';
+// import { View, Text } from 'react-native-tailwindcss';
 
 const uid = "lkdfasjlfka";
 
+import { tw } from "tailwind-rn";
 export default function App() {
   const [imageUri, setImageUri] = useState(null);
 
@@ -44,6 +58,23 @@ export default function App() {
     //     <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
     //   )}
     // </View>
-    <AppNavigation></AppNavigation>
+    // <AppNavigation></AppNavigation>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <FriendsScreen></FriendsScreen>
+      </View>
+    </SafeAreaView>
+    // <AppNavigation></AppNavigation>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 100,
+  },
+  innerContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
