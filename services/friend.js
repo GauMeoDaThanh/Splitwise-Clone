@@ -54,6 +54,36 @@ class FriendService {
       console.error(e);
     }
   }
+
+  async getFriendsAvatarAndName(uid) {
+    const friendsList = await this.getFriendList(uid);
+    // const friendsData = new Map();
+    if (friendsList) {
+      const friendsData = await Promise.all(
+        friendsList.map(async (friendUid) => {
+          const friendRef = doc(db, "users", friendUid);
+          const friendSnap = await getDoc(friendRef);
+          const friendData = friendSnap.data();
+          return {
+            avatar: friendData.avatarUrl,
+            name: friendData.username,
+          };
+        })
+      );
+      console.log(friendsData);
+      return friendsData;
+    }
+  }
+
+  async getFriendList(uid) {
+    const userRef = doc(db, "users", uid);
+    try {
+      const userSnap = await getDoc(userRef);
+      return userSnap.data().friends;
+    } catch (e) {
+      console.log(e);
+    }
+  }
 }
 
 export default FriendService;
