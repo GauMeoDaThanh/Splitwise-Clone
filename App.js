@@ -26,27 +26,29 @@
 //     justifyContent: 'center',
 //   },
 // });
-import { NavigationContainer } from "@react-navigation/native";
-import AppNavigation from "./navigation/AppNavigation";
-import { SafeAreaView, View, StyleSheet } from "react-native";
+import React from 'react';
+import { SafeAreaView, View, Dimensions } from 'react-native';
+import AppNavigation from './navigation/AppNavigation';
 
-export default function App() {
+const App = () => {
+  // Lấy kích thước của màn hình thiết bị
+  const screenWidth = Dimensions.get('screen').width;
+  const screenHeight = Dimensions.get('screen').height;
+
+  // Tính toán các style dựa trên kích thước của màn hình
+  const containerStyle = {
+    flex: 1, // Đảm bảo view đầy đủ chiều cao và chiều rộng của màn hình
+    width: screenWidth,
+    height: screenHeight,
+  };
+
   return (
-    <SafeAreaView style={styles.container} >
-      <View style={styles.container}>
+    <SafeAreaView style={containerStyle}>
+      <View style={containerStyle}>
         <AppNavigation />
       </View>
     </SafeAreaView>
   );
-}
-const styles = StyleSheet.create({
-  container: {
-    flex: 100,
-    // backgroundColor: 'black',
-  },
-  innerContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+};
+
+export default App;

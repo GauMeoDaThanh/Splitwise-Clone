@@ -1,11 +1,17 @@
 import AddToolBar from "../components/AddToolBar";
-import React, { useState } from "react";
-import { TextInput, View, Text, TouchableOpacity } from "react-native";
+import React, { useState, useEffect  } from "react";
+import { TextInput, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 const AddFriendScreen = (props) => {
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [isFocused, setIsFocused] = useState(0);
+
+  const [isBothFieldsFilled, setIsBothFieldsFilled] = useState(false);
+
+  useEffect(() => {
+    setIsBothFieldsFilled(name !== "" && contact !== "");
+  }, [name, contact]);
 
   const clearName = () => {
     setName("");
@@ -21,22 +27,16 @@ const AddFriendScreen = (props) => {
           navigation={props.navigation}
           title={"Add new contact"}
           action={"Add"}
+          isDisabled={!isBothFieldsFilled}
         ></AddToolBar>
       </View>
       <View style={{ flex: 93, backgroundColor: "white", }}>
         <View style={{ padding: 20 }}>
           <Text style={{ fontSize: 16, fontWeight: 500 }}>Name</Text>
-          <View style={{ flexDirection: "row", alignItems: "center", borderBottomColor: isFocused === 2 ? "#009966" : "black",
+          <View style={{ flexDirection: "row", alignItems: "center", borderBottomColor: isFocused === 2 ? "#009966" : "#999999",
                 borderBottomWidth: 1, }}>
             <TextInput
-              style={{
-                marginTop: 5,
-                marginBottom: 1,
-                paddingVertical: 5,
-                fontSize: 16,
-                fontWeight: 300,
-                width: '96%',
-              }}
+              style={styles.textInputStyle}
               value={name}
               onChangeText={(text) => setName(text)}
               onFocus={() => setIsFocused(2)}
@@ -52,17 +52,10 @@ const AddFriendScreen = (props) => {
         </View>
         <View style={{ padding: 20 }}>
           <Text style={{ fontSize: 16, fontWeight: 500 }}>Phone number or email address</Text>
-          <View style={{ flexDirection: "row", alignItems: "center",  borderBottomColor: isFocused == 1 ? "#009966" : "black",
+          <View style={{ flexDirection: "row", alignItems: "center",  borderBottomColor: isFocused == 1 ? "#009966" : "#999999",
                 borderBottomWidth: 1, }}>
             <TextInput
-              style={{
-                marginTop: 5,
-                marginBottom: 1,
-                paddingVertical: 5,
-                fontSize: 16,
-                fontWeight: 300,
-                width: '96%',
-              }}
+              style={styles.textInputStyle}
               value={contact}
               onChangeText={(text) => setContact(text)}
               onFocus={() => setIsFocused(1)}
@@ -89,3 +82,13 @@ const AddFriendScreen = (props) => {
 };
 
 export default AddFriendScreen;
+const styles = StyleSheet.create({
+  textInputStyle:{
+    marginTop: 5,
+    marginBottom: 1,
+    paddingVertical: 5,
+    fontSize: 16,
+    fontWeight: 300,
+    width: '96%',
+  },
+});
