@@ -2,6 +2,18 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswor
 import { auth } from "../firebaseConfig";
 
 class AuthenticateService {
+    constructor() {
+        if (AuthenticateService.instance == null) {
+            AuthenticateService.instance = this;
+        }
+        return AuthenticateService.instance;
+    }
+    static getInstance() {
+        if (!AuthenticateService.instance) {
+            AuthenticateService.instance = new AuthenticateService();
+        }
+        return AuthenticateService.instance;
+    }
     async handleSignUp(email, password) {
         const userCredential = await createUserWithEmailAndPassword(
             auth,

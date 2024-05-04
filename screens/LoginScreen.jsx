@@ -4,7 +4,7 @@ import { Text, TextInput, SafeAreaView, View, TouchableOpacity, Image, ScrollVie
 import AuthenticateService from "../services/authentication";
 import { sendPasswordResetEmail } from "firebase/auth";
 
-const authenticateService = new AuthenticateService()
+const authenticateService = AuthenticateService.getInstance();
 const LoginScreen = () => {
     const navigation = useNavigation();
     const [showPassword, setShowPassword] = useState(false);
@@ -76,7 +76,7 @@ const LoginScreen = () => {
                         Or
                     </Text>
                     <View className = "flex-row justify-center space-x-2">
-                        <TouchableOpacity className="p-2 bg-gray-100 rounded-2xl mr-6" onPress={()=>{signInWithGoogle;}}>
+                        <TouchableOpacity className="p-2 bg-gray-100 rounded-2xl mr-6">
                             <Image source={require('../assets/icons/google_icon.png')}
                                 style={{width: 30, height: 30}}
                             />
@@ -86,7 +86,7 @@ const LoginScreen = () => {
                                 style={{width: 30, height: 30}}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity className="p-2 bg-gray-100 rounded-2xl " onPress={signInWithFacebook}>
+                        <TouchableOpacity className="p-2 bg-gray-100 rounded-2xl ">
                             <Image source={require('../assets/icons/facebook_icon.png')}
                                 style={{width: 30, height: 30}}
                             />
