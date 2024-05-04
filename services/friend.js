@@ -57,7 +57,6 @@ class FriendService {
 
   async getFriendsAvatarAndName(uid) {
     const friendsList = await this.getFriendList(uid);
-    // const friendsData = new Map();
     if (friendsList) {
       const friendsData = await Promise.all(
         friendsList.map(async (friendUid) => {

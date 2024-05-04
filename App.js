@@ -30,9 +30,10 @@ export default function App() {
     // UserService.getInstance().setUsername(uid, username);
     // UserService.getInstance().getAvatar(uid);
     // UserService.getInstance().createUser("abc", "Huyen", "huyen1@gmail.com");
-
     // await FriendService.getInstance().addFriend(uid, "ddat828@gmail.com");
-    await FriendService.getInstance().getFriendsAvatarAndName(uid);
+    const friendsData =
+      await FriendService.getInstance().getFriendsAvatarAndName(uid);
+    console.log(friendsData[1]["name"]);
     // FriendService.getInstance().deleteFriend(uid, "abc");
     // UserService.getInstance().getUser(uid);
   };
@@ -51,20 +52,20 @@ export default function App() {
   };
 
   return (
-    // <View className="flex-1 items-center justify-center">
-    //   <Text className="text-red-900">Test User</Text>
-    //   <Button title="Click me check user" onPress={handlePress}></Button>
-    //   <Button title="Choose Image" onPress={chooseImage}></Button>
-    //   {imageUri && (
-    //     <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
-    //   )}
-    // </View>
+    <View className="flex-1 items-center justify-center">
+      <Text className="text-red-900">Test User</Text>
+      <Button title="Click me check user" onPress={handlePress}></Button>
+      <Button title="Choose Image" onPress={chooseImage}></Button>
+      {imageUri && (
+        <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
+      )}
+    </View>
     // <AppNavigation></AppNavigation>
-    <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
-        <FriendsScreen></FriendsScreen>
-      </View>
-    </SafeAreaView>
+    // <SafeAreaView style={styles.container}>
+    //   <View style={styles.container}>
+    //     <FriendsScreen></FriendsScreen>
+    //   </View>
+    // </SafeAreaView>
     // <AppNavigation></AppNavigation>
   );
 }
