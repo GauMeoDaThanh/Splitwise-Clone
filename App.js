@@ -1,9 +1,7 @@
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import React from 'react';
 import AppNavigation from "./navigation/AppNavigation";
 import { SafeAreaView, View, Dimensions } from 'react-native';
-import AppNavigation from './navigation/AppNavigation';
 
 const App = () => {
   // Lấy kích thước của màn hình thiết bị
