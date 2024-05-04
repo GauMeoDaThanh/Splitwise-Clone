@@ -1,7 +1,6 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, signInWithRedirect} from "firebase/auth";
-import { GoogleAuthProvider } from 'firebase/auth';
-import { signInWithPopup } from "firebase/auth";
-import { auth } from "../firebaseConfig"
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification} from "firebase/auth";
+import { auth } from "../firebaseConfig";
+
 class AuthenticateService {
     async handleSignUp(email, password) {
         const userCredential = await createUserWithEmailAndPassword(
@@ -36,20 +35,6 @@ class AuthenticateService {
             alert("Login failed");
         }
     }
-
-    // async handleSignInWithGoogle() {
-    //     try {
-    //         const provider = new GoogleAuthProvider();
-    //         await signInWithRedirect(auth, provider);
-    //         // Không cần log gì ở đây vì sẽ không có kết quả trả về ngay khi sử dụng signInWithRedirect
-
-    //         // Bạn có thể log thông điệp chờ đợi ở đây nếu cần
-    //         console.log("Chuyển hướng đến trang đăng nhập của Google...");
-    //     } catch (error) {
-    //         // Xử lý lỗi
-    //         console.error("Lỗi đăng nhập:", error.message);
-    //     }
-    // }
 
     async handleSendPasswordReset(email) {
         try {

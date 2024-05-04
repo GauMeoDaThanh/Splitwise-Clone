@@ -14,12 +14,12 @@ const LoginScreen = () => {
     const SignIn = () => {
         authenticateService.handleSignIn(email, password);
     }
-    const signInWithFacebook = () => {
-        authenticateService.handleSignInWithFacebook();
-    }
-    const signInWithGoogle = () => {
-        authenticateService.handleSignInWithGoogle();
-    }
+    // const signInWithFacebook = () => {
+    //     authenticateService.handleSignInWithFacebook();
+    // }
+    // const signInWithGoogle = () => {
+    //     authenticateService.handleSignInWithGoogle;
+    // }
     const sendPasswordResetEmail = (email) => {
         authenticateService.handleSendPasswordReset(email);
     }
@@ -76,7 +76,7 @@ const LoginScreen = () => {
                         Or
                     </Text>
                     <View className = "flex-row justify-center space-x-2">
-                        <TouchableOpacity className="p-2 bg-gray-100 rounded-2xl mr-6" onPress={signInWithGoogle}>
+                        <TouchableOpacity className="p-2 bg-gray-100 rounded-2xl mr-6" onPress={()=>{signInWithGoogle;}}>
                             <Image source={require('../assets/icons/google_icon.png')}
                                 style={{width: 30, height: 30}}
                             />
