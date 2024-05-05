@@ -6,10 +6,18 @@ const renderColoredText = (text) => {
   return (
     <Text>
       {parts.map((part, index) => {
-        if (part === 'owes') {
-          return <Text key={index} style={{ color: 'green' }}>{part}</Text>;
-        } else if (part === 'owe') {
-          return <Text key={index} style={{ color: 'red' }}>{part}</Text>;
+        if (part === "owes") {
+          return (
+            <Text key={index} style={{ color: "green" }}>
+              {part}
+            </Text>
+          );
+        } else if (part === "owe") {
+          return (
+            <Text key={index} style={{ color: "red" }}>
+              {part}
+            </Text>
+          );
         } else {
           return <Text key={index}>{part}</Text>;
         }
@@ -30,7 +38,11 @@ const CardFriend = (props) => {
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Image
-          source={require("../assets/icons/account.png")}
+          source={
+            props.avatar
+              ? { uri: props.avatar }
+              : require("../assets/icons/account.png")
+          }
           style={{ width: 40, height: 40, borderRadius: 20 }}
         />
         <View style={{ paddingHorizontal: 20, width: "68%" }}>
@@ -65,27 +77,27 @@ const CardFriend = (props) => {
           <Text style={{ justifyContent: "center", textAlign: 'right', color: '#990000', fontWeight: 500 }}>35.000 đồng</Text> */}
         </View>
       </View>
-      <View style={{ paddingStart: 60, marginTop: 10}}>
-          <Text
-            style={{
-              justifyContent: "center",
-              textAlign: "left",
-              paddingVertical: 6,
-              color: "#777777",
-            }}
-          >
-            {renderColoredText("Tan Dung owes you 35.000 đồng")}
-          </Text>
-          <Text
-            style={{
-              justifyContent: "center",
-              textAlign: "left",
-              paddingVertical: 6,
-              color: "#777777",
-            }}
-          >
-            {renderColoredText("You owe Tan Dung 35.000 đồng")}
-          </Text>
+      <View style={{ paddingStart: 60, marginTop: 10 }}>
+        <Text
+          style={{
+            justifyContent: "center",
+            textAlign: "left",
+            paddingVertical: 6,
+            color: "#777777",
+          }}
+        >
+          {renderColoredText("Tan Dung owes you 35.000 đồng")}
+        </Text>
+        <Text
+          style={{
+            justifyContent: "center",
+            textAlign: "left",
+            paddingVertical: 6,
+            color: "#777777",
+          }}
+        >
+          {renderColoredText("You owe Tan Dung 35.000 đồng")}
+        </Text>
       </View>
     </TouchableOpacity>
   );

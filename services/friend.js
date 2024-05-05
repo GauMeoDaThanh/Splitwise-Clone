@@ -69,7 +69,6 @@ class FriendService {
           };
         })
       );
-      console.log(friendsData);
       return friendsData;
     }
   }
