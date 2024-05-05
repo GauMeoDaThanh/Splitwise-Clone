@@ -2,7 +2,6 @@ import { useNavigation } from "@react-navigation/native";
 import React, {useState} from "react";
 import {Text, TextInput, SafeAreaView, View,TouchableOpacity, Image, ScrollView} from "react-native";
 const AccountScreen = () => {
-    const navigation = useNavigation();
     return(
         <ScrollView >
             <View className ="flex-1 bg-white" >
