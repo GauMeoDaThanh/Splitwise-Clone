@@ -12,6 +12,18 @@ import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 class AuthenticateService {
+  constructor() {
+    if (AuthenticateService.instance == null) {
+      AuthenticateService.instance = this;
+    }
+    return AuthenticateService.instance;
+  }
+  static getInstance() {
+    if (!AuthenticateService.instance) {
+        AuthenticateService.instance = new AuthenticateService();
+    }
+    return AuthenticateService.instance;
+  }
   async handleSignUpAndCreateUser(email, password, userName) {
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -92,7 +104,6 @@ class AuthenticateService {
 
   async handleSendPasswordReset(email) {
     try {
-      email = "ddat828@gmail.com";
       await sendPasswordResetEmail(auth, email);
       alert("Check your email to reset your password");
     } catch (err) {
