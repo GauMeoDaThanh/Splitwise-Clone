@@ -10,7 +10,6 @@ import {
   ScrollView,
 } from "react-native";
 import AuthenticateService from "../services/authentication";
-import { sendPasswordResetEmail } from "firebase/auth";
 
 const authenticateService = AuthenticateService.getInstance();
 const LoginScreen = () => {
