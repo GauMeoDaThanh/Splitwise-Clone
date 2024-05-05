@@ -24,9 +24,9 @@ const SignUpScreen = () => {
       await authenticateService.handleSignUpAndCreateUser(
         email,
         password,
-        name
+        name,
+        navigation
       );
-      navigation.navigate("Login");
     } catch (e) {
       console.error("Sign up failed:", error);
       Alert.alert("Sign up failed:", "An error occurred during sign up.");

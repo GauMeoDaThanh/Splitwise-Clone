@@ -12,7 +12,20 @@ import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 class AuthenticateService {
-  async handleSignUpAndCreateUser(email, password, userName) {
+  constructor() {
+    if (AuthenticateService.instance == null) {
+      AuthenticateService.instance = this;
+    }
+    return AuthenticateService.instance;
+  }
+  static getInstance() {
+    if (!AuthenticateService.instance) {
+      AuthenticateService.instance = new AuthenticateService();
+    }
+    return AuthenticateService.instance;
+  }
+
+  async handleSignUpAndCreateUser(email, password, userName, navigation) {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -30,6 +43,7 @@ class AuthenticateService {
         userName,
         user.email
       );
+      navigation.navigate("Login");
     } catch (e) {
       switch (e.code) {
         case "auth/email-already-in-use":
@@ -63,7 +77,7 @@ class AuthenticateService {
       const user = userCredential.user;
       if (user.emailVerified) {
         //   Đến home
-        navigation.navigate("FriendsScreen");
+        navigation.navigate("Account");
         console.log("Login successfully!");
       } else {
         // Email chưa được xác nhận
@@ -90,11 +104,16 @@ class AuthenticateService {
   // }
   // }
 
-  async handleSendPasswordReset(email) {
+  async handleSendPasswordReset(email, navigation) {
     try {
-      email = "ddat828@gmail.com";
-      await sendPasswordResetEmail(auth, email);
-      alert("Check your email to reset your password");
+      userId = await UserService.getInstance().getUserIDWithMail(email);
+      if (userId != null) {
+        await sendPasswordResetEmail(auth, email);
+        alert("Check your email to reset your password");
+      } else {
+        alert("Email does not exist ");
+      }
+      navigation.navigate("Login");
     } catch (err) {
       console.error(err);
       alert(err.message);
