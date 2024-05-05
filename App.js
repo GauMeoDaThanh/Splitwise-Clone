@@ -1,24 +1,27 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import LoginScreen from "./screens/LoginScreen";
-import SignUpScreen from "./screens/SignUpScreen";
-import AppNavigation from "./navigation/appNavigation";
+import React from "react";
+import AppNavigation from "./navigation/AppNavigation";
+import { SafeAreaView, View, Dimensions } from "react-native";
 
-export default function App() {
-  return <AppNavigation></AppNavigation>;
-}
+const App = () => {
+  // Lấy kích thước của màn hình thiết bị
+  const screenWidth = Dimensions.get("screen").width;
+  const screenHeight = Dimensions.get("screen").height;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+  // Tính toán các style dựa trên kích thước của màn hình
+  const containerStyle = {
+    flex: 1, // Đảm bảo view đầy đủ chiều cao và chiều rộng của màn hình
+    width: screenWidth,
+    height: screenHeight,
+  };
+
+  return (
+    <SafeAreaView style={containerStyle}>
+      <View style={containerStyle}>
+        <AppNavigation />
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default App;

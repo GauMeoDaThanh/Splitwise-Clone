@@ -3,11 +3,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
+import AppBar from "../components/AppBar";
+import AddFriendScreen from "../screens/AddFriendScreen";
+import FriendsScreen from "../screens/FriendsScreen";
+import AddExpenseScreen from "../screens/AddExpenseScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import AccountScreen from "../screens/AccountScreen";
-import Home from "../screens/Home";
-const Stack = createNativeStackNavigator();
 
+const Stack = createNativeStackNavigator();
 const AppNavigation = () => {
   return (
     <NavigationContainer>
@@ -20,6 +23,21 @@ const AppNavigation = () => {
         <Stack.Screen
           name="SignUp"
           component={SignUpScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddFriendScreen"
+          component={AddFriendScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="FriendsScreen"
+          component={FriendsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddExpenseScreen"
+          component={AddExpenseScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

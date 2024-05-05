@@ -96,12 +96,7 @@ export default CardFriend;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: "green",
-    // borderColor: "red",
-    // alignItems: "center",
-    // justifyContent: "center",
     paddingHorizontal: 16,
     paddingVertical: 10,
-    // height: 70,
   },
 });
