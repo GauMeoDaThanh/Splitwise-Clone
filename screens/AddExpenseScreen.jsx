@@ -53,7 +53,8 @@ const AddExpenseScreen = (props) => {
         ]}
       >
         <Text>With</Text>
-        <Text style={{fontWeight: 600, fontSize: 16}}> you </Text>
+        {/* <Text style={{fontWeight: 600, fontSize: 16}}> you </Text> */}
+        <Text style={{ fontSize: 16 }}> you </Text>
         <Text style={{ marginEnd: 10 }}>and:</Text>
         <TextInput
           placeholder="Enter email, name or group"
@@ -61,7 +62,7 @@ const AddExpenseScreen = (props) => {
           style={{
             width: "70%",
             fontSize: 16,
-            fontWeight: 400,
+            // fontWeight: 400,
             height: "60%",
           }}
         ></TextInput>
@@ -85,7 +86,10 @@ const AddExpenseScreen = (props) => {
           </TouchableOpacity>
           <TextInput
             placeholder="Enter a description"
-            style={[styles.textInputStyle, {borderBottomColor: isFocused ===1 ?  "#009966" : "#999999",}]}
+            style={[
+              styles.textInputStyle,
+              { borderBottomColor: isFocused === 1 ? "#009966" : "#999999" },
+            ]}
             value={description}
             onChangeText={(text) => setDescription(text)}
             onFocus={() => setIsFocused(1)}
@@ -102,7 +106,10 @@ const AddExpenseScreen = (props) => {
           <TextInput
             placeholder="0 đồng"
             keyboardType="numeric"
-            style={[styles.textInputStyle, {borderBottomColor: isFocused ===2 ?  "#009966" : "#999999",}]}
+            style={[
+              styles.textInputStyle,
+              { borderBottomColor: isFocused === 2 ? "#009966" : "#999999" },
+            ]}
             value={money}
             onChangeText={(text) => setMoney(text)}
             onFocus={() => setIsFocused(2)}
@@ -122,7 +129,9 @@ const AddExpenseScreen = (props) => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={[{ flex: 10, borderTopColor:'#EEEEEE', borderTopWidth: 1 }]}></View>
+      <View
+        style={[{ flex: 10, borderTopColor: "#EEEEEE", borderTopWidth: 1 }]}
+      ></View>
       <View style={[{ flex: 36 }]}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -142,12 +151,11 @@ const AddExpenseScreen = (props) => {
 export default AddExpenseScreen;
 const styles = StyleSheet.create({
   textInputStyle: {
-    
     borderBottomWidth: 1,
     width: "60%",
     marginHorizontal: 10,
     fontSize: 18,
-    fontWeight: 600,
+    // fontWeight: 600,
   },
   buttonStyle: {
     borderColor: "#EEEEEE",
