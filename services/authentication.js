@@ -77,7 +77,8 @@ class AuthenticateService {
       const user = userCredential.user;
       if (user.emailVerified) {
         //   Đến home
-        navigation.navigate("FriendsScreen");
+        // navigation.navigate("FriendsScreen");
+        navigation.navigate("test screen");
         console.log("Login successfully!");
       } else {
         // Email chưa được xác nhận

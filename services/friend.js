@@ -1,4 +1,4 @@
-import { db } from "../firebaseConfig";
+import { db, USER_COLLECTION } from "../firebaseConfig";
 import UserService from "./user";
 import {
   collection,
@@ -31,7 +31,7 @@ class FriendService {
   async addFriend(uid, fMail) {
     const friendUid = await UserService.getInstance().getUserIDWithMail(fMail);
     if (friendUid) {
-      const userRef = doc(db, "users", uid);
+      const userRef = doc(db, USER_COLLECTION, uid);
       try {
         await updateDoc(userRef, {
           friends: arrayUnion(friendUid),
@@ -45,7 +45,7 @@ class FriendService {
   }
 
   async deleteFriend(uid, friendUid) {
-    const userRef = doc(db, "users", uid);
+    const userRef = doc(db, USER_COLLECTION, uid);
     try {
       await updateDoc(userRef, {
         friends: arrayRemove(friendUid),
@@ -60,7 +60,7 @@ class FriendService {
     if (friendsList) {
       const friendsData = await Promise.all(
         friendsList.map(async (friendUid) => {
-          const friendRef = doc(db, "users", friendUid);
+          const friendRef = doc(db, USER_COLLECTION, friendUid);
           const friendSnap = await getDoc(friendRef);
           const friendData = friendSnap.data();
           return {
@@ -74,7 +74,7 @@ class FriendService {
   }
 
   async getFriendList(uid) {
-    const userRef = doc(db, "users", uid);
+    const userRef = doc(db, USER_COLLECTION, uid);
     try {
       const userSnap = await getDoc(userRef);
       return userSnap.data().friends;

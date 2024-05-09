@@ -4,6 +4,7 @@ import AuthenticateService from "../services/authentication";
 import { useNavigation } from "@react-navigation/native";
 import { auth } from "../firebaseConfig";
 import UserService from "../services/user";
+import GroupService from "../services/group";
 
 const Home = () => {
   const [userInfo, setUserInfo] = React.useState(null);
@@ -13,7 +14,6 @@ const Home = () => {
   React.useEffect(() => {
     const fetchUserInfo = async () => {
       const user = auth.currentUser;
-      console.log(user.uid);
       const userInfo = await UserService.getInstance().getUser(user.uid);
       setUserInfo(userInfo.username);
     };
@@ -25,9 +25,23 @@ const Home = () => {
     authenticateService.handleSignOut(navigation);
   };
 
+  const handleAction = () => {
+    const listUserId = ["abc", "lkdfasjlfka"];
+    GroupService.getInstance().addGroup(
+      "kinh phi cho pbl",
+      listUserId,
+      "hoc tap"
+    );
+  };
+
   return (
     <View className="flex-1 items-center justify-center">
       <Text className=" text-blue-700">{userInfo}</Text>
+      <Button
+        className="bg-purple-600"
+        title="Action"
+        onPress={handleAction}
+      ></Button>
       <Button title="Log out" onPress={handleLogOut}></Button>
     </View>
   );
