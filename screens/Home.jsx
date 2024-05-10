@@ -4,6 +4,7 @@ import AuthenticateService from "../services/authentication";
 import { useNavigation } from "@react-navigation/native";
 import { auth } from "../firebaseConfig";
 import UserService from "../services/user";
+import ActivityService from "../services/activity";
 import GroupService from "../services/group";
 
 const Home = () => {
@@ -27,11 +28,12 @@ const Home = () => {
 
   const handleAction = () => {
     const listUserId = ["abc", "lkdfasjlfka"];
-    GroupService.getInstance().addGroup(
-      "kinh phi cho pbl",
-      listUserId,
-      "hoc tap"
-    );
+    // GroupService.getInstance().addGroup(
+    //   "kinh phi cho pbl",
+    //   listUserId,
+    //   "hoc tap"
+    // );
+    ActivityService.getInstance().getUserActivities();
   };
 
   return (
