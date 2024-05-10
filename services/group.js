@@ -1,4 +1,5 @@
 import { db, storage, auth, GROUP_COLLECTION } from "../firebaseConfig";
+import ActivityService from "./activity";
 import {
   addDoc,
   collection,
@@ -52,6 +53,11 @@ class GroupService {
     try {
       const groupRef = await addDoc(collection(db, GROUP_COLLECTION), group);
       console.log("Document written with ID: ", groupRef.id);
+      ActivityService.getInstance().aCreateGroup(
+        groupRef.id,
+        group["name"],
+        group["members"]
+      );
     } catch (e) {
       console.log(e);
     }
@@ -132,8 +138,6 @@ class GroupService {
       console.error(e);
     }
   }
-
-  async getGroupExpense() {}
 }
 
 export default GroupService;
