@@ -50,7 +50,7 @@ const LoginScreen = () => {
 
                         <TouchableOpacity 
                             className = "py-3 rounded-xl" style={{backgroundColor: "#1DC29F"}}
-                            onPress={()=>navigation.navigate('Account')}
+                            onPress={()=>navigation.navigate('Friends')}
                         >
                             <Text className = "font-xl font-bold text-center text-gray-700 ml-4">Login</Text>
                         </TouchableOpacity>

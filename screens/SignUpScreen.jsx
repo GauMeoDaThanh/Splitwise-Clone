@@ -46,11 +46,6 @@ const SignUpScreen = () => {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <Text className = "text-gray-700">Phone</Text>
-                        <TextInput 
-                            className = "p-2 bg-gray-100 text-gray-700 rounded-2xl mb-8"
-                            placeholder="Enter Phone"
-                        />
                         <TouchableOpacity className = "py-3 rounded-xl" style={{backgroundColor: "#1DC29F"}}>
                             <Text className = "font-xl font-bold text-center text-gray-700 ml-4">Sign Up</Text>
                         </TouchableOpacity>
