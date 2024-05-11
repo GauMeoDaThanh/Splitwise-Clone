@@ -1,22 +1,32 @@
 import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
 const AddToolBar = (props) => {
   return (
-    <View
-        style = {[
-          styles.container,
-          {borderBottomColor:'#EEEEEE', borderBottomWidth: 1}
-        ]}
-    >
-      <TouchableOpacity onPress={() => props.navigation.goBack()}>
-        <Text style = {{color: '#009966', fontWeight: '500', fontSize: 16}} >
-          Cancel
-        </Text>
-      </TouchableOpacity>
-      <Text style = {{fontWeight: '500', fontSize: 16}}>{props.title}</Text>
-      <TouchableOpacity>
-        <Text style = {{fontWeight: '500', fontSize: 16, color: props.isDisabled ? '#999999' : '#009966'}}>{props.action}</Text>
-      </TouchableOpacity>
-    </View>
+      <View
+          style={[
+              styles.container,
+              { borderBottomColor: "#EEEEEE", borderBottomWidth: 1 },
+          ]}
+      >
+          <TouchableOpacity onPress={() => props.navigation.goBack()}>
+              <Text
+                  style={{ color: "#009966", fontWeight: "500", fontSize: 16 }}
+              >
+                  Cancel
+              </Text>
+          </TouchableOpacity>
+          <Text style={{ fontWeight: "500", fontSize: 16 }}>{props.title}</Text>
+          <TouchableOpacity onPress={props.onPress}>
+              <Text
+                  style={{
+                      fontWeight: "500",
+                      fontSize: 16,
+                      color: props.isDisabled ? "#999999" : "#009966",
+                  }}
+              >
+                  {props.action}
+              </Text>
+          </TouchableOpacity>
+      </View>
   );
 };
 export default AddToolBar;

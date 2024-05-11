@@ -8,126 +8,134 @@ import { GoogleAuthProvider } from "firebase/auth";
 import { signInWithPopup } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import UserService from "./user";
-import { Alert } from "react-native";
+import { Alert, useState} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
+
+
 class AuthenticateService {
-  constructor() {
-    if (AuthenticateService.instance == null) {
-      AuthenticateService.instance = this;
+    constructor() {
+        if (AuthenticateService.instance == null) {
+            AuthenticateService.instance = this;
+            this.state = { idAcc: "" };
+        }
+        return AuthenticateService.instance;
     }
-    return AuthenticateService.instance;
-  }
-  static getInstance() {
-    if (!AuthenticateService.instance) {
-      AuthenticateService.instance = new AuthenticateService();
+    static getInstance() {
+        if (!AuthenticateService.instance) {
+            AuthenticateService.instance = new AuthenticateService();
+        }
+        return AuthenticateService.instance;
     }
-    return AuthenticateService.instance;
-  }
 
-  async handleSignUpAndCreateUser(email, password, userName, navigation) {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-      await sendEmailVerification(user);
-      Alert.alert(
-        "Alert",
-        "Check your authentication email to log in with your registered account"
-      );
-      await UserService.getInstance().createUser(
-        user.uid,
-        userName,
-        user.email
-      );
-      navigation.navigate("Login");
-    } catch (e) {
-      switch (e.code) {
-        case "auth/email-already-in-use":
-          alert(`Email address ${email} already in use.`);
-          break;
-        case "auth/invalid-email":
-          alert(`Email address ${email} is invalid.`);
-          break;
-        case "auth/operation-not-allowed":
-          alert(`Error during sign up.`);
-          break;
-        case "auth/weak-password":
-          alert(
-            "Password is not strong enough. Add additional characters including special characters and numbers."
-          );
-          break;
-        default:
-          alert(e.message);
-          break;
-      }
+    async handleSignUpAndCreateUser(email, password, userName, navigation) {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            const user = userCredential.user;
+            await sendEmailVerification(user);
+            Alert.alert(
+                "Alert",
+                "Check your authentication email to log in with your registered account"
+            );
+            await UserService.getInstance().createUser(
+                user.uid,
+                userName,
+                user.email
+            );
+            navigation.navigate("Login");
+        } catch (e) {
+            switch (e.code) {
+                case "auth/email-already-in-use":
+                    alert(`Email address ${email} already in use.`);
+                    break;
+                case "auth/invalid-email":
+                    alert(`Email address ${email} is invalid.`);
+                    break;
+                case "auth/operation-not-allowed":
+                    alert(`Error during sign up.`);
+                    break;
+                case "auth/weak-password":
+                    alert(
+                        "Password is not strong enough. Add additional characters including special characters and numbers."
+                    );
+                    break;
+                default:
+                    alert(e.message);
+                    break;
+            }
+        }
     }
-  }
 
-  async handleSignIn(email, password, navigation) {
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-      if (user.emailVerified) {
-        //   Đến home
-        navigation.navigate("FriendsScreen");
-        console.log("Login successfully!");
-      } else {
-        // Email chưa được xác nhận
-        alert(
-          "Email has not been verified yet. Please verify your email before logging in."
-        );
-      }
-    } catch (error) {
-      console.log("Login failed: ", error);
-      alert("Login failed");
+    async handleSignIn(email, password, navigation) {
+        try {
+            const userCredential = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            const user = userCredential.user;
+            if (user.emailVerified) {
+                //   Đến home
+                this.state.idAcc = user.uid; // Update state
+                navigation.navigate("FriendsScreen");
+                console.log("Login successfully!");
+            } else {
+                // Email chưa được xác nhận
+                alert(
+                    "Email has not been verified yet. Please verify your email before logging in."
+                );
+            }
+        } catch (error) {
+            console.log("Login failed: ", error);
+            alert("Login failed");
+        }
     }
-  }
-
-  // async handleSignInWithGoogle() {
-  //     try {
-  //         const provider = new GoogleAuthProvider();
-  //         console.log(provider);
-  //     const result = await signInWithPopup(auth, provider);
-  //     // Xử lý đăng nhập thành công
-  //     console.log('Người dùng đã đăng nhập thành công:', result.user);
-  // } catch (error) {
-  //     // Xử lý lỗi
-  //     console.error('Lỗi đăng nhập:', error.message);
-  // }
-  // }
-
-  async handleSendPasswordReset(email, navigation) {
-    try {
-      userId = await UserService.getInstance().getUserIDWithMail(email);
-      if (userId != null) {
-        await sendPasswordResetEmail(auth, email);
-        alert("Check your email to reset your password");
-      } else {
-        alert("Email does not exist ");
-      }
-      navigation.navigate("Login");
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
+  // Lấy id account hiện tại
+     get idAcc() {
+        return this.state.idAcc; // Return value of idAcc from state
     }
-  }
 
-  async handleSignOut(navigate) {
-    try {
-      await auth.signOut();
-      navigate.navigate("Login");
-      console.log("Sign out successfully!");
-    } catch (error) {
-      console.log("Sign out failed: ", error);
+    // async handleSignInWithGoogle() {
+    //     try {
+    //         const provider = new GoogleAuthProvider();
+    //         console.log(provider);
+    //     const result = await signInWithPopup(auth, provider);
+    //     // Xử lý đăng nhập thành công
+    //     console.log('Người dùng đã đăng nhập thành công:', result.user);
+    // } catch (error) {
+    //     // Xử lý lỗi
+    //     console.error('Lỗi đăng nhập:', error.message);
+    // }
+    // }
+
+    async handleSendPasswordReset(email, navigation) {
+        try {
+            userId = await UserService.getInstance().getUserIDWithMail(email);
+            if (userId != null) {
+                await sendPasswordResetEmail(auth, email);
+                alert("Check your email to reset your password");
+            } else {
+                alert("Email does not exist ");
+            }
+            navigation.navigate("Login");
+        } catch (err) {
+            console.error(err);
+            alert(err.message);
+        }
     }
-  }
+
+    async handleSignOut(navigate) {
+        try {
+            await auth.signOut();
+            navigate.navigate("Login");
+            console.log("Sign out successfully!");
+        } catch (error) {
+            console.log("Sign out failed: ", error);
+        }
+    }
 }
 export default AuthenticateService;
