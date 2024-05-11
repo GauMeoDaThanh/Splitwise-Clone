@@ -12,6 +12,7 @@ import {Text, TextInput, SafeAreaView, View,TouchableOpacity, Image, ScrollView}
 import FriendsScreen from '../screens/tabs/FriendsScreen';
 import GroupsScreen from '../screens/tabs/GroupsScreen';
 import ActivityScreen from '../screens/tabs/ActivityScreen';
+import EditAccountScreen from '../screens/EditAccountScreen';
 
 const AppNavigation = () => {
   return (
@@ -37,17 +38,37 @@ const AppNavigation = () => {
                 component={TabNavigator}
                 options={{ headerShown: false }}
             />
+
         </Stack.Navigator>
     </NavigationContainer>
   );
+};
+
+const AccountStack = createNativeStackNavigator();
+
+const AccountStackScreen = () => {
+    return (
+        <AccountStack.Navigator>
+        <AccountStack.Screen 
+            name="Account" 
+            component={AccountScreen} 
+            options={{ headerShown: false }} 
+        />
+        <AccountStack.Screen 
+            name="EditAccount" 
+            component={EditAccountScreen} 
+            options={{ headerShown: false }} 
+        />
+        </AccountStack.Navigator>
+    );
 };
 
 const TabNavigator = () => {
     return (
         <Tab.Navigator initialRouteName='Friends'
             screenOptions={{
-                tabBarStyle:{
-                    position:'absolute',
+                tabBarStyle: {
+                    position: 'absolute',
                     borderRadius: 15,
                     left: 10,
                     right: 10,
@@ -60,54 +81,52 @@ const TabNavigator = () => {
                     marginBottom: 3,
                     fontWeight: 'bold'
                 },
-                tabBarInactiveTintColor: 'gray', 
-                tabBarActiveTintColor: '#0B9D7E',
+                    tabBarInactiveTintColor: 'gray', 
+                    tabBarActiveTintColor: '#0B9D7E'
             }}
-        >
+            >
             <Tab.Screen
                 name='Groups'
                 component={GroupsScreen}
                 options={{
-                    title: 'Groups',
-                    tabBarIcon: ({ focused }) => {
-                        return <Image source={require('../assets/icons/groups_icon.png')} style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray' }} />;
-                    }
+                tabBarIcon: ({ focused }) => {
+                    return <Image source={require('../assets/icons/groups_icon.png')} style={{ width: 25, height: 25, tintColor: focused ? '#0B9D7E' : 'gray' }} />;
+                },
+                    headerShown: false
                 }}
             />
             <Tab.Screen
                 name='Friends'
                 component={FriendsScreen}
                 options={{
-                    title: 'Friends',
-                    tabBarIcon: ({ focused }) => {
-                        return <Image source={require('../assets/icons/friend_icon.png')} style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray' }} />;
-                    }
+                tabBarIcon: ({ focused }) => {
+                    return <Image source={require('../assets/icons/friend_icon.png')} style={{ width: 25, height: 25, tintColor: focused ? '#0B9D7E' : 'gray' }} />;
+                },
+                    headerShown: false
                 }}
             />
             <Tab.Screen
                 name='Activity'
                 component={ActivityScreen}
                 options={{
-                    title: 'Activity',
-                    tabBarIcon: ({ focused }) => {
-                        return <Image source={require('../assets/icons/activity_icon.png')} style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray'}} />;
-                    }
+                tabBarIcon: ({ focused }) => {
+                    return <Image source={require('../assets/icons/activity_icon.png')} style={{ width: 25, height: 25, tintColor: focused ? '#0B9D7E' : 'gray'}} />;
+                },
+                    headerShown: false
                 }}
             />
             <Tab.Screen
                 name='Account'
-                component={AccountScreen}
+                component={AccountStackScreen}
                 options={{
-                    title: 'Account',
-                    tabBarIcon: ({ focused }) => {
-                        return <Image source={require('../assets/icons/account_icon.png')} style={{ width: 25, height: 25, borderRadius:25}} />;
-                    }
+                tabBarIcon: ({ focused }) => {
+                    return <Image source={require('../assets/icons/account_icon.png')} style={{ width: 25, height: 25, borderRadius: 25 }} />;
+                },
+                    headerShown: false
                 }}
             />
-        </Tab.Navigator>
-    );
-};
-
-
+            </Tab.Navigator>
+        );
+    };
 export default AppNavigation;
 
