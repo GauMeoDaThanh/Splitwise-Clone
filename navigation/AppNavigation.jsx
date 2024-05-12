@@ -38,29 +38,15 @@ const AppNavigation = () => {
                 component={TabNavigator}
                 options={{ headerShown: false }}
             />
+            <Stack.Screen
+                 name="EditAccount" 
+                 component={EditAccountScreen} 
+                 options={{ headerShown: false }} 
+            />
 
         </Stack.Navigator>
     </NavigationContainer>
   );
-};
-
-const AccountStack = createNativeStackNavigator();
-
-const AccountStackScreen = () => {
-    return (
-        <AccountStack.Navigator>
-        <AccountStack.Screen 
-            name="Account" 
-            component={AccountScreen} 
-            options={{ headerShown: false }} 
-        />
-        <AccountStack.Screen 
-            name="EditAccount" 
-            component={EditAccountScreen} 
-            options={{ headerShown: false }} 
-        />
-        </AccountStack.Navigator>
-    );
 };
 
 const TabNavigator = () => {
@@ -117,7 +103,7 @@ const TabNavigator = () => {
             />
             <Tab.Screen
                 name='Account'
-                component={AccountStackScreen}
+                component={AccountScreen} 
                 options={{
                 tabBarIcon: ({ focused }) => {
                     return <Image source={require('../assets/icons/account_icon.png')} style={{ width: 25, height: 25, borderRadius: 25 }} />;
