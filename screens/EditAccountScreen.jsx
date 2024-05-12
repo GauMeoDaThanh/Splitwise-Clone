@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { Text, View, TouchableOpacity, Image, ScrollView } from "react-native";
+import { Text, View, TouchableOpacity, Image, ScrollView,TextInput} from "react-native";
 import ChangePassword from "../components/ChangePassword";
 import ChangeName from "../components/ChangeName";
 const EditAccountScreen = () => {
@@ -41,7 +41,12 @@ const EditAccountScreen = () => {
                 <View className="flex-col">
                     <Text>Full name</Text>
                     {showChangeName ? (
-                            <ChangeName onCancelEdit={handleCancelEdit}></ChangeName>
+                            <View className="flex p-2" onCancelEdit={handleCancelEdit}>
+                                <TextInput 
+                                    className = "p-1 bg-gray-100 text-gray-700 rounded-xl mb-1 border"
+                                    placeholder="Full Name"
+                                ></TextInput>
+                            </View>
                         ) : (
                             <View className="flex-row space-x-2 items-center mb-3">
                                 <Text className='font-bold'>Huỳnh Tứ</Text>
@@ -64,7 +69,16 @@ const EditAccountScreen = () => {
                 <View className="flex-col">
                     <Text>Password</Text>
                     {showChangePassword ? (
-                            <ChangePassword onCancelEdit={handleCancelEdit}></ChangePassword>
+                        <View className="form space-y-1 p-2" onCancelEdit={handleCancelEdit}>
+                            <TextInput 
+                                className = "p-1 bg-gray-100 text-gray-700 rounded-xl mb-1 border"
+                                placeholder="Your current password"
+                            ></TextInput>
+                            <TextInput 
+                                className = "p-1 bg-gray-100 text-gray-700 rounded-xl mb-1 border"
+                                placeholder="Create a new password"
+                            ></TextInput>
+                        </View>
                         ) : (
                             <View className="flex-row space-x-2 items-center mb-3">
                                 <Text className='font-bold'>{'*'.repeat('Huỳnh Tứ'.length)}</Text>
