@@ -11,13 +11,10 @@ import {
 } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import AddToolBar from "../components/AddToolBar";
-import UserService from "../services/user";
 import ExpenseService from "../services/expense";
-import AuthenticateService from "../services/authentication";
 
-const userService = UserService.getInstance();
+
 const expenseService = ExpenseService.getInstance();
-const authentication = AuthenticateService.getInstance();
 
 const AddExpenseScreen = (props) => {
     const textInputRef = useRef(null);
@@ -33,42 +30,42 @@ const AddExpenseScreen = (props) => {
 
     // Làm Gợi ý khi nhận mail hoặc tên user
     const [suggestions, setSuggestions] = useState([]);
-    const [selectedUser, setSelectedUser] = useState([]);
+    const [selectedParticipants, setSelectedParticipants] = useState([]);
 
     useEffect(() => {
         setIsBothFieldsFilled(description !== "" && money !== "");
     }, [description, money]);
 
-    handleInputUser = async (text) => {
-        const filteredSuggestions = await userService.handleInputUser(text);
-        setSuggestions(filteredSuggestions);
-        console.log(suggestions);
+    handleInputParticipants = async (text) => {
+        const filteredSuggestions = await expenseService.handleInputParticipants(text);
+        setSuggestions(filteredSuggestions);    
     };
     // Xử lí nhấn chọn tên user
     const handleSuggestionSelect = (item) => {
-        const isExist = selectedUser.some((user) => user.id === item.id);
+        const isExist = selectedParticipants.some(
+            (user) => user.uid === item.uid
+        );
         if (!isExist) {
-            setSelectedUser((prevSelectedUser) => [...prevSelectedUser, item]);
+            setSelectedParticipants((prevSelectedPaticipants) => [
+                ...prevSelectedPaticipants,
+                item,
+            ]);
         } else {
-            console.log("User is already selected!");
+            console.log("Friend or group is already selected!");
         }
-             console.log("Users selected:", selectedUser);
+             console.log("Friend or group selected:", selectedParticipants);
     };
 
     //Tạo hoá đơn
     const handleCreateExpense = async () => {
-        console.log("Vào đây");
         try {
             // Chưa thêm groupid, img
             expenseService.createExpense(
-                authentication.idAcc,
                 new Date(),
                 "",
-                "",
                 parseFloat(money),
-                authentication.idAcc,
                 description,
-                selectedUser
+                selectedParticipants
             );
         } catch (e) {
             console.error("Fail to add expense ", e);
@@ -112,7 +109,7 @@ const AddExpenseScreen = (props) => {
                         fontSize: 16,
                         height: "60%",
                     }}
-                    onChangeText={(text) => handleInputUser(text)}
+                    onChangeText={(text) => handleInputParticipants(text)}
                 />
             </View>
             <View style={{ position: "fixed" }}>
@@ -123,7 +120,7 @@ const AddExpenseScreen = (props) => {
                             <TouchableOpacity
                                 onPress={() => handleSuggestionSelect(item)}
                             >
-                                <Text>{item.username}</Text>
+                                <Text>{item.type?item.name:item.username}</Text>
                             </TouchableOpacity>
                         )}
                         keyExtractor={(item) => item.id}

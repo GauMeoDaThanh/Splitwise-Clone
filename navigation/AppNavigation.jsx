@@ -9,6 +9,7 @@ import FriendsScreen from "../screens/FriendsScreen";
 import AddExpenseScreen from "../screens/AddExpenseScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import AccountScreen from "../screens/AccountScreen";
+import Home from "../screens/Home";
 
 const Stack = createNativeStackNavigator();
 const AppNavigation = () => {
@@ -48,6 +49,11 @@ const AppNavigation = () => {
         <Stack.Screen
           name="Account"
           component={AccountScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="test screen"
+          component={Home}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
