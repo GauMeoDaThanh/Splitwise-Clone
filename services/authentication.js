@@ -78,7 +78,7 @@ class AuthenticateService {
       if (user.emailVerified) {
         //   Đến home
         // navigation.navigate("FriendsScreen");
-        navigation.navigate("test screen");
+        navigation.navigate("TabNavigator");
         console.log("Login successfully!");
       } else {
         // Email chưa được xác nhận

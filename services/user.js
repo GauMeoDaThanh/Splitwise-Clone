@@ -1,4 +1,4 @@
-import { db, storage, USER_COLLECTION } from "../firebaseConfig";
+import { db, storage, USER_COLLECTION, auth } from "../firebaseConfig";
 import {
   collection,
   getDocs,
@@ -58,8 +58,9 @@ class UserService {
     }
   }
 
-  async getUser(uid) {
+  async getUser() {
     console.log(`start get user ${uid}`);
+    const uid = auth.currentUser.uid;
     const userRef = doc(db, USER_COLLECTION, uid);
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
@@ -71,9 +72,10 @@ class UserService {
     }
   }
 
-  async uploadAvatar(uid, imgUri) {
+  async uploadAvatar(imgUri, navigator) {
     try {
       console.log("start upload avatar");
+      const uid = auth.currentUser.uid;
       const storageRef = ref(storage, `avatars/${uid}`);
       const fetchReponse = await fetch(imgUri);
       const blob = await fetchReponse.blob();
@@ -103,9 +105,10 @@ class UserService {
     }
   }
 
-  async getAvatar(uid) {
+  async getAvatar() {
     try {
       console.log("begin to get avatar");
+      const uid = auth.currentUser.uid;
       const q = query(collection(db, USER_COLLECTION), where("uid", "==", uid));
       const querySnapshot = await getDocs(q);
       console.log(querySnapshot.docs[0].data().avatarUrl);
@@ -115,8 +118,9 @@ class UserService {
     }
   }
 
-  async setUsername(uid, username) {
+  async setUsername(username) {
     console.log("start update username");
+    const uid = auth.currentUser.uid;
     const userRef = doc(db, USER_COLLECTION, uid);
     try {
       await setDoc(userRef, { username }, { merge: true });
