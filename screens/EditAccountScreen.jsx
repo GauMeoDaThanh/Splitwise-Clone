@@ -1,8 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { Text, View, TouchableOpacity, Image, ScrollView,TextInput} from "react-native";
-import ChangePassword from "../components/ChangePassword";
-import ChangeName from "../components/ChangeName";
 const EditAccountScreen = () => {
     const navigation = useNavigation();
     const [showChangePassword, setShowChangePassword] = useState(false);
