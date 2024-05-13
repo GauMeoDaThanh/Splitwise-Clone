@@ -11,14 +11,15 @@ import {
   TextInput,
 } from "react-native";
 import UserService from "../services/user";
+import AuthenticateService from "../services/authentication";
 
 const EditAccountScreen = ({ route }) => {
   const navigation = useNavigation();
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showChangeName, setShowChangeName] = useState(false);
   const [editName, setEditName] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [editPassword, setEditPassword] = useState(null);
+  const [oldPassword, setOldPassword] = useState(null);
+  const [newPassword, setNewPassword] = useState(null);
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
@@ -41,7 +42,11 @@ const EditAccountScreen = ({ route }) => {
       UserService.getInstance().setUsername(editName);
       setUserData({ ...userData, username: editName });
     }
-    if (showChangePassword && password && editPassword) {
+    if (showChangePassword && oldPassword && newPassword) {
+      AuthenticateService.getInstance().updatePassword(
+        oldPassword,
+        newPassword
+      );
     }
   };
   return (
@@ -102,13 +107,13 @@ const EditAccountScreen = ({ route }) => {
                 <TextInput
                   className="p-1 bg-gray-100 text-gray-700 rounded-xl mb-1 border"
                   placeholder="Your current password"
-                  onChangeText={(value) => setPassword(value)}
+                  onChangeText={(value) => setOldPassword(value)}
                   secureTextEntry={true}
                 ></TextInput>
                 <TextInput
                   className="p-1 bg-gray-100 text-gray-700 rounded-xl mb-1 border"
                   placeholder="Create a new password"
-                  onChangeText={(value) => setEditPassword(value)}
+                  onChangeText={(value) => setNewPassword(value)}
                   secureTextEntry={true}
                 ></TextInput>
               </View>

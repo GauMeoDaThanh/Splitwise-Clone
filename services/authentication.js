@@ -3,6 +3,9 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   sendEmailVerification,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
 } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { signInWithPopup } from "firebase/auth";
@@ -129,6 +132,35 @@ class AuthenticateService {
     } catch (error) {
       console.log("Sign out failed: ", error);
     }
+  }
+
+  async updatePassword(oldPassword, newPassword) {
+    try {
+      const user = auth.currentUser;
+      await this.reAuthenticateUser(oldPassword);
+      await updatePassword(user, newPassword);
+      alert("Password updated successfully");
+    } catch (e) {
+      switch (e.code) {
+        case "auth/invalid-credential":
+          alert("Invalid password");
+          break;
+        case "auth/weak-password":
+          alert(
+            "Password is not strong enough. At least 6 characters are required."
+          );
+          break;
+        default:
+          alert(e.message);
+          break;
+      }
+    }
+  }
+
+  async reAuthenticateUser(currentPassword) {
+    const user = auth.currentUser;
+    const cred = EmailAuthProvider.credential(user.email, currentPassword);
+    return reauthenticateWithCredential(user, cred);
   }
 }
 export default AuthenticateService;
