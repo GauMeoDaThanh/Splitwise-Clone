@@ -53,31 +53,44 @@ const TabNavigator = () => {
     return (
         <Tab.Navigator initialRouteName='Friends'
             screenOptions={{
-                tabBarStyle: {
-                    position: 'absolute',
+                tabBarStyle:{
+                    position:'absolute',
                     borderRadius: 15,
                     left: 10,
                     right: 10,
                     bottom: 10,
                     height: 50,
-                    elevation: 10,
-                    padding: 4
+                    elevation: 10
                 },
                 tabBarLabelStyle: {
                     marginBottom: 3,
                     fontWeight: 'bold'
                 },
-                    tabBarInactiveTintColor: 'gray', 
-                    tabBarActiveTintColor: '#0B9D7E'
+                tabBarInactiveTintColor: 'gray', 
+                tabBarActiveTintColor: '#0B9D7E',
             }}
-            >
+        >
             <Tab.Screen
                 name='Groups'
                 component={GroupsScreen}
                 options={{
-                tabBarIcon: ({ focused }) => {
-                    return <Image source={require('../assets/icons/groups_icon.png')} style={{ width: 25, height: 25, tintColor: focused ? '#0B9D7E' : 'gray' }} />;
-                },
+                    title: 'Groups',
+                    tabBarIcon: ({ focused }) => {
+                        return(
+                            <View style = {{
+                                alignItems: 'center',
+                                borderTopColor: focused ?  '#0B9D7E': 'white',
+                                borderTopWidth: 3,
+                                padding: 3
+
+                            }}>
+                                <Image 
+                                    source={require('../assets/icons/groups_icon.png')} 
+                                    style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray' }} 
+                                />
+                            </View> 
+                        ); 
+                    },
                     headerShown: false
                 }}
             />
@@ -85,9 +98,23 @@ const TabNavigator = () => {
                 name='Friends'
                 component={FriendsScreen}
                 options={{
-                tabBarIcon: ({ focused }) => {
-                    return <Image source={require('../assets/icons/friend_icon.png')} style={{ width: 25, height: 25, tintColor: focused ? '#0B9D7E' : 'gray' }} />;
-                },
+                    title: 'Friends',
+                    tabBarIcon: ({ focused }) => {
+                        return(
+                            <View style = {{
+                                alignItems: 'center',
+                                borderTopColor: focused ?  '#0B9D7E': 'white',
+                                borderTopWidth: 3,  
+                                padding: 3
+    
+                            }}>
+                                <Image 
+                                    source={require('../assets/icons/friend_icon.png')} 
+                                    style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray' }} 
+                                />
+                            </View> 
+                        );
+                    },
                     headerShown: false
                 }}
             />
@@ -95,24 +122,55 @@ const TabNavigator = () => {
                 name='Activity'
                 component={ActivityScreen}
                 options={{
-                tabBarIcon: ({ focused }) => {
-                    return <Image source={require('../assets/icons/activity_icon.png')} style={{ width: 25, height: 25, tintColor: focused ? '#0B9D7E' : 'gray'}} />;
-                },
+                    title: 'Activity',
+                    tabBarIcon: ({ focused }) => {
+                        return(
+                            <View style = {{
+                                alignItems: 'center',
+                                borderTopColor: focused ?  '#0B9D7E': 'white',
+                                borderTopWidth: 3,
+                                padding: 3
+    
+                            }}>
+                                <Image 
+                                    source={require('../assets/icons/activity_icon.png')} 
+                                    style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray' }} 
+                                />
+                            </View>  
+                        );
+                        
+                    },
                     headerShown: false
                 }}
             />
             <Tab.Screen
                 name='Account'
-                component={AccountScreen} 
+                component={AccountScreen}
                 options={{
-                tabBarIcon: ({ focused }) => {
-                    return <Image source={require('../assets/icons/account_icon.png')} style={{ width: 25, height: 25, borderRadius: 25 }} />;
-                },
+                    title: 'Account',
+                    tabBarIcon: ({ focused }) => {
+                        return(
+                            <View style = {{
+                                alignItems: 'center',
+                                borderTopColor: focused ?  '#0B9D7E': 'white',
+                                borderTopWidth: 3,
+                                padding: 3
+
+                            }}>
+                                <Image source={require('../assets/icons/account_icon.png')} 
+                                        style={{ width: 25, height: 25, borderRadius:25}} 
+                                />
+                            </View> 
+                            
+                        ); 
+                    },
                     headerShown: false
                 }}
             />
-            </Tab.Navigator>
-        );
-    };
+        </Tab.Navigator>
+    );
+};
+
+
 export default AppNavigation;
 
