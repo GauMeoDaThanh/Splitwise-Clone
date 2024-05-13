@@ -8,7 +8,7 @@ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import AccountScreen from '../screens/tabs/AccountScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-import {Text, TextInput, SafeAreaView, View,TouchableOpacity, Image, ScrollView} from "react-native";
+import {View, Image} from "react-native";
 import FriendsScreen from '../screens/tabs/FriendsScreen';
 import GroupsScreen from '../screens/tabs/GroupsScreen';
 import ActivityScreen from '../screens/tabs/ActivityScreen';
@@ -53,8 +53,7 @@ const TabNavigator = () => {
                     right: 10,
                     bottom: 10,
                     height: 50,
-                    elevation: 10,
-                    padding: 4
+                    elevation: 10
                 },
                 tabBarLabelStyle: {
                     marginBottom: 3,
@@ -70,8 +69,22 @@ const TabNavigator = () => {
                 options={{
                     title: 'Groups',
                     tabBarIcon: ({ focused }) => {
-                        return <Image source={require('../assets/icons/groups_icon.png')} style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray' }} />;
-                    }
+                        return(
+                            <View style = {{
+                                alignItems: 'center',
+                                borderTopColor: focused ?  '#0B9D7E': 'white',
+                                borderTopWidth: 3,
+                                padding: 3
+
+                            }}>
+                                <Image 
+                                    source={require('../assets/icons/groups_icon.png')} 
+                                    style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray' }} 
+                                />
+                            </View> 
+                        ); 
+                    },
+                    headerShown: false
                 }}
             />
             <Tab.Screen
@@ -80,8 +93,22 @@ const TabNavigator = () => {
                 options={{
                     title: 'Friends',
                     tabBarIcon: ({ focused }) => {
-                        return <Image source={require('../assets/icons/friend_icon.png')} style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray' }} />;
-                    }
+                        return(
+                            <View style = {{
+                                alignItems: 'center',
+                                borderTopColor: focused ?  '#0B9D7E': 'white',
+                                borderTopWidth: 3,  
+                                padding: 3
+    
+                            }}>
+                                <Image 
+                                    source={require('../assets/icons/friend_icon.png')} 
+                                    style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray' }} 
+                                />
+                            </View> 
+                        );
+                    },
+                    headerShown: false
                 }}
             />
             <Tab.Screen
@@ -90,8 +117,23 @@ const TabNavigator = () => {
                 options={{
                     title: 'Activity',
                     tabBarIcon: ({ focused }) => {
-                        return <Image source={require('../assets/icons/activity_icon.png')} style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray'}} />;
-                    }
+                        return(
+                            <View style = {{
+                                alignItems: 'center',
+                                borderTopColor: focused ?  '#0B9D7E': 'white',
+                                borderTopWidth: 3,
+                                padding: 3
+    
+                            }}>
+                                <Image 
+                                    source={require('../assets/icons/activity_icon.png')} 
+                                    style={{ width: 25, height: 25, tintColor: focused ?  '#0B9D7E': 'gray' }} 
+                                />
+                            </View>  
+                        );
+                        
+                    },
+                    headerShown: false
                 }}
             />
             <Tab.Screen
@@ -100,8 +142,22 @@ const TabNavigator = () => {
                 options={{
                     title: 'Account',
                     tabBarIcon: ({ focused }) => {
-                        return <Image source={require('../assets/icons/account_icon.png')} style={{ width: 25, height: 25, borderRadius:25}} />;
-                    }
+                        return(
+                            <View style = {{
+                                alignItems: 'center',
+                                borderTopColor: focused ?  '#0B9D7E': 'white',
+                                borderTopWidth: 3,
+                                padding: 3
+
+                            }}>
+                                <Image source={require('../assets/icons/account_icon.png')} 
+                                        style={{ width: 25, height: 25, borderRadius:25}} 
+                                />
+                            </View> 
+                            
+                        ); 
+                    },
+                    headerShown: false
                 }}
             />
         </Tab.Navigator>
