@@ -8,12 +8,13 @@ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import AccountScreen from '../screens/tabs/AccountScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-import {Text, TextInput, SafeAreaView, View,TouchableOpacity, Image, ScrollView} from "react-native";
-import FriendsScreen from '../screens/tabs/FriendsScreen';
+import {View,Image} from "react-native";
 import GroupsScreen from '../screens/tabs/GroupsScreen';
 import ActivityScreen from '../screens/tabs/ActivityScreen';
 import EditAccountScreen from '../screens/EditAccountScreen';
-
+import AddFriendScreen from "../screens/AddFriendScreen";
+import FriendsScreen from "../screens/tabs/FriendsScreen";
+import AddExpenseScreen from "../screens/AddExpenseScreen";
 const AppNavigation = () => {
   return (
     <NavigationContainer>
@@ -36,6 +37,16 @@ const AppNavigation = () => {
             <Stack.Screen
                 name="Friends"
                 component={TabNavigator}
+                options={{ headerShown: false }}
+            />
+             <Stack.Screen
+                name="AddExpenseScreen"
+                component={AddExpenseScreen}
+                options={{ headerShown: false }}
+            />
+             <Stack.Screen
+                name="AddFriendScreen"
+                component={AddFriendScreen}
                 options={{ headerShown: false }}
             />
             <Stack.Screen
