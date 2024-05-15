@@ -1,5 +1,5 @@
 import { auth, db } from "../firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, getDoc, updateDoc } from "firebase/firestore";
 import FriendService from "./friend";
 import AuthenticateService from "./authentication";
 import UserService from "./user";
@@ -227,6 +227,76 @@ class ExpenseService {
             console.error(e);
         }
     }
+
+    async getExpense(expenseId) {
+        try {
+            const q = query(
+                collection(db, "expenses"),
+                where("uid", "==",expenseId)
+            )
+            const expense = await getDoc(q);
+            return expense;
+        } catch (e) {
+            console.log("Fail to get expense by Id")
+        }
+    }
+    async getAmountByUserId(expenseId, userId) {
+        try {
+            const q = query(collection(db, "payments"),
+                where("uid", "==", expenseId));
+            const expense = await getDoc(q);
+            console.log("Gia tien: ", expense['participants'][userId]);
+            return expense['participants'][userId];
+        } catch (e) {
+            console.log();
+        }
+    }
+    // Settle up
+    async settleUp(expenseId, userId) {
+        try {
+            const docRef = await addDoc(collection(db, "payments"), {
+                expenseId: expenseId,
+                userId: userId,
+                amount: this.getAmountByUserId(expenseId, userId),
+                settleAt: new Date(),
+            })
+            console.log("Add payment successfully with ID", docRef.uid)
+        } catch (e) {
+            console.log("Settle up fail")
+        }
+    }
+    // Split expense
+    async splitExpense(expenseId, typeSplit, userSplits) {
+        const amounts = this.getExpense(expenseId)['amounts']
+        const participants = []
+        switch (typeSplit) {
+            case "equally":
+                for (userSplit of userSplits) {
+                    participants.push({
+                        userId: userSplit.userId,
+                        amount: amounts/length(userSplits)
+                   })
+                }
+            case "unequally":
+                participants = userSplits
+            case "percent":
+               for (userSplit of userSplits) {
+                    participants.push({
+                        userId: userSplit.userId,
+                        amount: userSplit.amout * amounts
+                   })
+                }
+        }
+        const expenseRef = doc(db, "expenses", expenseId);
+        // await setDoc(expenseRef, {participants}, { merge: true }); 
+        await updateDoc(expenseRef, {
+            participants: participants
+        })
+    }
+
+    
+
+
 }
 
 export default ExpenseService;
