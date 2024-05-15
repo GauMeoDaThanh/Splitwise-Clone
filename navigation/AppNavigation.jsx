@@ -24,11 +24,17 @@ import EditAccountScreen from "../screens/EditAccountScreen";
 import UserService from "../services/user";
 import AddFriendScreen from "../screens/AddFriendScreen";
 import AddExpenseScreen from "../screens/AddExpenseScreen";
+import LoadScreen from "../screens/LoadScreen";
 
 const AppNavigation = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="LoadScreen">
+        <Stack.Screen
+          name="LoadScreen"
+          component={LoadScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -68,25 +74,6 @@ const AppNavigation = () => {
     </NavigationContainer>
   );
 };
-
-// const AccountStack = createNativeStackNavigator();
-
-// const AccountStackScreen = () => {
-//   return (
-//     <AccountStack.Navigator>
-//       <AccountStack.Screen
-//         name="AccountScreen"
-//         component={AccountScreen}
-//         options={{ headerShown: false }}
-//       />
-//       <AccountStack.Screen
-//         name="EditAccount"
-//         component={EditAccountScreen}
-//         options={{ headerShown: false }}
-//       />
-//     </AccountStack.Navigator>
-//   );
-// };
 
 const TabNavigator = () => {
   const [imageUri, setImageUri] = React.useState(null);

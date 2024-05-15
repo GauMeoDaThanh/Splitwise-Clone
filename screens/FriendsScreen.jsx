@@ -14,21 +14,24 @@ import ButtonAddExpense from "../components/ButtonAddExpense";
 import { auth } from "../firebaseConfig";
 // import UserService from "../services/UserService";
 import FriendService from "../services/friend";
+import { useFocusEffect } from "@react-navigation/native";
 
-const FriendsScreen = () => {
+const FriendsScreen = ({ route }) => {
   const [userAvatar, setUserAvatar] = React.useState(null);
   const [listFriends, setListFriends] = React.useState(null);
 
-  React.useEffect(() => {
-    const getUserFriends = async () => {
-      const user = auth.currentUser;
-      const userFriends =
-        await FriendService.getInstance().getFriendsAvatarAndName(user.uid);
-      setListFriends(userFriends);
-    };
+  const getUserFriends = async () => {
+    const user = auth.currentUser;
+    const userFriends =
+      await FriendService.getInstance().getFriendsAvatarAndName(user.uid);
+    setListFriends(userFriends);
+  };
 
-    getUserFriends();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      getUserFriends();
+    }, [route.params?.reloadSc])
+  );
 
   return (
     <View

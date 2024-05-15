@@ -28,6 +28,11 @@ class AuthenticateService {
     return AuthenticateService.instance;
   }
 
+  async isLogin() {
+    console.log(auth.currentUser?.uid);
+    return auth.currentUser != null;
+  }
+
   async handleSignUpAndCreateUser(email, password, userName, navigation) {
     try {
       const userCredential = await createUserWithEmailAndPassword(

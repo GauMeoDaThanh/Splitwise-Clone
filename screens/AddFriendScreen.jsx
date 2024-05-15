@@ -7,16 +7,24 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import FriendService from "../services/friend";
 
 const AddFriendScreen = (props) => {
+  const navigation = useNavigation();
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [isFocused, setIsFocused] = useState(0);
 
   const [isBothFieldsFilled, setIsBothFieldsFilled] = useState(false);
 
+  const handleAddFriend = () => {
+    FriendService.getInstance().addFriend(contact);
+    navigation.navigate("Friends", { reloadSc: true });
+  };
+
   useEffect(() => {
-    setIsBothFieldsFilled(name !== "" && contact !== "");
+    setIsBothFieldsFilled(contact !== "");
   }, [name, contact]);
 
   const clearName = () => {
@@ -34,41 +42,15 @@ const AddFriendScreen = (props) => {
           title={"Add new contact"}
           action={"Add"}
           isDisabled={!isBothFieldsFilled}
+          onAddPress={handleAddFriend}
         ></AddToolBar>
       </View>
       <View style={{ flex: 93, backgroundColor: "white" }}>
         <View style={{ padding: 20 }}>
-          {/* <Text style={{ fontSize: 16, fontWeight: 500 }}>Name</Text> */}
-          <Text style={{ fontSize: 16 }}>Name</Text>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              borderBottomColor: isFocused === 2 ? "#009966" : "#999999",
-              borderBottomWidth: 1,
-            }}
-          >
-            <TextInput
-              style={styles.textInputStyle}
-              value={name}
-              onChangeText={(text) => setName(text)}
-              onFocus={() => setIsFocused(2)}
-              onBlur={() => setIsFocused(0)}
-            ></TextInput>
-            {name !== "" && (
-              <TouchableOpacity onPress={clearName} style={{ width: 15 }}>
-                <Text name="clear" style={{ fontSize: 18, color: "#666666" }}>
-                  x
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-        <View style={{ padding: 20 }}>
           {/* <Text style={{ fontSize: 16, fontWeight: 500 }}>
             Phone number or email address
           </Text> */}
-          <Text style={{ fontSize: 16 }}>Phone number or email address</Text>
+          <Text style={{ fontSize: 16 }}>Enter email address</Text>
           <View
             style={{
               flexDirection: "row",
@@ -99,10 +81,10 @@ const AddFriendScreen = (props) => {
             Don't worry, nothing sends just yet. You will have another chance to
             review before sending.
           </Text> */}
-          <Text style={{ fontSize: 14, textAlign: "center" }}>
+          {/* <Text style={{ fontSize: 14, textAlign: "center" }}>
             Don't worry, nothing sends just yet. You will have another chance to
             review before sending.
-          </Text>
+          </Text> */}
         </View>
       </View>
     </View>
