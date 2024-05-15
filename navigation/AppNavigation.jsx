@@ -17,11 +17,13 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import FriendsScreen from "../screens/tabs/FriendsScreen";
+import FriendsScreen from "../screens/FriendsScreen";
 import GroupsScreen from "../screens/tabs/GroupsScreen";
 import ActivityScreen from "../screens/tabs/ActivityScreen";
 import EditAccountScreen from "../screens/EditAccountScreen";
 import UserService from "../services/user";
+import AddFriendScreen from "../screens/AddFriendScreen";
+import AddExpenseScreen from "../screens/AddExpenseScreen";
 
 const AppNavigation = () => {
   return (
@@ -50,6 +52,16 @@ const AppNavigation = () => {
         <Stack.Screen
           name="EditAccount"
           component={EditAccountScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddFriendScreen"
+          component={AddFriendScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddExpenseScreen"
+          component={AddExpenseScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
