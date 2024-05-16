@@ -26,4 +26,15 @@ const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
-export { db, storage, auth };
+const GROUP_COLLECTION = "groups";
+const USER_COLLECTION = "users";
+const ACTIVITY_COLLECTION = "activities";
+
+export {
+  db,
+  storage,
+  auth,
+  USER_COLLECTION,
+  GROUP_COLLECTION,
+  ACTIVITY_COLLECTION,
+};

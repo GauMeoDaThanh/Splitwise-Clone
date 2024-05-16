@@ -1,4 +1,4 @@
-import { db, storage } from "../firebaseConfig";
+import { db, storage, USER_COLLECTION, auth } from "../firebaseConfig";
 import {
   collection,
   getDocs,
@@ -50,7 +50,7 @@ class UserService {
     };
     try {
       const customRef = uid;
-      const docRef = doc(collection(db, "users"), customRef);
+      const docRef = doc(collection(db, USER_COLLECTION), customRef);
       await setDoc(docRef, this.user);
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -58,9 +58,10 @@ class UserService {
     }
   }
 
-  async getUser(uid) {
+  async getUser() {
     console.log(`start get user ${uid}`);
-    const userRef = doc(db, "users", uid);
+    const uid = auth.currentUser.uid;
+    const userRef = doc(db, USER_COLLECTION, uid);
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
       console.log(userSnap.data());
@@ -71,9 +72,10 @@ class UserService {
     }
   }
 
-  async uploadAvatar(uid, imgUri) {
+  async uploadAvatar(imgUri, navigator) {
     try {
       console.log("start upload avatar");
+      const uid = auth.currentUser.uid;
       const storageRef = ref(storage, `avatars/${uid}`);
       const fetchReponse = await fetch(imgUri);
       const blob = await fetchReponse.blob();
@@ -91,7 +93,7 @@ class UserService {
           console.error(error);
         },
         () => {
-          const userRef = doc(db, "users", uid);
+          const userRef = doc(db, USER_COLLECTION, uid);
           getDownloadURL(storageRef).then((downloadURL) => {
             console.log("File available at", downloadURL);
             setDoc(userRef, { avatarUrl: downloadURL }, { merge: true });
@@ -103,10 +105,11 @@ class UserService {
     }
   }
 
-  async getAvatar(uid) {
+  async getAvatar() {
     try {
       console.log("begin to get avatar");
-      const q = query(collection(db, "users"), where("uid", "==", uid));
+      const uid = auth.currentUser.uid;
+      const q = query(collection(db, USER_COLLECTION), where("uid", "==", uid));
       const querySnapshot = await getDocs(q);
       console.log(querySnapshot.docs[0].data().avatarUrl);
       return querySnapshot.docs[0].data().avatarUrl;
@@ -115,9 +118,10 @@ class UserService {
     }
   }
 
-  async setUsername(uid, username) {
+  async setUsername(username) {
     console.log("start update username");
-    const userRef = doc(db, "users", uid);
+    const uid = auth.currentUser.uid;
+    const userRef = doc(db, USER_COLLECTION, uid);
     try {
       await setDoc(userRef, { username }, { merge: true });
       console.log(`Document with ID ${uid} updated with username ${username}`);
@@ -129,7 +133,10 @@ class UserService {
   async getUserIDWithMail(mail) {
     try {
       console.log("start get user with mail");
-      const q = query(collection(db, "users"), where("email", "==", mail));
+      const q = query(
+        collection(db, USER_COLLECTION),
+        where("email", "==", mail)
+      );
       const querySnapshot = await getDocs(q);
       if (querySnapshot.docs.length === 0) {
         console.log("Khong tim thay User");
