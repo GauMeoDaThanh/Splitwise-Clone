@@ -10,9 +10,12 @@ import {
 } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import AddToolBar from "../components/AddToolBar";
+import { useNavigation } from '@react-navigation/native';
 
 const AddExpenseScreen = (props) => {
   const textInputRef = useRef(null);
+  const descriptionInputRef = useRef(null);
+  const moneyInputRef = useRef(null);
 
   useEffect(() => {
     // Focus vào TextInput khi mở trang
@@ -28,6 +31,11 @@ const AddExpenseScreen = (props) => {
   useEffect(() => {
     setIsBothFieldsFilled(description !== "" && money !== "");
   }, [description, money]);
+
+  const navigation = useNavigation();
+  const handleAddImageExpense = () => {
+    navigation.navigate('AddImageExpense');
+  };
 
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]}>
@@ -53,7 +61,7 @@ const AddExpenseScreen = (props) => {
         ]}
       >
         <Text>With</Text>
-        <Text style={{fontWeight: 600, fontSize: 16}}> you </Text>
+        <Text style={{ fontWeight: 600, fontSize: 16 }}> you </Text>
         <Text style={{ marginEnd: 10 }}>and:</Text>
         <TextInput
           placeholder="Enter email, name or group"
@@ -64,12 +72,15 @@ const AddExpenseScreen = (props) => {
             fontWeight: 400,
             height: "60%",
           }}
+          onSubmitEditing={() => {
+            descriptionInputRef.current.focus();
+          }}
         ></TextInput>
       </View>
       <View
         style={[
           {
-            flex: 43,
+            flex: 56,
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
@@ -85,8 +96,15 @@ const AddExpenseScreen = (props) => {
           </TouchableOpacity>
           <TextInput
             placeholder="Enter a description"
-            style={[styles.textInputStyle, {borderBottomColor: isFocused ===1 ?  "#009966" : "#999999",}]}
+            ref={descriptionInputRef}
+            style={[
+              styles.textInputStyle,
+              { borderBottomColor: isFocused === 1 ? "#009966" : "#999999" },
+            ]}
             value={description}
+            onSubmitEditing={() => {
+              moneyInputRef.current.focus();
+            }}
             onChangeText={(text) => setDescription(text)}
             onFocus={() => setIsFocused(1)}
             onBlur={() => setIsFocused(0)}
@@ -102,7 +120,11 @@ const AddExpenseScreen = (props) => {
           <TextInput
             placeholder="0 đồng"
             keyboardType="numeric"
-            style={[styles.textInputStyle, {borderBottomColor: isFocused ===2 ?  "#009966" : "#999999",}]}
+            ref={moneyInputRef}
+            style={[
+              styles.textInputStyle,
+              { borderBottomColor: isFocused === 2 ? "#009966" : "#999999" },
+            ]}
             value={money}
             onChangeText={(text) => setMoney(text)}
             onFocus={() => setIsFocused(2)}
@@ -122,27 +144,38 @@ const AddExpenseScreen = (props) => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={[{ flex: 10, borderTopColor:'#EEEEEE', borderTopWidth: 1 }]}></View>
-      <View style={[{ flex: 36 }]}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-        ></KeyboardAvoidingView>
-      </View>
-      {/* <KeyboardAvoidingView
-        style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      <View
+        style={[{ flex: 10, borderTopColor: "#EEEEEE", borderTopWidth: 1 }]}
       >
-      </KeyboardAvoidingView> */}
+        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: 'flex-end' }} onPress={handleAddImageExpense}>
+       
+          <Image
+            source={require("../assets/icons/camera.png")}
+            style={{ width: 60, height: 60 }}
+          />
+  
+        </TouchableOpacity>
+      </View>
+      {/* <View style={[{ isFocused === 2 ? flex: 50 : flex: 36 }]}>
+        <KeyboardAvoidingView
+          // style={{ flex: 1 }}
+          // behavior={Platform.OS === "ios" ? "padding" : "height"}
+          // keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        ></KeyboardAvoidingView>
+      </View> */}
+      {isFocused === 2 && (
+        <View style={{ flex: 36 }}>{<KeyboardAvoidingView></KeyboardAvoidingView>}</View>
+      )}
+
+      {isFocused !== 2 && (
+        <View style={{ flex: 50 }}>{<KeyboardAvoidingView></KeyboardAvoidingView>}</View>
+      )}
     </View>
   );
 };
 export default AddExpenseScreen;
 const styles = StyleSheet.create({
   textInputStyle: {
-    
     borderBottomWidth: 1,
     width: "60%",
     marginHorizontal: 10,
