@@ -13,24 +13,24 @@ const ButtonAddExpense = (props) => {
     navigation.navigate('AddExpenseScreen');
   };
   return (
-    <TouchableOpacity onPress={handleAddExpensePress} style={[styles.addButtonContainer,{ flexDirection: "row", alignItems: "center", justifyContent: 'center', padding: 10, backgroundColor:'#00CC99', width: '44%', borderRadius: 30}]}>
+    <TouchableOpacity 
+      onPress={handleAddExpensePress}
+      className = 'flex-row items-center space-x-2 px-5 py-1.5 rounded-2xl'
+      style = {{
+        backgroundColor: '#0B9D7E',
+        elevation: 10
+      }}
+    >
       <Image
-        source={require("../assets/icons/bill5.png")}
-        style={{ width: 34, height: 34 }}
+        source={require("../assets/icons/icon_bill.png")}
+        style={{ 
+          width: 25, 
+          height: 25,
+          tintColor: 'white'
+        }}
       ></Image>
-      <Text style={{paddingHorizontal: 10, color: 'white', fontSize: 16, fontWeight: 400}}>Add expense</Text>
+      <Text className = 'text-white font-semibold'>Add expense</Text>
     </TouchableOpacity>
   );
 };
 export default ButtonAddExpense;
-const styles = StyleSheet.create({
-  container: {
-    
-  },
-  addButtonContainer: {
-    position: 'absolute',
-    right: 10,
-    bottom: 10,
-    zIndex: 1,
-  },
-});

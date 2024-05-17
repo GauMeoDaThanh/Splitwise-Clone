@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
       backgroundColor: 'white',
       alignItems: 'center', 
       justifyContent: 'flex-end', 
-      height: 60,
+      height: 50,
     },
     searchInput: {
       flex: 1,
