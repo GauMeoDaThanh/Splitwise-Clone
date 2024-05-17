@@ -25,6 +25,7 @@ import UserService from "../services/user";
 import AddFriendScreen from "../screens/AddFriendScreen";
 import AddExpenseScreen from "../screens/AddExpenseScreen";
 import AddGroupsScreen from "../screens/AddGroupsScreen";
+import DetailsGroupsScreen from "../screens/DetailsGroupsScreen";
 
 const AppNavigation = () => {
   return (
@@ -75,6 +76,24 @@ const AppNavigation = () => {
   );
 };
 
+const GroupsStack = createNativeStackNavigator();
+
+const GroupsStackScreen = () => {
+  return (
+    <GroupsStack.Navigator>
+      <GroupsStack.Screen 
+        name="Groups" 
+        component={GroupsScreen} 
+        options={{ headerShown: false }} 
+      />
+      <GroupsStack.Screen 
+        name="DetailGroups" 
+        component={DetailsGroupsScreen} 
+        options={{ headerShown: false }} 
+      />
+    </GroupsStack.Navigator>
+  );
+};
 
 const TabNavigator = () => {
   const [imageUri, setImageUri] = React.useState(null);
@@ -108,7 +127,7 @@ const TabNavigator = () => {
     >
         <Tab.Screen
             name='Groups'
-            component={GroupsScreen}
+            component={GroupsStackScreen}
             options={{
                 title: 'Groups',
                 tabBarIcon: ({ focused }) => {

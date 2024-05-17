@@ -91,7 +91,7 @@ const GroupsScreen = () => {
                             </TouchableOpacity>
                         );
                     </FlatList> */}
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.navigate("DetailGroups")}>
                         <View className = 'flex-row space-x-4 items-center mb-3'>
                             <Image
                                 source={require('../../assets/images/avatar_image.jpg')}
