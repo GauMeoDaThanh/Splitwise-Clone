@@ -11,6 +11,7 @@
     "clear:cache": "del /q node_modules\\.cache"
   },
   "dependencies": {
+    "@react-native-community/checkbox": "^0.5.17",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.29",
     "@types/react": "~18.2.45",
@@ -20,7 +21,9 @@
     "nativewind": "^2.0.11",
     "react": "18.2.0",
     "react-native": "0.73.6",
+    "react-native-bouncy-checkbox": "^4.0.1",
     "react-native-camera": "^4.2.1",
+    "react-native-checkbox": "^2.0.0",
     "react-native-image-picker": "^7.1.2",
     "react-native-tailwindcss": "^1.1.11",
     "tailwind-rn": "^4.2.0",

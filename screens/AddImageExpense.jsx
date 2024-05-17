@@ -13,7 +13,7 @@ const AddImageExpense = (props) => {
           navigation={props.navigation}
           title={"Add image expense"}
           action={"Add"}
-          isDisabled="false"
+          // isDisabled="false"
         ></AddToolBar>
       </View>
       <View

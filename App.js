@@ -30,6 +30,7 @@ import React from 'react';
 import { SafeAreaView, View, Dimensions } from 'react-native';
 import AppNavigation from './navigation/AppNavigation';
 import AddExpenseScreen from './screens/AddExpenseScreen';
+import SplitExpenseScreen from './screens/SplitExpenseScreen';
 
 const App = () => {
   // Lấy kích thước của màn hình thiết bị
@@ -46,8 +47,8 @@ const App = () => {
   return (
     <SafeAreaView style={containerStyle}>
       <View style={containerStyle}>
-        <AppNavigation />
-        {/* <AddExpenseScreen></AddExpenseScreen> */}
+        {/* <AppNavigation /> */}
+        <SplitExpenseScreen></SplitExpenseScreen>
       </View>
     </SafeAreaView>
   );

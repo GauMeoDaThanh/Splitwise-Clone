@@ -12,6 +12,7 @@ import React, { useRef, useEffect, useState } from "react";
 import AddToolBar from "../components/AddToolBar";
 import { useNavigation } from '@react-navigation/native';
 
+
 const AddExpenseScreen = (props) => {
   const textInputRef = useRef(null);
   const descriptionInputRef = useRef(null);
@@ -37,6 +38,10 @@ const AddExpenseScreen = (props) => {
     navigation.navigate('AddImageExpense');
   };
 
+  const handleSplitExpense = () => {
+    navigation.navigate('SplitExpenseScreen');
+  };
+
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]}>
       <View style={[{ flex: 7 }]}>
@@ -45,6 +50,7 @@ const AddExpenseScreen = (props) => {
           title={"Add an expense"}
           action={"Save"}
           isDisabled={!isBothFieldsFilled}
+          disabled={!isBothFieldsFilled}
         ></AddToolBar>
       </View>
       <View
@@ -139,7 +145,7 @@ const AddExpenseScreen = (props) => {
             <Text> you </Text>
           </TouchableOpacity>
           <Text> and split </Text>
-          <TouchableOpacity style={[styles.buttonStyle]}>
+          <TouchableOpacity style={[styles.buttonStyle]} onPress={handleSplitExpense}>
             <Text>equally</Text>
           </TouchableOpacity>
         </View>
