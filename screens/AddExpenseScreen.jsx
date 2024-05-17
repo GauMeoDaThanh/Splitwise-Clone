@@ -118,6 +118,7 @@ const AddExpenseScreen = (props) => {
                         data={suggestions} // Truyền trạng thái gợi ý cập nhật
                         renderItem={({ item }) => (
                             <TouchableOpacity
+                                id={item.uid}
                                 onPress={() => handleSuggestionSelect(item)}
                             >
                                 <Text>{item.type?item.name:item.username}</Text>
