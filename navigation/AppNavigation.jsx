@@ -171,7 +171,11 @@ const TabNavigator = () => {
           tabBarIcon: ({ focused }) => {
             return (
               <Image
-                source={{ uri: imageUri }}
+                source={
+                  imageUri
+                    ? { uri: imageUri }
+                    : require("../assets/icons/account_icon.png")
+                }
                 style={{ width: 25, height: 25, borderRadius: 25 }}
               />
             );
