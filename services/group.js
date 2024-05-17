@@ -1,5 +1,12 @@
-import { db, storage, auth, GROUP_COLLECTION } from "../firebaseConfig";
+import {
+  db,
+  storage,
+  auth,
+  GROUP_COLLECTION,
+  USER_COLLECTION,
+} from "../firebaseConfig";
 import ActivityService from "./activity";
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import {
   addDoc,
   collection,
@@ -21,6 +28,7 @@ const initGroup = {
   information: "",
   members: [],
   type: "",
+  imageuri: "",
 };
 
 class GroupService {
@@ -37,7 +45,17 @@ class GroupService {
     return GroupService.instance;
   }
 
-  async addGroup(name, members, type) {
+  async listenToGroupList(callback) {
+    const uid = auth.currentUser.uid;
+    // const userRef = doc(db, USER_COLLECTION, uid);
+    const unsubscribe = onSnapshot(userRef, () => {
+      // this.getFriendsAvatarAndName(uid).then((friends) => callback(friends));
+    });
+
+    return () => unsubscribe();
+  }
+
+  async addGroup(name, type, imgUri, navigation) {
     const createAt = serverTimestamp();
     const createBy = auth.currentUser.uid;
     const group = {
@@ -46,20 +64,56 @@ class GroupService {
       createAt,
       createBy,
       type,
-      members,
     };
 
     console.log("start add group");
     try {
       const groupRef = await addDoc(collection(db, GROUP_COLLECTION), group);
       console.log("Document written with ID: ", groupRef.id);
-      ActivityService.getInstance().aCreateGroup(
-        groupRef.id,
-        group["name"],
-        group["members"]
-      );
+
+      if (imgUri) {
+        this.uploadAvatar(groupRef.id, imgUri);
+      }
+
+      alert("Create group successfully");
+      navigation.navigate("Groups");
+
+      // Add activity
+      ActivityService.getInstance().aCreateGroup(groupRef.id, group["name"]);
     } catch (e) {
       console.log(e);
+    }
+  }
+
+  async uploadAvatar(groupId, imgUri) {
+    try {
+      console.log("start upload avatar");
+      const storageRef = ref(storage, `groups/${groupId}`);
+      const fetchReponse = await fetch(imgUri);
+      const blob = await fetchReponse.blob();
+
+      const uploadTask = uploadBytesResumable(storageRef, blob);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(`Upload is ${progress}% done`);
+        },
+        (error) => {
+          console.error(error);
+        },
+        () => {
+          const groupRef = doc(db, GROUP_COLLECTION, groupId);
+          getDownloadURL(storageRef).then((downloadURL) => {
+            console.log("File available at", downloadURL);
+            setDoc(groupRef, { avatarUrl: downloadURL }, { merge: true });
+          });
+        }
+      );
+    } catch (e) {
+      console.error(e);
     }
   }
 

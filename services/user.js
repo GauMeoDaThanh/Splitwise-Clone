@@ -84,7 +84,7 @@ class UserService {
     }
   }
 
-  async uploadAvatar(imgUri, navigator) {
+  async uploadAvatar(imgUri) {
     try {
       console.log("start upload avatar");
       const uid = auth.currentUser.uid;

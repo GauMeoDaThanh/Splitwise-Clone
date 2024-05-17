@@ -234,7 +234,11 @@ const TabNavigator = () => {
                 }}
               >
                 <Image
-                  source={require("../assets/icons/account_icon.png")}
+                  source={
+                    imageUri
+                      ? { uri: imageUri }
+                      : require("../assets/icons/account_icon.png")
+                  }
                   style={{ width: 25, height: 25, borderRadius: 25 }}
                 />
               </View>
