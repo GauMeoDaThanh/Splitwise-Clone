@@ -47,8 +47,8 @@ const App = () => {
   return (
     <SafeAreaView style={containerStyle}>
       <View style={containerStyle}>
-        {/* <AppNavigation /> */}
-        <SplitExpenseScreen></SplitExpenseScreen>
+        <AppNavigation />
+        {/* <SplitExpenseScreen></SplitExpenseScreen> */}
       </View>
     </SafeAreaView>
   );

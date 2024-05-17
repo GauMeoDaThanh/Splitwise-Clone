@@ -145,7 +145,7 @@ const AddExpenseScreen = (props) => {
             <Text> you </Text>
           </TouchableOpacity>
           <Text> and split </Text>
-          <TouchableOpacity style={[styles.buttonStyle]} onPress={handleSplitExpense}>
+          <TouchableOpacity style={[styles.buttonStyle]} onPress={handleSplitExpense} disabled={!isBothFieldsFilled}>
             <Text>equally</Text>
           </TouchableOpacity>
         </View>
