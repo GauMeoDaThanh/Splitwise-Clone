@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   ScrollView,
   TouchableOpacity,
@@ -27,11 +27,11 @@ const FriendsScreen = ({ route }) => {
     setListFriends(userFriends);
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getUserFriends();
-    }, [route.params?.reloadSc])
-  );
+  useEffect(() => {
+    FriendService.getInstance().listenToFriendList((friends) => {
+      setListFriends(friends);
+    });
+  }, []);
 
   return (
     <View

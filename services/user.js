@@ -8,6 +8,7 @@ import {
   doc,
   setDoc,
   getDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import {
   ref,
@@ -38,6 +39,17 @@ class UserService {
       UserService.instance = new UserService();
     }
     return UserService.instance;
+  }
+
+  async listenToUserInfo(callback) {
+    const uid = auth.currentUser.uid;
+    const userRef = doc(db, USER_COLLECTION, uid);
+    const unsubscribe = onSnapshot(userRef, (doc) => {
+      this.user = doc.data();
+      callback(this.user);
+    });
+
+    return () => unsubscribe();
   }
 
   async createUser(uid, username, email) {

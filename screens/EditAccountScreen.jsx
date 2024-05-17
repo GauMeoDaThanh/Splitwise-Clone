@@ -52,9 +52,7 @@ const EditAccountScreen = ({ route }) => {
   return (
     <View className="flex-1 bg-white p-1 py-5">
       <View className="flex-row ml-1 mr-1 space-x-4 items-center border-b-2 border-gray-600 py-2">
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Account", { userData })}
-        >
+        <TouchableOpacity onPress={() => navigation.navigate("Account")}>
           <Image
             source={require("../assets/icons/back_icon.png")}
             style={{ width: 20, height: 20 }}

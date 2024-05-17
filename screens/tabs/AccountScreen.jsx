@@ -13,14 +13,17 @@ import * as ImagePicker from "expo-image-picker";
 import AuthenticateService from "../../services/authentication";
 import UserService from "../../services/user";
 
-const AccountScreen = ({ route }) => {
+const AccountScreen = () => {
   const navigation = useNavigation();
   const [imageUri, setImageUri] = useState(null);
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    setUserData(route.params?.userData);
-  }, [route.params?.userData]);
+    UserService.getInstance().listenToUserInfo((user) => {
+      setUserData(user);
+      setImageUri(user.avatarUrl);
+    });
+  }, []);
 
   const updateTabBarIcon = useCallback(() => {
     navigation.setOptions({
@@ -37,15 +40,6 @@ const AccountScreen = ({ route }) => {
     updateTabBarIcon();
   }, [imageUri, updateTabBarIcon]);
 
-  useEffect(() => {
-    const getUserData = async () => {
-      const user = await UserService.getInstance().getUser();
-      setUserData(user);
-      setImageUri(user.avatarUrl);
-    };
-    getUserData();
-  }, []);
-
   const chooseImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -54,7 +48,6 @@ const AccountScreen = ({ route }) => {
       quality: 1,
     });
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
       await UserService.getInstance().uploadAvatar(result.assets[0].uri);
     }
   };

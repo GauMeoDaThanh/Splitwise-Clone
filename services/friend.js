@@ -12,6 +12,7 @@ import {
   arrayUnion,
   arrayRemove,
   getDoc,
+  onSnapshot,
 } from "firebase/firestore";
 
 class FriendService {
@@ -26,6 +27,16 @@ class FriendService {
       FriendService.instance = new FriendService();
     }
     return FriendService.instance;
+  }
+
+  async listenToFriendList(callback) {
+    const uid = auth.currentUser.uid;
+    const userRef = doc(db, USER_COLLECTION, uid);
+    const unsubscribe = onSnapshot(userRef, () => {
+      this.getFriendsAvatarAndName(uid).then((friends) => callback(friends));
+    });
+
+    return () => unsubscribe();
   }
 
   async addFriend(fMail) {
