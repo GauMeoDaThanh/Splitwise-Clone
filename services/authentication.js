@@ -3,6 +3,9 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   sendEmailVerification,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
 } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { signInWithPopup } from "firebase/auth";
@@ -14,13 +17,24 @@ import { useNavigation } from "@react-navigation/native";
 
 
 class AuthenticateService {
-    constructor() {
+     constructor() {
         if (AuthenticateService.instance == null) {
             AuthenticateService.instance = this;
             this.state = { idAcc: "" };
         }
         return AuthenticateService.instance;
     }
+  static getInstance() {
+    if (!AuthenticateService.instance) {
+      AuthenticateService.instance = new AuthenticateService();
+    }
+    return AuthenticateService.instance;
+  }
+
+  async isLogin() {
+    console.log(auth.currentUser?.uid);
+    return auth.currentUser != null;
+  }
     static getInstance() {
         if (!AuthenticateService.instance) {
             AuthenticateService.instance = new AuthenticateService();
@@ -70,6 +84,30 @@ class AuthenticateService {
         }
     }
 
+  async handleSignIn(email, password, navigation) {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      if (user.emailVerified) {
+        //   Đến home
+        // navigation.navigate("FriendsScreen");
+        navigation.navigate("TabNavigator");
+        console.log("Login successfully!");
+      } else {
+        // Email chưa được xác nhận
+        alert(
+          "Email has not been verified yet. Please verify your email before logging in."
+        );
+      }
+    } catch (error) {
+      console.log("Login failed: ", error);
+      alert("Login failed");
+    }
+  }
     async handleSignIn(email, password, navigation) {
         try {
             const userCredential = await signInWithEmailAndPassword(
@@ -128,14 +166,43 @@ class AuthenticateService {
         }
     }
 
-    async handleSignOut(navigate) {
-        try {
-            await auth.signOut();
-            navigate.navigate("Login");
-            console.log("Sign out successfully!");
-        } catch (error) {
-            console.log("Sign out failed: ", error);
-        }
+  async handleSignOut(navigate) {
+    try {
+      await auth.signOut();
+      navigate.navigate("Login");
+      console.log("Sign out successfully!");
+    } catch (error) {
+      console.log("Sign out failed: ", error);
     }
+  }
+
+  async updatePassword(oldPassword, newPassword) {
+    try {
+      const user = auth.currentUser;
+      await this.reAuthenticateUser(oldPassword);
+      await updatePassword(user, newPassword);
+      alert("Password updated successfully");
+    } catch (e) {
+      switch (e.code) {
+        case "auth/invalid-credential":
+          alert("Invalid password");
+          break;
+        case "auth/weak-password":
+          alert(
+            "Password is not strong enough. At least 6 characters are required."
+          );
+          break;
+        default:
+          alert(e.message);
+          break;
+      }
+    }
+  }
+
+  async reAuthenticateUser(currentPassword) {
+    const user = auth.currentUser;
+    const cred = EmailAuthProvider.credential(user.email, currentPassword);
+    return reauthenticateWithCredential(user, cred);
+  }
 }
 export default AuthenticateService;

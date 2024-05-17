@@ -1,4 +1,4 @@
-import { db, USER_COLLECTION } from "../firebaseConfig";
+import { db, USER_COLLECTION, auth } from "../firebaseConfig";
 import UserService from "./user";
 import {
   collection,
@@ -12,6 +12,7 @@ import {
   arrayUnion,
   arrayRemove,
   getDoc,
+  onSnapshot,
 } from "firebase/firestore";
 
 class FriendService {
@@ -28,13 +29,28 @@ class FriendService {
     return FriendService.instance;
   }
 
-  async addFriend(uid, fMail) {
+  async listenToFriendList(callback) {
+    const uid = auth.currentUser.uid;
+    const userRef = doc(db, USER_COLLECTION, uid);
+    const unsubscribe = onSnapshot(userRef, () => {
+      this.getFriendsAvatarAndName(uid).then((friends) => callback(friends));
+    });
+
+    return () => unsubscribe();
+  }
+
+  async addFriend(fMail) {
+    const uid = auth.currentUser.uid;
     const friendUid = await UserService.getInstance().getUserIDWithMail(fMail);
     if (friendUid) {
       const userRef = doc(db, USER_COLLECTION, uid);
+      const friendRef = doc(db, USER_COLLECTION, friendUid);
       try {
         await updateDoc(userRef, {
           friends: arrayUnion(friendUid),
+        });
+        await updateDoc(friendRef, {
+          friends: arrayUnion(uid),
         });
       } catch (e) {
         console.error(e);
@@ -44,7 +60,8 @@ class FriendService {
     }
   }
 
-  async deleteFriend(uid, friendUid) {
+  async deleteFriend(friendUid) {
+    const uid = auth.currentUser.uid;
     const userRef = doc(db, USER_COLLECTION, uid);
     try {
       await updateDoc(userRef, {

@@ -84,7 +84,7 @@ class ExpenseService {
         );
         const users = [];
         for (id of idFr) {
-            users.push(await userService.getUser(id));
+            users.push(await userService.getUserById(id));
         }
         groupList = await groupService.getGroupOfIdAcc(
             authenticateService.idAcc
