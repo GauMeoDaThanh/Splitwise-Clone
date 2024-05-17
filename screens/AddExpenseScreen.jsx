@@ -124,7 +124,7 @@ const AddExpenseScreen = (props) => {
                                 <Text>{item.type?item.name:item.username}</Text>
                             </TouchableOpacity>
                         )}
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item) => item.uid}
                         style={{
                             height: 100,
                             borderColor: "gray",
