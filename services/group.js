@@ -66,19 +66,17 @@ class GroupService {
         orderBy("createAt", "asc")
       );
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        if (!querySnapshot.metadata.hasPendingWrites) {
-          let groups = [];
-          querySnapshot.forEach((doc) => {
-            let group = doc.data();
-            if (group.createAt) {
-              group["id"] = doc.id;
-              group["createAt"] = group["createAt"].toDate().toDateString();
-              group["imageuri"] = group["imageuri"] || null;
-              groups.push(group);
-            }
-          });
-          callback(groups);
-        }
+        let groups = [];
+        querySnapshot.forEach((doc) => {
+          let group = doc.data();
+          if (group.createAt) {
+            group["id"] = doc.id;
+            group["createAt"] = group["createAt"].toDate().toDateString();
+            group["imageuri"] = group["imageuri"] || null;
+            groups.push(group);
+          }
+        });
+        callback(groups);
       });
 
       return () => unsubscribe();
@@ -143,8 +141,7 @@ class GroupService {
         () => {
           const groupRef = doc(db, GROUP_COLLECTION, groupId);
           getDownloadURL(storageRef).then((downloadURL) => {
-            setDoc(groupRef, { imageuri: downloadURL }, { merge: true });
-            console.log("File available at", downloadURL);
+            updateDoc(groupRef, { imageuri: downloadURL }, { merge: true });
           });
         }
       );
