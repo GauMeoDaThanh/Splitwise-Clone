@@ -1,9 +1,18 @@
 import { auth, db } from "../firebaseConfig";
-import { collection, addDoc, query, getDoc, updateDoc } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc, query, getDoc, updateDoc } from "firebase/firestore";
 import FriendService from "./friend";
 import AuthenticateService from "./authentication";
 import UserService from "./user";
 import GroupService from "./group";
+import {
+  ref,
+  getStorage,
+  getDownloadURL,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { storage} from "../firebaseConfig";
+import { useRef } from "react";
+
 
 const friendService = FriendService.getInstance();
 const authenticateService = AuthenticateService.getInstance();
@@ -38,7 +47,7 @@ class ExpenseService {
         return ExpenseService.instance;
     }
 
-    async createExpense(createAt, imgUrl, amounts, description, participants) {
+    async createExpense(createAt, amounts, description, participants) {
         members = [];
         groupId = [];
         // console.log("Participants: ", participants);
@@ -60,7 +69,6 @@ class ExpenseService {
             ...this.expense,
             createAt,
             groupId,
-            imgUrl,
             amounts,
             description,
             participants,
@@ -197,12 +205,13 @@ class ExpenseService {
                     console.error(error);
                 },
                 () => {
-                    const userRef = doc(db, "expenses", uid);
+                    const expenseRef = doc(db, "expenses", uid);
+                    console.log("expense", expenseRef)
                     getDownloadURL(storageRef).then((downloadURL) => {
                         console.log("File available at", downloadURL);
                         setDoc(
-                            userRef,
-                            { avatarUrl: downloadURL },
+                            expenseRef,
+                            { imgUrl: downloadURL },
                             { merge: true }
                         );
                     });

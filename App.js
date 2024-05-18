@@ -3,6 +3,7 @@ import React from "react";
 import AppNavigation from "./navigation/AppNavigation";
 import { SafeAreaView, View, Dimensions } from "react-native";
 
+
 const App = () => {
   // Lấy kích thước của màn hình thiết bị
   const screenWidth = Dimensions.get("screen").width;
@@ -19,6 +20,7 @@ const App = () => {
     <SafeAreaView style={containerStyle}>
       <View style={containerStyle}>
         <AppNavigation />
+        {/* <AddImageExpense></AddImageExpense> */}
       </View>
     </SafeAreaView>
   );

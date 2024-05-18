@@ -15,9 +15,12 @@ import ExpenseService from "../services/expense";
 
 
 const expenseService = ExpenseService.getInstance();
+import { useNavigation } from '@react-navigation/native';
 
 const AddExpenseScreen = (props) => {
-    const textInputRef = useRef(null);
+  const textInputRef = useRef(null);
+  const descriptionInputRef = useRef(null);
+  const moneyInputRef = useRef(null);
     useEffect(() => {
         // Focus vào TextInput khi mở trang
         textInputRef.current.focus();
@@ -28,13 +31,19 @@ const AddExpenseScreen = (props) => {
     const [isFocused, setIsFocused] = useState(0);
     const [isBothFieldsFilled, setIsBothFieldsFilled] = useState(false);
 
+    
+    const navigation = useNavigation();
+    const handleAddImageExpense = () => {
+        navigation.navigate('AddImageExpense');
+        };
+    
     // Làm Gợi ý khi nhận mail hoặc tên user
     const [suggestions, setSuggestions] = useState([]);
     const [selectedParticipants, setSelectedParticipants] = useState([]);
 
-    useEffect(() => {
-        setIsBothFieldsFilled(description !== "" && money !== "");
-    }, [description, money]);
+  useEffect(() => {
+    setIsBothFieldsFilled(description !== "" && money !== "");
+  }, [description, money]);
 
     handleInputParticipants = async (text) => {
         const filteredSuggestions = await expenseService.handleInputParticipants(text);
@@ -59,10 +68,8 @@ const AddExpenseScreen = (props) => {
     //Tạo hoá đơn
     const handleCreateExpense = async () => {
         try {
-            // Chưa thêm groupid, img
             expenseService.createExpense(
                 new Date(),
-                "",
                 parseFloat(money),
                 description,
                 selectedParticipants
@@ -223,25 +230,34 @@ const AddExpenseScreen = (props) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            <View
-                style={[
-                    { flex: 10, borderTopColor: "#EEEEEE", borderTopWidth: 1 },
-                ]}
-            ></View>
-            <View style={[{ flex: 36 }]}>
-                <KeyboardAvoidingView
-                    style={{ flex: 1 }}
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-                ></KeyboardAvoidingView>
-            </View>
-            {/* <KeyboardAvoidingView
-        style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+
+             <View
+        style={[{ flex: 10, borderTopColor: "#EEEEEE", borderTopWidth: 1 }]}
       >
-      </KeyboardAvoidingView> */}
-        </View>
+        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: 'flex-end' }} onPress={handleAddImageExpense}>
+       
+          <Image
+            source={require("../assets/icons/camera.png")}
+            style={{ width: 60, height: 60 }}
+          />
+  
+        </TouchableOpacity>
+      </View>
+      {/* <View style={[{ isFocused === 2 ? flex: 50 : flex: 36 }]}>
+        <KeyboardAvoidingView
+          // style={{ flex: 1 }}
+          // behavior={Platform.OS === "ios" ? "padding" : "height"}
+          // keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        ></KeyboardAvoidingView>
+      </View> */}
+      {isFocused === 2 && (
+        <View style={{ flex: 36 }}>{<KeyboardAvoidingView></KeyboardAvoidingView>}</View>
+      )}
+
+      {isFocused !== 2 && (
+        <View style={{ flex: 50 }}>{<KeyboardAvoidingView></KeyboardAvoidingView>}</View>
+      )}
+    </View>
     );
 };
 export default AddExpenseScreen;

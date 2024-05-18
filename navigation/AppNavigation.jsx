@@ -25,11 +25,12 @@ import UserService from "../services/user";
 import AddFriendScreen from "../screens/AddFriendScreen";
 import AddExpenseScreen from "../screens/AddExpenseScreen";
 import LoadScreen from "../screens/LoadScreen";
+import AddImageExpense from "../screens/AddImageExpense";
 
 const AppNavigation = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="LoadScreen">
         <Stack.Screen
           name="LoadScreen"
           component={LoadScreen}
@@ -66,14 +67,14 @@ const AppNavigation = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="FriendsScreen"
-          component={FriendsScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
           name="AddExpenseScreen"
           component={AddExpenseScreen}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddImageExpense"
+          component={AddImageExpense}
+          options={{ headerShown: false, }}
         />
       </Stack.Navigator>
     </NavigationContainer>

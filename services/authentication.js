@@ -119,7 +119,7 @@ class AuthenticateService {
             if (user.emailVerified) {
                 //   Đến home
                 this.state.idAcc = user.uid; // Update state
-                navigation.navigate("FriendsScreen");
+                navigation.navigate("Friends");
                 console.log("Login successfully!");
             } else {
                 // Email chưa được xác nhận
