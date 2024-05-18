@@ -95,10 +95,15 @@ const FriendsScreen = () => {
               />
             ))}
         </ScrollView>
-
-        {/* <TouchableOpacity > */}
-        <ButtonAddExpense></ButtonAddExpense>
-        {/* </TouchableOpacity> */}
+      </View>
+      <View className='flex-row'
+            style={{
+              position: 'absolute',
+              top: 530,
+              left: 190
+            }}
+      >
+              <ButtonAddExpense />
       </View>
     </View>
   );
