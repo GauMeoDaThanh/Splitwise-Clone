@@ -96,6 +96,7 @@ class GroupService {
       createAt,
       createBy,
       type,
+      members: [createBy],
     };
 
     console.log("start add group");
