@@ -81,6 +81,7 @@ class FriendService {
           const friendSnap = await getDoc(friendRef);
           const friendData = friendSnap.data();
           return {
+            id: friendUid,
             avatar: friendData.avatarUrl,
             name: friendData.username,
           };

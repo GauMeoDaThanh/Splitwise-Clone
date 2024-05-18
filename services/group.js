@@ -5,6 +5,7 @@ import {
   GROUP_COLLECTION,
   USER_COLLECTION,
 } from "../firebaseConfig";
+import { Alert } from "react-native";
 import ActivityService from "./activity";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import {
@@ -19,6 +20,12 @@ import {
   arrayUnion,
   arrayRemove,
   deleteDoc,
+  query,
+  where,
+  or,
+  getDocs,
+  onSnapshot,
+  orderBy,
 } from "firebase/firestore";
 
 const initGroup = {
@@ -46,13 +53,38 @@ class GroupService {
   }
 
   async listenToGroupList(callback) {
-    const uid = auth.currentUser.uid;
-    // const userRef = doc(db, USER_COLLECTION, uid);
-    const unsubscribe = onSnapshot(userRef, () => {
-      // this.getFriendsAvatarAndName(uid).then((friends) => callback(friends));
-    });
+    try {
+      console.log("start listen to group list");
+      const groupsRef = collection(db, GROUP_COLLECTION);
+      const uid = auth.currentUser.uid;
+      const q = query(
+        groupsRef,
+        or(
+          where("createBy", "==", uid),
+          where("members", "array-contains", uid)
+        ),
+        orderBy("createAt", "asc")
+      );
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        if (!querySnapshot.metadata.hasPendingWrites) {
+          let groups = [];
+          querySnapshot.forEach((doc) => {
+            let group = doc.data();
+            if (group.createAt) {
+              group["id"] = doc.id;
+              group["createAt"] = group["createAt"].toDate().toDateString();
+              group["imageuri"] = group["imageuri"] || null;
+              groups.push(group);
+            }
+          });
+          callback(groups);
+        }
+      });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async addGroup(name, type, imgUri, navigation) {
@@ -69,14 +101,17 @@ class GroupService {
     console.log("start add group");
     try {
       const groupRef = await addDoc(collection(db, GROUP_COLLECTION), group);
+      if (imgUri) {
+        await this.uploadAvatar(groupRef.id, imgUri);
+      }
       console.log("Document written with ID: ", groupRef.id);
 
-      if (imgUri) {
-        this.uploadAvatar(groupRef.id, imgUri);
-      }
-
-      alert("Create group successfully");
-      navigation.navigate("Groups");
+      Alert.alert("Success", "Group created successfully", [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("Groups"),
+        },
+      ]);
 
       // Add activity
       ActivityService.getInstance().aCreateGroup(groupRef.id, group["name"]);
@@ -107,8 +142,8 @@ class GroupService {
         () => {
           const groupRef = doc(db, GROUP_COLLECTION, groupId);
           getDownloadURL(storageRef).then((downloadURL) => {
+            setDoc(groupRef, { imageuri: downloadURL }, { merge: true });
             console.log("File available at", downloadURL);
-            setDoc(groupRef, { avatarUrl: downloadURL }, { merge: true });
           });
         }
       );
@@ -124,7 +159,7 @@ class GroupService {
       const groupSnap = await getDoc(groupRef);
 
       let groupInfo = groupSnap.data();
-      groupInfo["createAt"] = groupInfo["createAt"].toDate().toDateString();
+      groupInfo["createAt"] = groupInfo["createAt"]?.toDate().toDateString();
 
       return groupInfo;
     } catch (e) {

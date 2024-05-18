@@ -14,11 +14,12 @@ import GroupService from "../services/group";
 const AddGroupsScreen = () => {
   const [imageUri, setImageUri] = useState(null);
   const [groupName, setGroupName] = useState("");
+  const [selectedTypeText, setSelectedTypeText] = useState("");
 
   const handleAddGroup = () => {
     GroupService.getInstance().addGroup(
       groupName,
-      "trip",
+      selectedTypeText,
       imageUri,
       navigation
     );
@@ -51,7 +52,6 @@ const AddGroupsScreen = () => {
       selected: false,
     },
   ]);
-  const [selectedTypeText, setSelectedTypeText] = useState("");
 
   const chooseImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -184,7 +184,7 @@ const AddGroupsScreen = () => {
             Type
           </Text>
         </View>
-        <ScrollView horizontal={true}>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
           <View className="flex-row justify-center space-x-3">
             {buttons.map((button, index) => (
               <TouchableOpacity

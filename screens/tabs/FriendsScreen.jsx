@@ -18,17 +18,6 @@ const FriendsScreen = () => {
   const [userAvatar, setUserAvatar] = React.useState(null);
   const [listFriends, setListFriends] = React.useState(null);
 
-  // React.useEffect(() => {
-  //   const getUserFriends = async () => {
-  //     const user = auth.currentUser;
-  //     const userFriends =
-  //       await FriendService.getInstance().getFriendsAvatarAndName(user.uid);
-  //     setListFriends(userFriends);
-  //   };
-
-  //   getUserFriends();
-  // }, []);
-
   React.useEffect(() => {
     FriendService.getInstance().listenToFriendList((friends) => {
       setListFriends(friends);
@@ -93,18 +82,27 @@ const FriendsScreen = () => {
       <View style={{ flex: 70, position: "relative" }}>
         <ScrollView>
           {listFriends &&
-            listFriends.map((friend, index) => (
+            listFriends.map((friend) => (
               <CardFriend
-                key={index}
+                key={friend.id}
                 name={friend.name}
                 avatar={friend.avatar}
+                onPress={() => {
+                  console.log(friend.id);
+                }}
               />
             ))}
         </ScrollView>
-
-        {/* <TouchableOpacity > */}
-        <ButtonAddExpense></ButtonAddExpense>
-        {/* </TouchableOpacity> */}
+      </View>
+      <View
+        className="flex-row"
+        style={{
+          position: "absolute",
+          top: 530,
+          left: 190,
+        }}
+      >
+        <ButtonAddExpense />
       </View>
     </View>
   );
