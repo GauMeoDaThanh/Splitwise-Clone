@@ -30,7 +30,7 @@ import DetailsGroupsScreen from "../screens/DetailsGroupsScreen";
 import BalancesScreen from "../screens/BalancesScreen";
 import WhiteboardScreen from "../screens/WhiteboardScreen";
 import TotalsScreen from "../screens/TotalsScreen";
-import ListFriendsScreen from "../screens/ListFriendsScreen";
+import ListFriendsScreen from "../screens/AddMemberGroupsScreen";
 import AddMemberGroupsScreen from "../screens/AddMemberGroupsScreen";
 const AppNavigation = () => {
   return (
