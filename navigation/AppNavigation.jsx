@@ -160,7 +160,7 @@ const TabNavigator = () => {
         }}
     >
         <Tab.Screen
-            name='Groups'
+            name='GroupsStackScreen'
             component={GroupsStackScreen}
             options={{
                 title: 'Groups',

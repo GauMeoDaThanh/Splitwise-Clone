@@ -1,11 +1,20 @@
 import { useNavigation } from "@react-navigation/native";
-import React, {useState} from "react";
+import React, { useState, useMemo } from "react";
 import {Text, TextInput, SafeAreaView, View,TouchableOpacity, Image, ScrollView, FlatList} from "react-native";
 import AppBar from "../../components/AppBar";
 import AddToolBar from "../../components/AddToolBar";
 import ButtonAddExpense from "../../components/ButtonAddExpense";
+import RadioButtons from "react-native-radio-buttons";
 const GroupsScreen = () => {
     const navigation = useNavigation();
+  
+    const [showFilterOptions, setShowFilterOptions] = useState(false);
+    const [selectedId, setSelectedId] = useState(null);
+    const radioButtons = ["All groups", "Groups you owe", "Groups that owe you","Trip","Home","Couple","Friend","Other"];
+    const toggleFilterOptions = () => {
+        setShowFilterOptions(!showFilterOptions);
+    };
+
     return(
         <View className = 'flex-1 py-5 bg-white'>
             <View className = 'flex-row border-gray-300'
@@ -26,16 +35,18 @@ const GroupsScreen = () => {
                             }}
                         >3.500.00vnđ</Text>
                     </View>
-                    <View className = 'flex-row items-center'>
-                        <Image 
-                            source={require('../../assets/icons/filter_icon.png')}
-                            style = {{
-                                width: 30,
-                                height: 30,
-                                tintColor: '#0B9D7E'
-                            }}
-                        >
-                        </Image>
+                    <View className = 'flex-row'>
+                    <TouchableOpacity className='flex-row items-center' onPress={toggleFilterOptions}>
+                            <Image 
+                                source={require('../../assets/icons/filter_icon.png')}
+                                style = {{
+                                    width: 30,
+                                    height: 30,
+                                    tintColor: '#0B9D7E'
+                                }}
+                            >
+                            </Image>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View className='flex-row mb-3'>
@@ -204,8 +215,59 @@ const GroupsScreen = () => {
          
                 </View>
             </View>
+           {/* Dropdown for filter options */}
+           {showFilterOptions && (
+                <View className = 'border-2 border-gray-300 '
+                    style={{ 
+                        position: 'absolute', 
+                        top: 130, 
+                        right: 5, 
+                        backgroundColor: 'white', 
+                        borderRadius: 10, 
+                        padding: 10, 
+                        zIndex: 1,
+                        borderRadius: 10,
+                    }}
+                >
+                    <RadioButtons
+                        options={radioButtons}
+                        onSelection={(option) => setSelectedId(option)}
+                        selectedOption={selectedId}
+                        renderOption={(option, selected, onSelect, index) => (
+                            <TouchableOpacity key={index} onPress={onSelect}>
+                                <View className = 'flex-row items-center py-1 space-x-2'>
+                                    <View style={{
+                                        width: 20,
+                                        height: 20,
+                                        borderRadius: 10,
+                                        borderWidth: 2,
+                                        marginRight: 8,
+                                        borderColor: selected ? "#0B9D7E" : "rgb(75, 85, 99)",
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }}>
+                                        {selected && (
+                                            <View style={{
+                                                width: 10,
+                                                height: 10,
+                                                borderRadius: 5,
+                                                backgroundColor: "#0B9D7E"
+                                            }} />
+                                        )}
+                                    </View>
+                                    <Text style={{ color: 'rgb(75, 85, 99)', fontWeight: 500, fontSize: 14 }}>{option}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        )}
+                    />
+
+                </View>
+            )}
         </View>
     );
 };
+
+
 export default GroupsScreen;
+
 
