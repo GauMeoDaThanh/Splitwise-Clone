@@ -29,6 +29,7 @@ const renderColoredText = (text) => {
 const CardFriend = (props) => {
   return (
     <TouchableOpacity
+      onPress={props.onPress}
       style={[
         styles.container,
         {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   TouchableOpacity,
@@ -20,13 +20,9 @@ const SplitExpenseScreen = (props) => {
 const [selectedButton, setSelectedButton] = useState(0); // Track selected button 
 const [participants, setParticipants] = useState([]); // Use state for participants
 const description = props.route.params.description;
-const money = props.route.params.money
-console.log("description", description)
-console.log("money", money)
-// Khởi tạo tất cả bạn bè được chọn
+const amounts = props.route.params.money
 const [selectedFriends, setSelectedFriends] = useState([]);
 const [selectedParticipants, setSelectedParticipants] = useState([])
-  const [splitType, setSplitType] = useState('equally'); 
   
   useEffect(() => {
     const handleGetParticipants = async () => {
@@ -40,7 +36,7 @@ const [selectedParticipants, setSelectedParticipants] = useState([])
       }
     };
     handleGetParticipants(); 
-  }, []);
+  }, [selectedParticipants]);
 
   // Danh sách người chia hoá đơn
   const friendsList = []
@@ -48,42 +44,56 @@ const [selectedParticipants, setSelectedParticipants] = useState([])
      friendsList.push({uid: participant.uid, name: participant.username, avatar: participant.avatarUrl})
   }
 
+  const handleButtonPress = (index) => {
+  setSelectedButton(index); // Update selected button state
+  };
 
-  // console.log("Selected Friends: ",selectedFriends)
-const handleButtonPress = (index) => {
-setSelectedButton(index); // Update selected button state
-};
-
-const handleFriendToggle = (item) => {
-  setSelectedFriends((prevSelectedFriends) =>
-    prevSelectedFriends.filter((friend) => friend.uid !== item.uid)?[...prevSelectedFriends, item]:[...prevSelectedFriends]
-);
+  const handleFriendToggle = (item) => {
+    setSelectedFriends((prevSelectedFriends) =>
+      prevSelectedFriends.filter((friend) => friend.uid !== item.uid)?[...prevSelectedFriends, item]:[...prevSelectedFriends]
+  );
   };
   // Xử lí chia hoàn thành
-  const navigation = useNavigation()
-  const handleDoneSplit = async () => {
-  switch (selectedButton) {
-    case 0:
-      Alert.alert('Success', 'Split expense successfully!');
-      setSplitType('equally')
-      // navigation.popToTop(); // Quay về màn hình gốc
-      await navigation.navigate("AddExpenseScreen", {
-      selectedFriends: JSON.stringify(selectedFriends),
-      selectedParticipants: JSON.stringify(selectedParticipants),
-      splitType,
-      description,
-      money,
-    });
-      break;
-    case 1:
-      setSplitType("percent");
-      
-      break;
-    case 2:
-      setSplitType("unequally");
-
-      break;
-    }
+    const navigation = useNavigation()
+    const handleDoneSplit = async () => {
+      let splitType = ""
+      switch (selectedButton) {
+        case 0:
+          Alert.alert('Success', 'Split expense successfully!');
+          splitType = "equally"
+          await navigation.navigate("AddExpenseScreen", {
+          selectedFriends: JSON.stringify(selectedFriends),
+          selectedParticipants: JSON.stringify(selectedParticipants),
+          splitType,
+          description,
+          amounts,
+        });
+          break;
+        case 1:
+          Alert.alert('Success', 'Split expense successfully!');
+          splitType = "unequally";
+          await navigation.navigate("AddExpenseScreen", {
+          valueInputs,
+          selectedParticipants: JSON.stringify(selectedParticipants),
+          splitType,
+          description,
+          amounts,
+          friendsList: JSON.stringify(friendsList)
+        });
+          break;
+        case 2:
+          Alert.alert('Success', 'Split expense successfully!');
+          splitType = "percent";
+          await navigation.navigate("AddExpenseScreen", {
+          valueInputs,
+          selectedParticipants: JSON.stringify(selectedParticipants),
+          splitType,
+          description,
+          amounts,
+          friendsList: JSON.stringify(friendsList)
+        });
+          break;
+      }
         // Reset lại màn hình SplitScreen sau khi điều hướng tới AddExpenseScreen
     // navigation.dispatch(
     //   CommonActions.reset({
@@ -93,7 +103,23 @@ const handleFriendToggle = (item) => {
     // );
   }
 
-const allSelected = selectedFriends.length === friendsList.length;
+  const allSelected = selectedFriends.length === friendsList.length;
+  const [valueInputs, setValueInputs] = useState({});
+  const handleValueInputChange = (friendId, value) => {
+    setValueInputs((prevValueInputs) => ({
+      ...prevValueInputs,
+      [friendId]: value,
+    }));
+  };
+
+const totalValueInput = Object.values(valueInputs).reduce(
+  (total, value) => total + parseFloat(value || 0),
+  0
+);
+
+const leftPercentage = 100 - totalValueInput;
+const leftAmount = amounts - totalValueInput;
+const amountOfPerson = (amounts / selectedFriends.length).toFixed(5);
 
 const imageSource = () => {
   switch (selectedButton) {
@@ -105,7 +131,7 @@ const imageSource = () => {
 
 }
 };
-
+  console.log("S")
 const renderTextContent = () => {
     switch (selectedButton) {
         case 1:
@@ -156,10 +182,10 @@ const renderGeneral = () => {
                 }}
             >
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
-                ... dong of .... dong
+                  {totalValueInput} dong of {amounts} dong
                 </Text>
                 <Text style={{ fontSize: 14, fontWeight: 400 }}>
-                ...dong left
+                  {leftAmount} dong left
                 </Text>
             </View>
             </>
@@ -176,9 +202,9 @@ const renderGeneral = () => {
                 }}
             >
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
-                ...% of 100%
+                {totalValueInput}% of 100%
                 </Text>
-                <Text style={{ fontSize: 14, fontWeight: 400 }}>...% left</Text>
+                 <Text style={{ fontSize: 14, fontWeight: 400, color: leftPercentage<0 ? 'red' : 'black' }}>{leftPercentage}% left</Text>
             </View>
             </>
         );
@@ -208,7 +234,7 @@ const renderGeneral = () => {
                 }}
                 >
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
-                    ...Dong/person
+                        {amountOfPerson} Dong/person
                 </Text>
                 <Text style={{ fontSize: 14, fontWeight: 400 }}>
                     ({selectedFriends.length} person
@@ -241,7 +267,7 @@ const renderGeneral = () => {
                         setSelectedFriends([]);
                     } else {
                         setSelectedFriends(
-                        friendsList.map((friend) => friend.name)
+                        friendsList.map((friend) => friend)
                         );
                     }
                     }}
@@ -251,7 +277,7 @@ const renderGeneral = () => {
             </>
         );
     }
-};
+  };
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]}>
       <View style={{ flex: 7 }}>
@@ -259,7 +285,7 @@ const renderGeneral = () => {
           navigation={props.navigation}
           title={"Split options"}
           action={"Done"}
-          isDisabled={selectedFriends.length === 0}
+          // isDisabled={selectedFriends.length === 0}
           onPress={handleDoneSplit}
         ></AddToolBar>
       </View>
@@ -354,6 +380,8 @@ const renderGeneral = () => {
               isSelected={selectedFriends.includes(friend)}
               onToggle={() => handleFriendToggle(friend)}
               selectedButton={selectedButton}
+              valueInput={valueInputs[friend.uid] || ""}
+              setValueInput={(text) => handleValueInputChange(friend.uid, text)}
             />
           ))}
         </ScrollView>

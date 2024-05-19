@@ -46,7 +46,7 @@ class ActivityService {
     }
   }
 
-  async aCreateGroup(groupId, groupName, groupMembers) {
+  async aCreateGroup(groupId, groupName) {
     try {
       const activity = {
         createBy: auth.currentUser.uid,
@@ -55,7 +55,6 @@ class ActivityService {
         additionalInfo: {
           groupId: groupId,
           name: groupName,
-          members: groupMembers,
         },
       };
 

@@ -19,8 +19,6 @@ import { useNavigation } from '@react-navigation/native';
 import { auth } from "../firebaseConfig";
 const AddExpenseScreen = (props) => {
     const textInputRef = useRef(null);
-    const descriptionInputRef = useRef(null);
-    const moneyInputRef = useRef(null);
     const navigation = useNavigation();
     const [description, setDescription] = useState("");
     const [money, setMoney] = useState("");
@@ -38,13 +36,12 @@ const AddExpenseScreen = (props) => {
     
     // Làm Gợi ý khi nhận mail hoặc tên user
     const [suggestions, setSuggestions] = useState([]);
-    const [selectedParticipants, setSelectedParticipants] = useState([{userId: auth.currentUser.uid}]);
-
+    let [selectedParticipants, setSelectedParticipants] = useState([{userId: auth.currentUser.uid}]);
     useEffect(() => {
         setIsBothFieldsFilled(description !== "" && money !== "");
         if (props.route.params) {
             setDescription(props.route.params.description);
-        setMoney(props.route.params.money);
+            setMoney(props.route.params.amounts);
         }
     }, [description, money]);
 
@@ -70,44 +67,56 @@ const AddExpenseScreen = (props) => {
         } else {
             console.log("Friend or group is already selected!");
         }
-            // console.log("Friend or group selected:", selectedParticipants);
     };
 
     //Tạo hoá đơn
     const handleCreateExpense = async () => {
         const selectedParticipants = JSON.parse(props.route.params.selectedParticipants)
-        // console.log("selected par", selectedParticipants)
         let groupId = []
         for (par of selectedParticipants) {
-            // console.log("PAR", par)
             if (par.groupId) {
                groupId.push(par.groupId)
            }
         }
-        // console.log("Group ID: ", groupId)
         const splitType = props.route.params.splitType
-        // console.log("splitType:", splitType)
+        let friendsList = [];
+        let valueInputs = {};
+        if (splitType != "equally") {
+            friendsList = JSON.parse(props.route.params.friendsList)
+            valueInputs = props.route.params.valueInputs
+        }
+        console.log("splitType:", splitType)
         let participants = []
             switch (splitType) {
                 case "equally":
-                    selectedFriends = props.route.params.selectedFriends
-                    // console.log("selected friends: ", selectedFriends);
-                    selectedFriends = JSON.parse(selectedFriends)
+                    selectedFriends = JSON.parse(props.route.params.selectedFriends)
                     for (friend of selectedFriends) {
                         console.log("Friend: ", friend)
                         participants.push({
                             userId: friend.uid,
-                            amout : parseFloat(money)/selectedFriends.length.toFixed(4)
+                            amout: parseFloat(money) / selectedFriends.length.toFixed(4)
                         })
                     }
-                    // console.log("Participants: ", participants)
+                    break;
                 case "unequally":
-
+                    console.log("Fr", friendsList)
+                    for (friend of friendsList) {
+                        participants.push({
+                            userId: friend.uid,
+                            amount: parseFloat(valueInputs[friend.uid])
+                        })
+                    }
+                    break;
                 case "percent":
-
+                    for (friend of friendsList) {
+                        participants.push({
+                            userId: friend.uid,
+                            amount: parseFloat(valueInputs[friend.uid]) / 100 * money
+                        })
+                    }
+                    break;
             }
         try {
-            // console.log("Par",participants)
             await expenseService.createExpense(
             new Date(),
             parseFloat(money),
@@ -116,16 +125,17 @@ const AddExpenseScreen = (props) => {
             participants
             );
             navigation.navigate('Friends');
-            // const uid = expenseService.expenseId;
-            // const imageUri = props.route.params.imageUri;
-            // await expenseService.uploadImgExpense(uid, imageUri);
+        //     // const uid = expenseService.expenseId;
+        //     // const imageUri = props.route.params.imageUri;
+        //     // await expenseService.uploadImgExpense(uid, imageUri);
         } catch (e) {
             console.error("Fail to add expense ", e);
         }
     };
     // Chia hoá đơn
     const handleSplitExpense = () => {
-    navigation.navigate('SplitExpenseScreen',{selectedParticipants, description, money});
+        navigation.navigate('SplitExpenseScreen', { selectedParticipants, description, money });
+        selectedParticipants = []
   };
     return (
         <View style={[{ flex: 100, backgroundColor: "white" }]}>

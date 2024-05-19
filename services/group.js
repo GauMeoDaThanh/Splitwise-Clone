@@ -1,6 +1,13 @@
-import { db, storage, auth, GROUP_COLLECTION } from "../firebaseConfig";
+import {
+  db,
+  storage,
+  auth,
+  GROUP_COLLECTION,
+  USER_COLLECTION,
+} from "../firebaseConfig";
+import { Alert } from "react-native";
 import ActivityService from "./activity";
-import { getDocs } from "firebase/firestore";
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import {
   addDoc,
   collection,
@@ -13,6 +20,12 @@ import {
   arrayUnion,
   arrayRemove,
   deleteDoc,
+  query,
+  where,
+  or,
+  getDocs,
+  onSnapshot,
+  orderBy,
 } from "firebase/firestore";
 
 const initGroup = {
@@ -22,6 +35,7 @@ const initGroup = {
   information: "",
   members: [],
   type: "",
+  imageuri: "",
 };
 
 class GroupService {
@@ -38,34 +52,64 @@ class GroupService {
         return GroupService.instance;
     }
 
-    async addGroup(name, members, type) {
-        const createAt = serverTimestamp();
-        const createBy = auth.currentUser.uid;
-        const group = {
-            ...initGroup,
-            name,
-            createAt,
-            createBy,
-            type,
-            members,
-        };
+  async listenToGroupList(callback) {
+    try {
+      console.log("start listen to group list");
+      const groupsRef = collection(db, GROUP_COLLECTION);
+      const uid = auth.currentUser.uid;
+      const q = query(
+        groupsRef,
+        or(
+          where("createBy", "==", uid),
+          where("members", "array-contains", uid)
+        ),
+        orderBy("createAt", "asc")
+      );
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        let groups = [];
+        querySnapshot.forEach((doc) => {
+          let group = doc.data();
+          if (group.createAt) {
+            group["id"] = doc.id;
+            group["createAt"] = group["createAt"].toDate().toDateString();
+            group["imageuri"] = group["imageuri"] || null;
+            groups.push(group);
+          }
+        });
+        callback(groups);
+      });
 
-        console.log("start add group");
-        try {
-            const groupRef = await addDoc(
-                collection(db, GROUP_COLLECTION),
-                group
-            );
-            console.log("Document written with ID: ", groupRef.id);
-            ActivityService.getInstance().aCreateGroup(
-                groupRef.id,
-                group["name"],
-                group["members"]
-            );
-        } catch (e) {
-            console.log(e);
-        }
+      return () => unsubscribe();
+    } catch (e) {
+      console.error(e);
     }
+  }
+
+  async addGroup(name, type, imgUri, navigation) {
+    const createAt = serverTimestamp();
+    const createBy = auth.currentUser.uid;
+    const group = {
+      ...initGroup,
+      name,
+      createAt,
+      createBy,
+      type,
+      members: [createBy],
+    };
+
+    console.log("start add group");
+    try {
+      const groupRef = await addDoc(collection(db, GROUP_COLLECTION), group);
+      console.log("Document written with ID: ", groupRef.id);
+      ActivityService.getInstance().aCreateGroup(
+        groupRef.id,
+        group["name"],
+        group["members"]
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
     async getGroupInfo(groupId) {
         try {
@@ -73,10 +117,8 @@ class GroupService {
             const groupRef = doc(db, GROUP_COLLECTION, groupId);
             const groupSnap = await getDoc(groupRef);
 
-            let groupInfo = groupSnap.data();
-            groupInfo["createAt"] = groupInfo["createAt"]
-                .toDate()
-                .toDateString();
+      let groupInfo = groupSnap.data();
+      groupInfo["createAt"] = groupInfo["createAt"]?.toDate().toDateString();
 
             return groupInfo;
         } catch (e) {
