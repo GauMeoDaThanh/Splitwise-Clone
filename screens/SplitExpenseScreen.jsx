@@ -43,6 +43,25 @@ setSelectedFriends((prevSelectedFriends) =>
 
 const allSelected = selectedFriends.length === friendsList.length;
 
+const [valueInputs, setValueInputs] = useState({});
+
+const handleValueInputChange = (friendName, value) => {
+  setValueInputs((prevValueInputs) => ({
+    ...prevValueInputs,
+    [friendName]: value,
+  }));
+};
+
+const totalValueInput = Object.values(valueInputs).reduce(
+  (total, value) => total + parseFloat(value || 0),
+  0
+);
+
+const totalExpense = 1000;
+const leftPercentage = 100 - totalValueInput;
+const leftAmount = totalExpense - totalValueInput;
+const amountOfPerson = (totalExpense / selectedFriends.length).toFixed(5);
+
 const imageSource = () => {
 switch (selectedButton) {
     case 1:
@@ -105,10 +124,10 @@ const renderGeneral = () => {
                 }}
             >
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
-                ... dong of .... dong
+                {totalValueInput} dong of {totalExpense} dong
                 </Text>
                 <Text style={{ fontSize: 14, fontWeight: 400 }}>
-                ...dong left
+                {leftAmount} dong left
                 </Text>
             </View>
             </>
@@ -125,9 +144,9 @@ const renderGeneral = () => {
                 }}
             >
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
-                ...% of 100%
+                {totalValueInput}% of 100%
                 </Text>
-                <Text style={{ fontSize: 14, fontWeight: 400 }}>...% left</Text>
+                <Text style={{ fontSize: 14, fontWeight: 400, color: leftPercentage<0 ? 'red' : 'black' }}>{leftPercentage}% left</Text>
             </View>
             </>
         );
@@ -157,7 +176,7 @@ const renderGeneral = () => {
                 }}
                 >
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
-                    ...Dong/person
+                  {amountOfPerson} Dong/person
                 </Text>
                 <Text style={{ fontSize: 14, fontWeight: 400 }}>
                     ({selectedFriends.length} person
@@ -302,6 +321,8 @@ const renderGeneral = () => {
               isSelected={selectedFriends.includes(friend.name)}
               onToggle={() => handleFriendToggle(friend.name)}
               selectedButton={selectedButton}
+              valueInput={valueInputs[friend.name] || ""}
+              setValueInput={(text) => handleValueInputChange(friend.name, text)}
             />
           ))}
         </ScrollView>

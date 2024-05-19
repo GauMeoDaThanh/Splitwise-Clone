@@ -15,9 +15,14 @@ const SelectFriend = ({
   isSelected,
   onToggle,
   selectedButton,
+  valueInput,
+  setValueInput,
 }) => {
   const [isFocused, setIsFocused] = useState(null);
   const renderSplit = () => {
+    useEffect(() => {
+      setValueInput(""); // Reset valueInput to an empty string
+    }, [selectedButton]);
     switch (selectedButton) {
       case 1:
         return (
@@ -25,12 +30,14 @@ const SelectFriend = ({
             <TextInput
               placeholder="0.0"
               keyboardType="numeric"
+              value={valueInput}
               style={[
                 styles.textInputStyle,
                 { borderBottomColor: isFocused ? "#009966" : "#999999", width: "16%", },
               ]}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
+              onChangeText={(text) => setValueInput(text)}
             ></TextInput>
             <Text style={{ fontWeight: 500, fontSize: 16 }}>dong</Text>
           </>
@@ -41,12 +48,14 @@ const SelectFriend = ({
             <TextInput
               placeholder="0"
               keyboardType="numeric"
+              value={valueInput}
               style={[
                 styles.textInputStyle,
                 { borderBottomColor: isFocused ? "#009966" : "#999999", width: "10%", },
               ]}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
+              onChangeText={(text) => setValueInput(text)}
             ></TextInput>
             <Text style={{ fontWeight: 500, fontSize: 16 }}>%</Text>
           </>
