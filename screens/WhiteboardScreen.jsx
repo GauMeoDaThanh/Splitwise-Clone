@@ -76,7 +76,8 @@ const WhiteboardScreen = () => {
                     className = 'text-gray-600'
                     style={{
                         fontSize: 11.5,
-                        fontWeight: 400
+                        fontWeight: 400,
+                        textAlign: 'center'
                     }}
                 >
                     Use the whiteboard to remember important info, like your landlord's address or emergency contact info. The whiteboard is visible to anyone who joins your group.

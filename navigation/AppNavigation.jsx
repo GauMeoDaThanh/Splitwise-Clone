@@ -29,6 +29,8 @@ import DetailsGroupsScreen from "../screens/DetailsGroupsScreen";
 import BalancesScreen from "../screens/BalancesScreen";
 import WhiteboardScreen from "../screens/WhiteboardScreen";
 import TotalsScreen from "../screens/TotalsScreen";
+import ListFriendsScreen from "../screens/ListFriendsScreen";
+import AddMemberGroupsScreen from "../screens/AddMemberGroupsScreen";
 const AppNavigation = () => {
   return (
     <NavigationContainer>
@@ -88,6 +90,18 @@ const AppNavigation = () => {
         <Stack.Screen
           name="Totals"
           component={TotalsScreen}
+          options={{headerShown:false}}
+        >
+        </Stack.Screen>
+        <Stack.Screen
+          name="ListFriends"
+          component={ListFriendsScreen}
+          options={{headerShown:false}}
+        >
+        </Stack.Screen>
+        <Stack.Screen
+          name="AddMember"
+          component={AddMemberGroupsScreen}
           options={{headerShown:false}}
         >
         </Stack.Screen>

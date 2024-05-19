@@ -160,6 +160,37 @@ const DetailsGroupsScreen = () => {
                     </Text>
                 </TouchableOpacity>
             </View>
+            <View className = 'flex-row justify-center mb-1'
+                style = {{
+                    top: -15
+                }}
+            >
+                <TouchableOpacity 
+                    className='flex-row items-center space-x-2 border py-1 px-3 rounded-md'
+                    style={{
+                        borderColor: '#0B9D7E'
+                    }}
+                    onPress={() => navigation.navigate('ListFriends')}
+                >
+                    <Image
+                        source={require('../assets/icons/addFriends_icon.png')}
+                        style={{
+                            width: 25,
+                            height: 25,
+                            tintColor: '#0B9D7E'
+                        }}
+                    >
+                    </Image>
+                    <Text 
+                        style={{
+                            color: '#0B9D7E',
+                            fontWeight:'bold'
+                        }}
+                    >
+                        Add members
+                    </Text>
+                </TouchableOpacity>
+            </View>
             {/* Viết code vô Flastlist */}
             {/* <View className = 'flex-col space-y-6 px-1'>
                 <FlatList>
