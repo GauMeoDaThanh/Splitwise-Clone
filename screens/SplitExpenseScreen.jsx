@@ -126,7 +126,7 @@ const renderGeneral = () => {
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
                 {totalValueInput} dong of {totalExpense} dong
                 </Text>
-                <Text style={{ fontSize: 14, fontWeight: 400 }}>
+                <Text style={{ fontSize: 14, fontWeight: 400, color: leftAmount<0 ? 'red' : 'black' }}>
                 {leftAmount} dong left
                 </Text>
             </View>
