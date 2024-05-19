@@ -77,7 +77,13 @@ const GroupsScreen = () => {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => {
               return (
-                <TouchableOpacity onPress={() => console.log(item.id)}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("DetailGroups", {
+                      groupInfo: item,
+                    })
+                  }
+                >
                   <View className="flex-row space-x-4 items-center mb-3">
                     <Image
                       source={
