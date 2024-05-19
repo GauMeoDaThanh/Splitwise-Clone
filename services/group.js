@@ -42,7 +42,7 @@ class GroupService {
     constructor() {
         if (GroupService.instance == null) {
             GroupService.instance = this;
-        }
+      }
         return GroupService.instance;
     }
     static getInstance() {
@@ -54,7 +54,6 @@ class GroupService {
 
   async listenToGroupList(callback) {
     try {
-      console.log("start listen to group list");
       const groupsRef = collection(db, GROUP_COLLECTION);
       const uid = auth.currentUser.uid;
       const q = query(
@@ -83,6 +82,18 @@ class GroupService {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async listenToGroupDetail(groupId, callback) {
+    const groupRef = doc(db, GROUP_COLLECTION, groupId);
+    const unsubscribe = onSnapshot(groupRef, (groupInfo) => {
+      let group = groupInfo.data();
+      group["id"] = groupInfo.id;
+      group["createAt"] = group["createAt"].toDate().toDateString();
+      callback(group);
+    });
+
+    return () => unsubscribe();
   }
 
   async addGroup(name, type, imgUri, navigation) {
@@ -208,7 +219,7 @@ class GroupService {
             }
         }
         return myGroup;
-    }
+  } 
 }
 
 export default GroupService;

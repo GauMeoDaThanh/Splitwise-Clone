@@ -27,7 +27,12 @@ import AddFriendScreen from "../screens/AddFriendScreen";
 import AddExpenseScreen from "../screens/AddExpenseScreen";
 import LoadScreen from "../screens/LoadScreen";
 import AddGroupsScreen from "../screens/AddGroupsScreen";
-import AddImageExpense from "../screens/AddImageExpense";
+import DetailsGroupsScreen from "../screens/DetailsGroupsScreen";
+import BalancesScreen from "../screens/BalancesScreen";
+import WhiteboardScreen from "../screens/WhiteboardScreen";
+import TotalsScreen from "../screens/TotalsScreen";
+import ListFriendsScreen from "../screens/ListFriendsScreen";
+import AddMemberGroupsScreen from "../screens/AddMemberGroupsScreen";import AddImageExpense from "../screens/AddImageExpense";
 
 const AppNavigation = () => {
   return (
@@ -79,6 +84,31 @@ const AppNavigation = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="Balances"
+          component={BalancesScreen}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="Whiteboard"
+          component={WhiteboardScreen}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="Totals"
+          component={TotalsScreen}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="ListFriends"
+          component={ListFriendsScreen}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="AddMember"
+          component={AddMemberGroupsScreen}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+        <Stack.Screen
           name="AddImageExpense"
           component={AddImageExpense}
           options={{ headerShown: false, }}
@@ -88,24 +118,24 @@ const AppNavigation = () => {
   );
 };
 
-// const AccountStack = createNativeStackNavigator();
+const GroupsStack = createNativeStackNavigator();
 
-// const AccountStackScreen = () => {
-//   return (
-//     <AccountStack.Navigator>
-//       <AccountStack.Screen
-//         name="AccountScreen"
-//         component={AccountScreen}
-//         options={{ headerShown: false }}
-//       />
-//       <AccountStack.Screen
-//         name="EditAccount"
-//         component={EditAccountScreen}
-//         options={{ headerShown: false }}
-//       />
-//     </AccountStack.Navigator>
-//   );
-// };
+const GroupsStackScreen = () => {
+  return (
+    <GroupsStack.Navigator>
+      <GroupsStack.Screen
+        name="Groups"
+        component={GroupsScreen}
+        options={{ headerShown: false }}
+      />
+      <GroupsStack.Screen
+        name="DetailGroups"
+        component={DetailsGroupsScreen}
+        options={{ headerShown: false }}
+      />
+    </GroupsStack.Navigator>
+  );
+};
 
 const TabNavigator = () => {
   const [imageUri, setImageUri] = React.useState(null);
@@ -139,8 +169,8 @@ const TabNavigator = () => {
       }}
     >
       <Tab.Screen
-        name="Groups"
-        component={GroupsScreen}
+        name="GroupsStackScreen"
+        component={GroupsStackScreen}
         options={{
           title: "Groups",
           tabBarIcon: ({ focused }) => {

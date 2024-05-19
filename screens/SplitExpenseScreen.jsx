@@ -17,27 +17,26 @@ import { CommonActions } from "@react-navigation/native";
 const expenseService = ExpenseService.getInstance();
 
 const SplitExpenseScreen = (props) => {
-const [selectedButton, setSelectedButton] = useState(0); // Track selected button 
-const [participants, setParticipants] = useState([]); // Use state for participants
-const description = props.route.params.description;
-const amounts = props.route.params.money
-const [selectedFriends, setSelectedFriends] = useState([]);
-const [selectedParticipants, setSelectedParticipants] = useState([])
+  const [selectedButton, setSelectedButton] = useState(0); // Track selected button 
+  const [participants, setParticipants] = useState([]); // Use state for participants
+  const description = props.route.params.description;
+  const amounts = props.route.params.money
+  const [selectedFriends, setSelectedFriends] = useState([]);
+  const [selectedParticipants, setSelectedParticipants] = useState([])
   
   useEffect(() => {
-    const handleGetParticipants = async () => {
-      const selectedPar = props.route.params.selectedParticipants;
-      setSelectedParticipants(selectedPar);
+    const fetchParticipants = async () => {
       try {
+        const selectedPar = props.route.params.selectedParticipants;
+        setSelectedParticipants(selectedPar);
         const participantsList = await expenseService.getParticipants(selectedPar);
         setParticipants(participantsList); // Update state with fetched data
       } catch (error) {
         console.error("Error fetching participants:", error);
-      }
+    }
     };
-    handleGetParticipants(); 
+    fetchParticipants();
   }, [selectedParticipants]);
-
   // Danh sách người chia hoá đơn
   const friendsList = []
   for (participant of participants) {
@@ -131,7 +130,7 @@ const imageSource = () => {
 
 }
 };
-  console.log("S")
+  // console.log("S")
 const renderTextContent = () => {
     switch (selectedButton) {
         case 1:

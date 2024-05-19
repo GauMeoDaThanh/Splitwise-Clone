@@ -14,15 +14,69 @@ import AppBar from "../../components/AppBar";
 import AddToolBar from "../../components/AddToolBar";
 import ButtonAddExpense from "../../components/ButtonAddExpense";
 import GroupService from "../../services/group";
+import ExpenseService from "../../services/expense";
+import UserService from "../../services/user";
 
 const GroupsScreen = () => {
   const navigation = useNavigation();
   const [groups, setGroups] = useState([]);
+  const [expenses, setExpenses] = useState([])
+  const [totalAmount, setTotalAmount] = useState([]);
+  const [participants, setParticipants] = useState([]);
 
   useEffect(() => {
-    GroupService.getInstance().listenToGroupList((groups) => {
-      setGroups(groups);
-    });
+      GroupService.getInstance().listenToGroupList((groups) => {
+        setGroups(groups);
+      });
+    
+     const fetchExpenses = async () => {
+       try {
+        //  Tìm các hoá đơn theo group
+         expensesList = []
+         let totalExpenses = []
+         let participantsList = []
+        for (group of groups) {
+          const expensesByGr = await ExpenseService.getInstance().getExpensesByGroupId(group.id);
+          expensesList.push(expensesByGr)
+          let sumByGr = 0;
+          let participantByGr = [];
+          for (expense of expensesByGr) {
+            sumByGr = sumByGr + parseFloat(expense.participants.slice(1).reduce((acc, curr) => acc + curr.amount, 0).toFixed(2))
+            for (par of expense.participants.slice(1)) {
+              const user = await UserService.getInstance().getUserById(par.userId)
+              participantByGr.push({
+                userName: user.username,
+                amount: par.amount
+              })
+            }
+          }
+          participantsList.push(participantByGr)
+          totalExpenses.push(sumByGr);
+         }
+        // Tính tổng nợ của các user trong group
+        const groupedExpenses = participantsList.reduce((acc, currExpenses) => {
+          acc.push(currExpenses.reduce((innerAcc, currExpense) => {
+            if (!innerAcc.some(group => group.userName === currExpense.userName)) {
+              innerAcc.push({ userName: currExpense.userName, amount: 0 });
+              }
+              const group = innerAcc.find(group => group.userName === currExpense.userName);
+              if (group) {
+                group.amount += currExpense.amount;
+              } else {
+                innerAcc.push({ userName: currExpense.userName, amount: currExpense.amount });
+              }
+              return innerAcc;
+            }, []));
+            return acc;
+          }, []);
+        setExpenses(expensesList)
+        setTotalAmount(totalExpenses)
+         setParticipants(groupedExpenses)
+      } catch (error) {
+        console.error("Error fetching expenses:", error);
+      }
+    };
+    fetchExpenses();
   }, []);
 
   return (
@@ -46,7 +100,7 @@ const GroupsScreen = () => {
                 fontSize: 17,
               }}
             >
-              3.500.00vnđ
+             {totalAmount.reduce((acc, curr) => acc + curr, 0)}
             </Text>
           </View>
           <View className="flex-row items-center">
@@ -75,9 +129,16 @@ const GroupsScreen = () => {
           <FlatList
             data={groups}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => {
+            renderItem={({ item, index }) => {
               return (
-                <TouchableOpacity onPress={() => console.log(item.id)}>
+               <TouchableOpacity
+                  onPress={() =>{
+                    navigation.navigate("DetailGroups", {
+                      groupInfo: item,
+                    })
+                  }
+                  }
+                >
                   <View className="flex-row space-x-4 items-center mb-3">
                     <Image
                       source={
@@ -99,25 +160,33 @@ const GroupsScreen = () => {
                       >
                         {item.name}
                       </Text>
+
                       <Text
                         style={{
                           color: "#0B9D7E",
                           fontWeight: 500,
                         }}
                       >
-                        you are owed 3.000.000vnđ
+                        {
+                          "You are owed " + `${totalAmount[index]?totalAmount[index]:0}` + " vnđ"
+                       }
                       </Text>
-                      <View className="flex-row">
-                        <Text>Đạt owes you </Text>
+
+                      {
+                        participants[index]?participants[index].map((participant, pos) => (
+                        <View key={pos} className="flex-row">
+                        <Text>{participant.userName} owes you </Text>
                         <Text
                           style={{
                             color: "#0B9D7E",
                             fontWeight: "500",
                           }}
                         >
-                          200.00vnđ
+                          {participant.amount.toFixed(2)}
                         </Text>
                       </View>
+                        )):null
+                      }
                     </View>
                   </View>
                 </TouchableOpacity>

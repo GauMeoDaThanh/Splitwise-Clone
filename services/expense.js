@@ -1,5 +1,5 @@
 import { auth, db } from "../firebaseConfig";
-import { collection, addDoc, doc, setDoc, query, getDoc, updateDoc } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc, query, getDoc, updateDoc, getDocs, where} from "firebase/firestore";
 import FriendService from "./friend";
 import AuthenticateService from "./authentication";
 import UserService from "./user";
@@ -188,15 +188,6 @@ class ExpenseService {
   }
 }
 
-    async getAllExpense() {
-        const expenseList = [];
-        const querySnapshot = await getDocs(collection(db, "expenses"));
-        querySnapshot.forEach((doc) => {
-            expenseList.push({ id: doc.id, ...doc.data() });
-        });
-        return expenseList;
-    }
-
     // img for expense
     async uploadImgExpense(uid, imgUri) {
         try {
@@ -314,6 +305,15 @@ class ExpenseService {
         await updateDoc(expenseRef, {
             participants: participants
         })
+    }
+
+    async getExpensesByGroupId(groupId) {
+        const expenses = [];
+        const querySnapshot = await getDocs(query(collection(db, "expenses"),where("groupId", "array-contains",groupId)));
+        querySnapshot.forEach((doc) => {
+            expenses.push({ id: doc.id, ...doc.data() });
+        });
+        return expenses;
     }
 
     

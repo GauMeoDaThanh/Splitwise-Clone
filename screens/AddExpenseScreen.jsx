@@ -94,7 +94,7 @@ const AddExpenseScreen = (props) => {
                         console.log("Friend: ", friend)
                         participants.push({
                             userId: friend.uid,
-                            amout: parseFloat(money) / selectedFriends.length.toFixed(4)
+                            amount: parseFloat(money) / selectedFriends.length.toFixed(4)
                         })
                     }
                     break;

@@ -119,11 +119,9 @@ class UserService {
 
   async getAvatar() {
     try {
-      console.log("begin to get avatar");
       const uid = auth.currentUser.uid;
       const q = query(collection(db, USER_COLLECTION), where("uid", "==", uid));
       const querySnapshot = await getDocs(q);
-      console.log(querySnapshot.docs[0].data().avatarUrl);
       return querySnapshot.docs[0].data().avatarUrl;
     } catch (e) {
       console.error(e);
@@ -162,11 +160,11 @@ class UserService {
     }
     
      async getUserById(uid) {
-        console.log(`start get user ${uid}`);
+        // console.log(`start get user ${uid}`);
         const userRef = doc(db, "users", uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
-            console.log(userSnap.data());
+            // console.log(userSnap.data());
             return userSnap.data();
         } else {
             console.log("Khong tim thay");
