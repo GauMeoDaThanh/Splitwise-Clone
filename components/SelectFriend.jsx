@@ -1,6 +1,13 @@
-import { TouchableOpacity, StyleSheet, Text, View, Image } from "react-native";
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TextInput,
+} from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 const SelectFriend = ({
   name,
@@ -9,42 +16,60 @@ const SelectFriend = ({
   onToggle,
   selectedButton,
 }) => {
+  const [isFocused, setIsFocused] = useState(null);
   const renderSplit = () => {
     switch (selectedButton) {
       case 1:
         return (
           <>
-            <Text style={{ fontWeight: 500, fontSize: 16 }}>
-              ...
-            </Text>
-            <Text style={{ fontWeight: 500, fontSize: 16 }}>
-              dong
-            </Text>
+            <TextInput
+              placeholder="0.0"
+              keyboardType="numeric"
+              style={[
+                styles.textInputStyle,
+                { borderBottomColor: isFocused ? "#009966" : "#999999", width: "16%", },
+              ]}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+            ></TextInput>
+            <Text style={{ fontWeight: 500, fontSize: 16 }}>dong</Text>
           </>
         );
       case 2:
         return (
           <>
-            <Text style={{ fontWeight: 500, fontSize: 16 }}>
-              ...
-            </Text>
-            <Text style={{ fontWeight: 500, fontSize: 16 }}>
-              %
-            </Text>
+            <TextInput
+              placeholder="0"
+              keyboardType="numeric"
+              style={[
+                styles.textInputStyle,
+                { borderBottomColor: isFocused ? "#009966" : "#999999", width: "10%", },
+              ]}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+            ></TextInput>
+            <Text style={{ fontWeight: 500, fontSize: 16 }}>%</Text>
           </>
         );
       case 0:
       default:
         return (
           <>
-          <View style={{ flex: 1, alignItems: "flex-end", backgroundColor: 'yellow' }}>
-            <BouncyCheckbox
-              isChecked={isSelected}
-              textColor="#000"
-              fillColor="#228B22"
-              text=""
-              onPress={onToggle}
-            /></View>
+            <View
+              style={{
+                flex: 1,
+                alignItems: "flex-end",
+                backgroundColor: "yellow",
+              }}
+            >
+              <BouncyCheckbox
+                isChecked={isSelected}
+                textColor="#000"
+                fillColor="#228B22"
+                text=""
+                onPress={onToggle}
+              />
+            </View>
           </>
         );
     }
@@ -69,7 +94,13 @@ const SelectFriend = ({
           backgroundColor: "yellow",
         }}
       />
-      <View style={{ paddingHorizontal: 20, width: selectedButton == 0 ? "94%" : selectedButton == 1 ? "76%" : "82%"}}>
+      <View
+        style={{
+          paddingHorizontal: 20,
+          width:
+            selectedButton == 0 ? "94%" : selectedButton == 1 ? "60%" : "72%",
+        }}
+      >
         <Text style={{ fontSize: 16, fontWeight: 500 }}>{name}</Text>
       </View>
       {renderSplit()}
@@ -86,5 +117,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomColor: "#EEEEEE",
     borderBottomWidth: 1,
+  },
+  textInputStyle: {
+    borderBottomWidth: 1,
+    marginHorizontal: 10,
+    fontSize: 16,
+    fontWeight: 500,
+    textAlign: 'right'
   },
 });
