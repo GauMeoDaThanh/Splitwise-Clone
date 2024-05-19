@@ -18,23 +18,22 @@ const friendService = FriendService.getInstance();
 const authenticateService = AuthenticateService.getInstance();
 const userService = UserService.getInstance();
 const groupService = GroupService.getInstance();
-const initUser = {
-    // uid: "",
-    createBy: authenticateService.idAcc,
+const initExpense = {
+    createBy:"",
     createAt: new Date(),
     groupId: [],
     imgUrl: "",
     isSettle: false,
     amounts: 0,
-    paidBy: authenticateService.idAcc,
+    paidBy:"",
     description: "",
     participants: [],
     comments: {},
 };
 class ExpenseService {
+    static expenseId = ""
     constructor(expense = null) {
         if (ExpenseService.instance == null) {
-            this.expense = initUser;
             ExpenseService.instance = this;
         }
         return ExpenseService.instance;
@@ -47,55 +46,69 @@ class ExpenseService {
         return ExpenseService.instance;
     }
 
-    async createExpense(createAt, amounts, description, participants) {
-        members = [];
-        groupId = [];
-        // console.log("Participants: ", participants);
-        for (participant of participants) {
-            if (participant.type) {
-                groupId.push(participant.id);
-                const group = await groupService.getGroupInfo(participant.id);
-                const membersId = group.members;
-                for (id of membersId) {
-                    members.push({ userId: id, amount: 50000 });
-                }
-            } else {
-                // Share money for friends
-                members.push({ userId: participant.uid, amount: 50000 });
-            }
-        }
-        participants = [...members];
-        this.expense = {
-            ...this.expense,
+    async createExpense(createAt, amounts, groupId, description, participants) {
+        expense = {
+            ...initExpense,
+            createBy: auth.currentUser.uid,
+            paidBy: auth.currentUser.uid,
             createAt,
             groupId,
             amounts,
             description,
             participants,
         };
-        console.log("Expense: ", this.expense);
         try {
             const docRef = await addDoc(
                 collection(db, "expenses"),
-                this.expense
+                expense
             );
             console.log("Add expense successfully with ID: ", docRef.id);
+            expenseId = docRef.id;
+            console.log("ID Exp", this.expenseId)
         } catch (e) {
             console.error("Error adding expense ", e);
         }
     }
 
+    async getParticipants(selectedParticipants) {
+    const uniqueMembers = new Set(); 
+    const members = []
+    const participants = []
+    for (const participant of selectedParticipants) {
+        if (participant.groupId) {
+        const group = await groupService.getGroupInfo(participant.groupId);
+        const membersId = group.members;
+        for (const id of membersId) {
+            if (!uniqueMembers.has(id)) {
+            uniqueMembers.add(id);
+            members.push({ userId: id });
+            }
+        }
+    } else {
+      if (!uniqueMembers.has(participant.userId)) {
+        uniqueMembers.add(participant.userId);
+        members.push({ userId: participant.userId });
+      }
+    }
+    }
+    for (member of members) {
+        participants.push(await userService.getUserById(member.userId))
+        }
+        return participants;
+}
+    get expenseId() {
+        return expenseId;
+    }
+
     // Handle input friend or group to share bill
     async handleInputParticipants(text) {
-        const idFr = await friendService.getFriendList(
-            authenticateService.idAcc
-        );
+        const idFr = await friendService.getFriendList(auth.currentUser?.uid);
         const users = [];
         for (id of idFr) {
             users.push(await userService.getUserById(id));
         }
         groupList = await groupService.getGroupOfIdAcc(
-            authenticateService.idAcc
+            auth.currentUser?.uid
         );
         // console.log("Group", groupList);
         const searchTerm = text.toLowerCase().trim();
@@ -154,8 +167,8 @@ class ExpenseService {
             }
         }
         participants = [...members];
-        this.expense = {
-            ...this.expense,
+        expense = {
+            ...initExpense,
             createAt,
             groupId,
             imgUrl,
@@ -166,9 +179,9 @@ class ExpenseService {
          try {
     console.log("start set expense information");
     const groupRef = doc(db, "expenses", groupId);
-    await setDoc(groupRef, { ...this.expense }, { merge: true });
+    await setDoc(groupRef, { ...expense }, { merge: true });
     console.log(
-      `Document with ID ${groupId} updated with username ${auth.currentUser.uid}`
+      `Document with ID ${groupId} updated with username ${auth.currentUser?.uid}`
     );
   } catch (e) {
     console.log(e);

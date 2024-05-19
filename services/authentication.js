@@ -20,7 +20,6 @@ class AuthenticateService {
      constructor() {
         if (AuthenticateService.instance == null) {
             AuthenticateService.instance = this;
-            this.state = { idAcc: "" };
         }
         return AuthenticateService.instance;
     }
@@ -108,48 +107,7 @@ class AuthenticateService {
       alert("Login failed");
     }
   }
-    async handleSignIn(email, password, navigation) {
-        try {
-            const userCredential = await signInWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-            const user = userCredential.user;
-            if (user.emailVerified) {
-                //   Đến home
-                this.state.idAcc = user.uid; // Update state
-                navigation.navigate("Friends");
-                console.log("Login successfully!");
-            } else {
-                // Email chưa được xác nhận
-                alert(
-                    "Email has not been verified yet. Please verify your email before logging in."
-                );
-            }
-        } catch (error) {
-            console.log("Login failed: ", error);
-            alert("Login failed");
-        }
-    }
-  // Lấy id account hiện tại
-     get idAcc() {
-        return this.state.idAcc; // Return value of idAcc from state
-    }
-
-    // async handleSignInWithGoogle() {
-    //     try {
-    //         const provider = new GoogleAuthProvider();
-    //         console.log(provider);
-    //     const result = await signInWithPopup(auth, provider);
-    //     // Xử lý đăng nhập thành công
-    //     console.log('Người dùng đã đăng nhập thành công:', result.user);
-    // } catch (error) {
-    //     // Xử lý lỗi
-    //     console.error('Lỗi đăng nhập:', error.message);
-    // }
-    // }
-
+  
     async handleSendPasswordReset(email, navigation) {
         try {
             userId = await UserService.getInstance().getUserIDWithMail(email);

@@ -16,34 +16,37 @@ import ExpenseService from "../services/expense";
 
 const expenseService = ExpenseService.getInstance();
 import { useNavigation } from '@react-navigation/native';
-
+import { auth } from "../firebaseConfig";
 const AddExpenseScreen = (props) => {
-  const textInputRef = useRef(null);
-  const descriptionInputRef = useRef(null);
-  const moneyInputRef = useRef(null);
+    const textInputRef = useRef(null);
+    const descriptionInputRef = useRef(null);
+    const moneyInputRef = useRef(null);
+    const navigation = useNavigation();
+    const [description, setDescription] = useState("");
+    const [money, setMoney] = useState("");
+    const [isFocused, setIsFocused] = useState(0);
+    const [isBothFieldsFilled, setIsBothFieldsFilled] = useState(false);
+    
     useEffect(() => {
         // Focus vào TextInput khi mở trang
         textInputRef.current.focus();
     }, []); // Chỉ chạy một lần sau khi mở trang
 
-    const [description, setDescription] = useState("");
-    const [money, setMoney] = useState("");
-    const [isFocused, setIsFocused] = useState(0);
-    const [isBothFieldsFilled, setIsBothFieldsFilled] = useState(false);
-
-    
-    const navigation = useNavigation();
     const handleAddImageExpense = () => {
         navigation.navigate('AddImageExpense');
         };
     
     // Làm Gợi ý khi nhận mail hoặc tên user
     const [suggestions, setSuggestions] = useState([]);
-    const [selectedParticipants, setSelectedParticipants] = useState([]);
+    const [selectedParticipants, setSelectedParticipants] = useState([{userId: auth.currentUser.uid}]);
 
-  useEffect(() => {
-    setIsBothFieldsFilled(description !== "" && money !== "");
-  }, [description, money]);
+    useEffect(() => {
+        setIsBothFieldsFilled(description !== "" && money !== "");
+        if (props.route.params) {
+            setDescription(props.route.params.description);
+        setMoney(props.route.params.money);
+        }
+    }, [description, money]);
 
     handleInputParticipants = async (text) => {
         const filteredSuggestions = await expenseService.handleInputParticipants(text);
@@ -52,32 +55,78 @@ const AddExpenseScreen = (props) => {
     // Xử lí nhấn chọn tên user
     const handleSuggestionSelect = (item) => {
         const isExist = selectedParticipants.some(
-            (user) => user.uid === item.uid
+            (participant) => {
+                if (participant.userId) {
+                    return participant.userId === item.uid
+                }
+                return participant.groupId === item.id
+            }
         );
         if (!isExist) {
             setSelectedParticipants((prevSelectedPaticipants) => [
                 ...prevSelectedPaticipants,
-                item,
+                item.uid?{userId: item.uid}:{groupId: item.id},
             ]);
         } else {
             console.log("Friend or group is already selected!");
         }
-             console.log("Friend or group selected:", selectedParticipants);
+            // console.log("Friend or group selected:", selectedParticipants);
     };
 
     //Tạo hoá đơn
     const handleCreateExpense = async () => {
+        const selectedParticipants = JSON.parse(props.route.params.selectedParticipants)
+        // console.log("selected par", selectedParticipants)
+        let groupId = []
+        for (par of selectedParticipants) {
+            // console.log("PAR", par)
+            if (par.groupId) {
+               groupId.push(par.groupId)
+           }
+        }
+        // console.log("Group ID: ", groupId)
+        const splitType = props.route.params.splitType
+        // console.log("splitType:", splitType)
+        let participants = []
+            switch (splitType) {
+                case "equally":
+                    selectedFriends = props.route.params.selectedFriends
+                    // console.log("selected friends: ", selectedFriends);
+                    selectedFriends = JSON.parse(selectedFriends)
+                    for (friend of selectedFriends) {
+                        console.log("Friend: ", friend)
+                        participants.push({
+                            userId: friend.uid,
+                            amout : parseFloat(money)/selectedFriends.length.toFixed(4)
+                        })
+                    }
+                    // console.log("Participants: ", participants)
+                case "unequally":
+
+                case "percent":
+
+            }
         try {
-            expenseService.createExpense(
-                new Date(),
-                parseFloat(money),
-                description,
-                selectedParticipants
+            // console.log("Par",participants)
+            await expenseService.createExpense(
+            new Date(),
+            parseFloat(money),
+            groupId,
+            description,
+            participants
             );
+            navigation.navigate('Friends');
+            // const uid = expenseService.expenseId;
+            // const imageUri = props.route.params.imageUri;
+            // await expenseService.uploadImgExpense(uid, imageUri);
         } catch (e) {
             console.error("Fail to add expense ", e);
         }
     };
+    // Chia hoá đơn
+    const handleSplitExpense = () => {
+    navigation.navigate('SplitExpenseScreen',{selectedParticipants, description, money});
+  };
     return (
         <View style={[{ flex: 100, backgroundColor: "white" }]}>
             <View style={[{ flex: 7 }]}>
@@ -86,6 +135,7 @@ const AddExpenseScreen = (props) => {
                     title={"Add an expense"}
                     action={"Save"}
                     isDisabled={!isBothFieldsFilled}
+                    disabled={!isBothFieldsFilled}
                     onPress={handleCreateExpense}
                 ></AddToolBar>
             </View>
@@ -125,7 +175,7 @@ const AddExpenseScreen = (props) => {
                         data={suggestions} // Truyền trạng thái gợi ý cập nhật
                         renderItem={({ item }) => (
                             <TouchableOpacity
-                                key={item.uid}
+                                key={item.uid?item.uid:item.id}
                                 onPress={() => handleSuggestionSelect(item)}
                             >
                                 <Text>{item.type?item.name:item.username}</Text>
@@ -225,7 +275,7 @@ const AddExpenseScreen = (props) => {
                         <Text> you </Text>
                     </TouchableOpacity>
                     <Text> and split </Text>
-                    <TouchableOpacity style={[styles.buttonStyle]}>
+                      <TouchableOpacity style={[styles.buttonStyle]} onPress={handleSplitExpense} disabled={!isBothFieldsFilled}>
                         <Text>equally</Text>
                     </TouchableOpacity>
                 </View>
@@ -276,3 +326,5 @@ const styles = StyleSheet.create({
     padding: 3,
   },
 });
+
+

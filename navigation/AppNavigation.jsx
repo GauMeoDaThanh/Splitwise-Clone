@@ -6,6 +6,7 @@ import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import AccountScreen from "../screens/tabs/AccountScreen";
+import SplitExpenseScreen from "../screens/SplitExpenseScreen";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 import {
@@ -189,6 +190,10 @@ const TabNavigator = () => {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="SplitExpenseScreen"
+        component={SplitExpenseScreen}
+        options={{ headerShown: false, }} />
     </Tab.Navigator>
   );
 };
