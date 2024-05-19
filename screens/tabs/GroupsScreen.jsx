@@ -4,15 +4,26 @@ import {Text, TextInput, SafeAreaView, View,TouchableOpacity, Image, ScrollView,
 import AppBar from "../../components/AppBar";
 import AddToolBar from "../../components/AddToolBar";
 import ButtonAddExpense from "../../components/ButtonAddExpense";
-import RadioButtons from "react-native-radio-buttons";
 const GroupsScreen = () => {
     const navigation = useNavigation();
   
     const [showFilterOptions, setShowFilterOptions] = useState(false);
-    const [selectedId, setSelectedId] = useState(null);
-    const radioButtons = ["All groups", "Groups you owe", "Groups that owe you","Trip","Home","Couple","Friend","Other"];
+    const [selectedFilter, setSelectedFilter] = useState(null);
+    const filterOptions = [
+        "All groups",
+        "Groups you owe",
+        "Groups that owe you",
+        "Trip",
+        "Home",
+        "Couple",
+        "Friend",
+        "Other"
+    ];
     const toggleFilterOptions = () => {
         setShowFilterOptions(!showFilterOptions);
+    };
+    const handleFilterSelect = (option) => {
+        setSelectedFilter(option);
     };
 
     return(
@@ -217,50 +228,50 @@ const GroupsScreen = () => {
             </View>
            {/* Dropdown for filter options */}
            {showFilterOptions && (
-                <View className = 'border-2 border-gray-300 '
-                    style={{ 
-                        position: 'absolute', 
-                        top: 130, 
-                        right: 5, 
-                        backgroundColor: 'white', 
-                        borderRadius: 10, 
-                        padding: 10, 
-                        zIndex: 1,
+                <View
+                    className='border-2 border-gray-300'
+                    style={{
+                        position: 'absolute',
+                        top: 130,
+                        right: 5,
+                        backgroundColor: 'white',
                         borderRadius: 10,
+                        padding: 10,
+                        zIndex: 1,
                     }}
                 >
-                    <RadioButtons
-                        options={radioButtons}
-                        onSelection={(option) => setSelectedId(option)}
-                        selectedOption={selectedId}
-                        renderOption={(option, selected, onSelect, index) => (
-                            <TouchableOpacity key={index} onPress={onSelect}>
-                                <View className = 'flex-row items-center py-1 space-x-2'>
-                                    <View style={{
+                    {filterOptions.map((option, index) => (
+                        <TouchableOpacity key={index} onPress={() => handleFilterSelect(option)}>
+                            <View className='flex-row items-center py-1 space-x-2'>
+                                <View
+                                    style={{
                                         width: 20,
                                         height: 20,
                                         borderRadius: 10,
                                         borderWidth: 2,
                                         marginRight: 8,
-                                        borderColor: selected ? "#0B9D7E" : "rgb(75, 85, 99)",
+                                        borderColor: selectedFilter === option ? "#0B9D7E" : "rgb(75, 85, 99)",
                                         justifyContent: 'center',
                                         alignItems: 'center'
-                                    }}>
-                                        {selected && (
-                                            <View style={{
+                                    }}
+                                >
+                                    {selectedFilter === option && (
+                                        <View
+                                            style={{
                                                 width: 10,
                                                 height: 10,
                                                 borderRadius: 5,
                                                 backgroundColor: "#0B9D7E"
-                                            }} />
-                                        )}
-                                    </View>
-                                    <Text style={{ color: 'rgb(75, 85, 99)', fontWeight: 500, fontSize: 14 }}>{option}</Text>
+                                            }}
+                                        />
+                                    )}
                                 </View>
-                            </TouchableOpacity>
-                        )}
-                    />
-
+                                <Text style={{ color: 'rgb(75, 85, 99)', fontWeight: 500, fontSize: 14 }}>
+                                    {option}
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    ))}
                 </View>
             )}
         </View>
