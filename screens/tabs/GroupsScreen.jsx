@@ -168,7 +168,8 @@ const GroupsScreen = () => {
                         }}
                       >
                         {
-                          "You are owed " + `${totalAmount[index]?totalAmount[index]:0}` + " vnđ"
+                          totalAmount[index] === 0 ? 'All settle up':"You are owed " + `${totalAmount[index]?totalAmount[index]:0}` + " vnđ"
+                          // `${totalAmount[index]?0:0`"You are owed " + `${totalAmount[index]?totalAmount[index]:0}` + " vnđ"
                        }
                       </Text>
 

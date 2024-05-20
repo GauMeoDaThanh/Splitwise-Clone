@@ -1,6 +1,7 @@
 import React from "react";
 import AppNavigation from "./navigation/AppNavigation";
 import { SafeAreaView, View, Dimensions } from "react-native";
+import DetailsExpense from "./screens/DetailsExpense";
 
 
 const App = () => {
@@ -18,8 +19,9 @@ const App = () => {
   return (
     <SafeAreaView style={containerStyle}>
       <View style={containerStyle}>
-        <AppNavigation />
+        {/* <AppNavigation /> */}
         {/* <AddImageExpense></AddImageExpense> */}
+        <DetailsExpense></DetailsExpense>
       </View>
     </SafeAreaView>
   );

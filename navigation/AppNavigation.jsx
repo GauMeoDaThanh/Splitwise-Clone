@@ -43,6 +43,10 @@ const AppNavigation = () => {
           component={LoadScreen}
           options={{ headerShown: false }}
         />
+          <Stack.Screen
+        name="SplitExpenseScreen"
+        component={SplitExpenseScreen}
+        options={{ headerShown: false, }} />
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -284,10 +288,6 @@ const TabNavigator = () => {
           headerShown: false,
         }}
       />
-      <Stack.Screen
-        name="SplitExpenseScreen"
-        component={SplitExpenseScreen}
-        options={{ headerShown: false, }} />
     </Tab.Navigator>
   );
 };

@@ -135,10 +135,10 @@ const AddExpenseScreen = (props) => {
     // Chia hoá đơn
     const handleSplitExpense = () => {
         navigation.navigate('SplitExpenseScreen', { selectedParticipants, description, money });
-        selectedParticipants = []
+        setSelectedParticipants([{userId: auth.currentUser.uid}])
   };
     return (
-        <View style={[{ flex: 100, backgroundColor: "white" }]}>
+        <View style={[{ flex: 100, backgroundColor: "white" }]} className="py-5">
             <View style={[{ flex: 7 }]}>
                 <AddToolBar
                     navigation={props.navigation}

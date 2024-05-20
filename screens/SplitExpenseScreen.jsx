@@ -27,7 +27,9 @@ const SplitExpenseScreen = (props) => {
   useEffect(() => {
     const fetchParticipants = async () => {
       try {
+        // setSelectedParticipants([]);
         const selectedPar = props.route.params.selectedParticipants;
+        console.log("Split: ", selectedParticipants);
         setSelectedParticipants(selectedPar);
         const participantsList = await expenseService.getParticipants(selectedPar);
         setParticipants(participantsList); // Update state with fetched data
@@ -178,7 +180,8 @@ const renderGeneral = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                }}
+              }}
+               className='py-5'
             >
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
                   {totalValueInput} dong of {amounts} dong
@@ -201,6 +204,7 @@ const renderGeneral = () => {
                 }}
             >
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
+                {totalValueInput}% of 100%
                 {totalValueInput}% of 100%
                 </Text>
                  <Text style={{ fontSize: 14, fontWeight: 400, color: leftPercentage<0 ? 'red' : 'black' }}>{leftPercentage}% left</Text>
