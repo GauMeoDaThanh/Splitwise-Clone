@@ -31,6 +31,8 @@ import WhiteboardScreen from "../screens/WhiteboardScreen";
 import TotalsScreen from "../screens/TotalsScreen";
 import ListFriendsScreen from "../screens/ListFriendsScreen";
 import AddMemberGroupsScreen from "../screens/AddMemberGroupsScreen";
+import EditFriendsScreen from "../screens/EditFriendsScreen";
+import EditGroupsScreen from "../screens/EditGroupScreen";
 const AppNavigation = () => {
   return (
     <NavigationContainer>
@@ -102,6 +104,18 @@ const AppNavigation = () => {
         <Stack.Screen
           name="AddMember"
           component={AddMemberGroupsScreen}
+          options={{headerShown:false}}
+        >
+        </Stack.Screen>
+        <Stack.Screen
+          name="EditFriends"
+          component={EditFriendsScreen}
+          options={{headerShown:false}}
+        >
+        </Stack.Screen>
+        <Stack.Screen
+          name="EditGroups"
+          component={EditGroupsScreen}
           options={{headerShown:false}}
         >
         </Stack.Screen>

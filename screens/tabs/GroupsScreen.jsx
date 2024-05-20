@@ -6,7 +6,6 @@ import AddToolBar from "../../components/AddToolBar";
 import ButtonAddExpense from "../../components/ButtonAddExpense";
 const GroupsScreen = () => {
     const navigation = useNavigation();
-  
     const [showFilterOptions, setShowFilterOptions] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState(null);
     const filterOptions = [
@@ -25,6 +24,7 @@ const GroupsScreen = () => {
     const handleFilterSelect = (option) => {
         setSelectedFilter(option);
     };
+
 
     return(
         <View className = 'flex-1 py-5 bg-white'>
