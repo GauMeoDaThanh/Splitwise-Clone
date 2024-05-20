@@ -19,9 +19,9 @@ const App = () => {
   return (
     <SafeAreaView style={containerStyle}>
       <View style={containerStyle}>
-        {/* <AppNavigation /> */}
+        <AppNavigation />
         {/* <AddImageExpense></AddImageExpense> */}
-        <DetailsExpense></DetailsExpense>
+        {/* <DetailsExpense></DetailsExpense> */}
       </View>
     </SafeAreaView>
   );

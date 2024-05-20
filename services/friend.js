@@ -1,4 +1,4 @@
-import { db, USER_COLLECTION, auth } from "../firebaseConfig";
+import { db, USER_COLLECTION, auth, GROUP_COLLECTION } from "../firebaseConfig";
 import UserService from "./user";
 import {
   collection,
@@ -14,6 +14,7 @@ import {
   getDoc,
   onSnapshot,
 } from "firebase/firestore";
+import { Alert } from "react-native";
 
 class FriendService {
   constructor() {
@@ -39,9 +40,16 @@ class FriendService {
     return () => unsubscribe();
   }
 
-  async addFriend(fMail) {
+  async addFriend(fMail, navigation) {
     const uid = auth.currentUser.uid;
     const friendUid = await UserService.getInstance().getUserIDWithMail(fMail);
+    const friends = await this.getFriendList(uid);
+
+    if (friends.includes(friendUid)) {
+      alert("User already in friend list");
+      return;
+    }
+
     if (friendUid) {
       const userRef = doc(db, USER_COLLECTION, uid);
       const friendRef = doc(db, USER_COLLECTION, friendUid);
@@ -52,11 +60,17 @@ class FriendService {
         await updateDoc(friendRef, {
           friends: arrayUnion(uid),
         });
+        Alert.alert("Success", "Add friend successfully", [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("Friends"),
+          },
+        ]);
       } catch (e) {
         console.error(e);
       }
     } else {
-      return;
+      alert("User not found");
     }
   }
 
@@ -99,6 +113,16 @@ class FriendService {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  async getFriendListNotInGroup(groupId) {
+    const uid = auth.currentUser.uid;
+    const groupRef = doc(db, GROUP_COLLECTION, groupId);
+    const groupSnap = await getDoc(groupRef);
+    const groupMembers = groupSnap.data().members;
+    const friendList = await this.getFriendsAvatarAndName(uid);
+
+    return friendList.filter((friend) => !groupMembers.includes(friend.id));
   }
 }
 

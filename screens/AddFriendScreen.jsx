@@ -19,8 +19,7 @@ const AddFriendScreen = (props) => {
   const [isBothFieldsFilled, setIsBothFieldsFilled] = useState(false);
 
   const handleAddFriend = () => {
-    FriendService.getInstance().addFriend(contact);
-    navigation.navigate("Friends", { reloadSc: true });
+    FriendService.getInstance().addFriend(contact, navigation);
   };
 
   useEffect(() => {
@@ -35,7 +34,7 @@ const AddFriendScreen = (props) => {
     setContact("");
   };
   return (
-    <View style={[{ flex: 100, backgroundColor: "white" }]}>
+    <View style={[{ flex: 100, backgroundColor: "white" }]} className="py-5">
       <View style={{ flex: 7 }}>
         <AddToolBar
           navigation={props.navigation}
@@ -74,17 +73,6 @@ const AddFriendScreen = (props) => {
               </TouchableOpacity>
             )}
           </View>
-        </View>
-
-        <View style={{ padding: 40 }}>
-          {/* <Text style={{ fontSize: 14, fontWeight: 300, textAlign: "center" }}>
-            Don't worry, nothing sends just yet. You will have another chance to
-            review before sending.
-          </Text> */}
-          {/* <Text style={{ fontSize: 14, textAlign: "center" }}>
-            Don't worry, nothing sends just yet. You will have another chance to
-            review before sending.
-          </Text> */}
         </View>
       </View>
     </View>

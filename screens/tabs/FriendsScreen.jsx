@@ -30,6 +30,7 @@ const FriendsScreen = () => {
         styles.container,
         { flex: 100, backgroundColor: "white", position: "relative" },
       ]}
+      className="py-5"
     >
       <View
         style={{ flex: 7, borderBottomColor: "#CCCCCC", borderBottomWidth: 1 }}
