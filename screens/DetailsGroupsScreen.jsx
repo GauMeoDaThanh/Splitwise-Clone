@@ -191,7 +191,7 @@ const DetailsGroupsScreen = ({ route }) => {
             borderColor: "#0B9D7E",
           }}
           onPress={() =>
-            navigation.navigate("ListFriends", { groupId: group.id })
+            navigation.navigate("AddMemberGroupsScreen", { groupId: group.id })
           }
         >
           <Image
