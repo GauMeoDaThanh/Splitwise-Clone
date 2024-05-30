@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   View,
+  FlatList,
 } from "react-native";
 import AppBar from "../../components/AppBar";
 import CardFriend from "../../components/CardFriend";
@@ -13,16 +14,26 @@ import ButtonAddExpense from "../../components/ButtonAddExpense";
 import { auth } from "../../firebaseConfig";
 // import UserService from "../services/UserService";
 import FriendService from "../../services/friend";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 
 const FriendsScreen = () => {
+  const isForcused = useIsFocused();
+  const navigation = useNavigation();
   const [userAvatar, setUserAvatar] = React.useState(null);
   const [listFriends, setListFriends] = React.useState(null);
+  const [searchTerm, setSearchTerm] = React.useState("");
 
   React.useEffect(() => {
     FriendService.getInstance().listenToFriendList((friends) => {
       setListFriends(friends);
     });
   }, []);
+
+  React.useEffect(() => {
+    if (isForcused) {
+      setSearchTerm("");
+    }
+  }, [isForcused]);
 
   return (
     <View
@@ -35,7 +46,11 @@ const FriendsScreen = () => {
       <View
         style={{ flex: 7, borderBottomColor: "#CCCCCC", borderBottomWidth: 1 }}
       >
-        <AppBar></AppBar>
+        <AppBar
+          onSearchSubmit={(text) => {
+            setSearchTerm(text);
+          }}
+        ></AppBar>
       </View>
       <View
         style={{
@@ -81,19 +96,27 @@ const FriendsScreen = () => {
       </View>
       {/* Danh sách bạn bè */}
       <View style={{ flex: 70, position: "relative" }}>
-        <ScrollView>
-          {listFriends &&
-            listFriends.map((friend) => (
+        <FlatList
+          data={listFriends?.filter((friend) => {
+            return friend.name
+              .toLowerCase()
+              .includes(searchTerm.trim().toLowerCase());
+          })}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => {
+            return (
               <CardFriend
-                key={friend.id}
-                name={friend.name}
-                avatar={friend.avatar}
+                name={item.name}
+                avatar={item.avatar}
                 onPress={() => {
-                  console.log(friend.id);
+                  navigation.navigate("FriendDetail", { friendId: item.id });
                 }}
               />
-            ))}
-        </ScrollView>
+            );
+          }}
+          contentContainerStyle={{ paddingBottom: 200 }}
+          showsVerticalScrollIndicator={false}
+        />
       </View>
       <View
         className="flex-row"

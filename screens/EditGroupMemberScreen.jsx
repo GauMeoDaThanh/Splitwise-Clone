@@ -139,7 +139,9 @@ const EditGroupMemberScreen = ({ route }) => {
         </Text>
         <FlatList
           data={membersInfo.filter((member) => {
-            return member.name.toLowerCase().includes(searchTerm.toLowerCase());
+            return member.name
+              .toLowerCase()
+              .includes(searchTerm.trim().toLowerCase());
           })}
           renderItem={({ item }) => (
             <View className="flex-row py-4 items-center space-x-4">

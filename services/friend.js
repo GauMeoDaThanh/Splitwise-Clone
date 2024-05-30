@@ -40,6 +40,16 @@ class FriendService {
     return () => unsubscribe();
   }
 
+  async listenToFriendDetail(friendId, callback) {
+    const friendRef = doc(db, USER_COLLECTION, friendId);
+    const unsubscribe = onSnapshot(friendRef, (friendInfo) => {
+      let friendData = friendInfo.data();
+      callback(friendData);
+    });
+
+    return () => unsubscribe();
+  }
+
   async addFriend(fMail, navigation) {
     const uid = auth.currentUser.uid;
     const friendUid = await UserService.getInstance().getUserIDWithMail(fMail);
@@ -74,16 +84,38 @@ class FriendService {
     }
   }
 
-  async deleteFriend(friendUid) {
-    const uid = auth.currentUser.uid;
-    const userRef = doc(db, USER_COLLECTION, uid);
-    try {
-      await updateDoc(userRef, {
-        friends: arrayRemove(friendUid),
-      });
-    } catch (e) {
-      console.error(e);
-    }
+  deleteFriend(friendUid, navigation) {
+    //warning box
+    Alert.alert("Warning", "Are you sure to delete this friend?", [
+      {
+        text: "No",
+        style: "cancel",
+      },
+      {
+        text: "Yes",
+        onPress: async () => {
+          const uid = auth.currentUser.uid;
+          const userRef = doc(db, USER_COLLECTION, uid);
+          const friendRef = doc(db, USER_COLLECTION, friendUid);
+          try {
+            await updateDoc(userRef, {
+              friends: arrayRemove(friendUid),
+            });
+            await updateDoc(friendRef, {
+              friends: arrayRemove(uid),
+            });
+            Alert.alert("Success", "Remove friend successfully", [
+              {
+                text: "OK",
+                onPress: () => navigation.navigate("Friends"),
+              },
+            ]);
+          } catch (e) {
+            console.error(e);
+          }
+        },
+      },
+    ]);
   }
 
   async getFriendsAvatarAndName(uid) {

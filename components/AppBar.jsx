@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const AppBar = () => {
+const AppBar = ({ onSearchSubmit }) => {
   const [searchText, setSearchText] = useState("");
   const [showSearchInput, setShowSearchInput] = useState(false);
 
@@ -22,13 +22,13 @@ const AppBar = () => {
     setSearchText(text);
   };
 
-  const handleSearchSubmit = () => {
-    // Xử lý tìm kiếm dựa trên searchText
-    console.log("Searching for:", searchText);
-    // Reset searchText và ẩn input sau khi tìm kiếm
-    setSearchText("");
-    setShowSearchInput(false);
-  };
+  // const handleSearchSubmit = () => {
+  //   // Xử lý tìm kiếm dựa trên searchText
+  //   console.log("Searching for:", searchText);
+  //   // Reset searchText và ẩn input sau khi tìm kiếm
+  //   setSearchText("");
+  //   setShowSearchInput(false);
+  // };
 
   const handleBlur = () => {
     setShowSearchInput(false);
@@ -59,9 +59,10 @@ const AppBar = () => {
         <TextInput
           style={styles.searchInput}
           placeholder="Search..."
-          onChangeText={handleSearchTextChange}
-          value={searchText}
-          onSubmitEditing={handleSearchSubmit}
+          onChangeText={(text) => {
+            onSearchSubmit(text);
+          }}
+          // onSubmitEditing={handleSearchSubmit}
           autoFocus={true}
           onBlur={handleBlur}
         />
