@@ -95,7 +95,7 @@ const GroupsScreen = () => {
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate("DetailGroups", {
-                      groupInfo: item,
+                      groupInfo: item.id,
                     })
                   }
                 >

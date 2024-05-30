@@ -15,14 +15,27 @@ import GroupService from "../services/group";
 
 const DetailsGroupsScreen = ({ route }) => {
   const navigation = useNavigation();
-  const groupId = route.params?.groupInfo.id;
+  const groupId = route.params?.groupInfo;
   const [group, setGroup] = useState(route.params?.groupInfo);
+  const [showEditOptions, setShowEditOptions] = useState(false);
 
   useEffect(() => {
     GroupService.getInstance().listenToGroupDetail(groupId, (group) => {
       setGroup(group);
     });
   }, []);
+
+  const toggleEditOptions = () => {
+    setShowEditOptions(!showEditOptions);
+  };
+  const handleOptionPress = (screen) => {
+    navigation.navigate(screen, { group: group });
+    setShowEditOptions(false);
+  };
+
+  const handleRemoveGroup = () => {
+    GroupService.getInstance().removeGroup(groupId, navigation);
+  };
 
   return (
     <View className="flex-1 bg-white">
@@ -61,7 +74,10 @@ const DetailsGroupsScreen = ({ route }) => {
               }}
             ></Image>
           </TouchableOpacity>
-          <TouchableOpacity className="flex-row justify-items-end">
+          <TouchableOpacity
+            className="flex-row justify-items-end"
+            onPress={toggleEditOptions}
+          >
             <Image
               source={require("../assets/icons/setting_icon.png")}
               style={{
@@ -475,7 +491,7 @@ const DetailsGroupsScreen = ({ route }) => {
           </TouchableOpacity>
           <TouchableOpacity
             className="flex-row items-center"
-            onPress={() => handleOptionPress("EditFriends")}
+            onPress={() => handleOptionPress("EditGroupMember")}
           >
             <Text
               style={{
@@ -487,7 +503,10 @@ const DetailsGroupsScreen = ({ route }) => {
               Edit members group
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity className="flex-row items-center">
+          <TouchableOpacity
+            className="flex-row items-center"
+            onPress={handleRemoveGroup}
+          >
             <Text
               className="text-red-500"
               style={{

@@ -88,9 +88,11 @@ class GroupService {
     const groupRef = doc(db, GROUP_COLLECTION, groupId);
     const unsubscribe = onSnapshot(groupRef, (groupInfo) => {
       let group = groupInfo.data();
-      group["id"] = groupInfo.id;
-      group["createAt"] = group["createAt"].toDate().toDateString();
-      callback(group);
+      if (group) {
+        group["id"] = groupInfo.id;
+        group["createAt"] = group["createAt"].toDate().toDateString();
+        callback(group);
+      }
     });
 
     return () => unsubscribe();
@@ -125,6 +127,28 @@ class GroupService {
 
       // Add activity
       ActivityService.getInstance().aCreateGroup(groupRef.id, group["name"]);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async updateGroup(groupId, name, type, imgUri, navigation) {
+    try {
+      console.log("start update group");
+      const groupRef = doc(db, GROUP_COLLECTION, groupId);
+      await updateDoc(groupRef, { name, type }, { merge: true });
+
+      if (imgUri) {
+        await this.uploadAvatar(groupId, imgUri);
+      }
+
+      Alert.alert("Success", "Group updated successfully", [
+        {
+          text: "OK",
+          onPress: () =>
+            navigation.navigate("DetailGroups", { groupInfo: groupId }),
+        },
+      ]);
     } catch (e) {
       console.log(e);
     }
@@ -213,25 +237,59 @@ class GroupService {
     }
   }
 
-  async removeGroupMembers(groupId, members) {
+  removeGroupMembers(groupId, membersId, navigation) {
     try {
-      console.log("start remove members of group");
-      const groupRef = doc(db, GROUP_COLLECTION, groupId);
-      await updateDoc(groupRef, {
-        members: arrayRemove(...members),
-      });
-      console.log("remove members successfully");
+      Alert.alert("Warning", "Are you sure you want to delete this member?", [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            console.log("start remove members of group");
+            const groupRef = doc(db, GROUP_COLLECTION, groupId);
+            await updateDoc(groupRef, {
+              members: arrayRemove(...membersId),
+            });
+            Alert.alert("Success", "Delete group members successfully", [
+              {
+                text: "OK",
+                onPress: () => navigation.goBack(),
+              },
+            ]);
+          },
+        },
+      ]);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 
-  async deleteGroup(groupId) {
+  removeGroup(groupId, navigation) {
     try {
-      console.log("start delete groups");
-      const groupRef = doc(db, GROUP_COLLECTION, groupId);
-      await deleteDoc(groupRef);
-      console.log("delete group successfully");
+      Alert.alert("Warning", "Are you sure you want to delete this group?", [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            console.log("start delete groups");
+            const groupRef = doc(db, GROUP_COLLECTION, groupId);
+            await deleteDoc(groupRef);
+            navigation.navigate("Groups");
+            Alert.alert("Success", "Group deleted successfully", [
+              {
+                text: "OK",
+              },
+            ]);
+          },
+        },
+      ]);
     } catch (e) {
       console.error(e);
     }

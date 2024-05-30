@@ -115,6 +115,16 @@ class FriendService {
     }
   }
 
+  async getFriendListInGroup(groupId) {
+    const uid = auth.currentUser.uid;
+    const groupRef = doc(db, GROUP_COLLECTION, groupId);
+    const groupSnap = await getDoc(groupRef);
+    const groupMembers = groupSnap.data().members;
+    const friendList = await this.getFriendsAvatarAndName(uid);
+
+    return friendList.filter((friend) => groupMembers.includes(friend.id));
+  }
+
   async getFriendListNotInGroup(groupId) {
     const uid = auth.currentUser.uid;
     const groupRef = doc(db, GROUP_COLLECTION, groupId);

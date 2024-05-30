@@ -31,7 +31,7 @@ import BalancesScreen from "../screens/BalancesScreen";
 import WhiteboardScreen from "../screens/WhiteboardScreen";
 import TotalsScreen from "../screens/TotalsScreen";
 import AddMemberGroupsScreen from "../screens/AddMemberGroupsScreen";
-import EditFriendsScreen from "../screens/EditFriendsScreen";
+import EditGroupMemberScreen from "../screens/EditGroupMemberScreen";
 import EditGroupsScreen from "../screens/EditGroupScreen";
 const AppNavigation = () => {
   return (
@@ -108,8 +108,8 @@ const AppNavigation = () => {
           options={{ headerShown: false }}
         ></Stack.Screen>
         <Stack.Screen
-          name="EditFriends"
-          component={EditFriendsScreen}
+          name="EditGroupMember"
+          component={EditGroupMemberScreen}
           options={{ headerShown: false }}
         ></Stack.Screen>
         <Stack.Screen
