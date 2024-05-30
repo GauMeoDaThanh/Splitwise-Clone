@@ -447,6 +447,59 @@ const DetailsGroupsScreen = ({ route }) => {
       >
         <ButtonAddExpense />
       </View>
+      {showEditOptions && (
+        <View
+          className="flex-col border-2 border-gray-300 space-y-2 p-3"
+          style={{
+            position: "absolute",
+            top: 53,
+            right: 5,
+            backgroundColor: "white",
+            borderRadius: 10,
+            zIndex: 1,
+          }}
+        >
+          <TouchableOpacity
+            className="flex-row items-center"
+            onPress={() => handleOptionPress("EditGroups")}
+          >
+            <Text
+              style={{
+                color: "rgb(75, 85, 99)",
+                fontWeight: 500,
+                fontSize: 14,
+              }}
+            >
+              Edit group
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-row items-center"
+            onPress={() => handleOptionPress("EditFriends")}
+          >
+            <Text
+              style={{
+                color: "rgb(75, 85, 99)",
+                fontWeight: 500,
+                fontSize: 14,
+              }}
+            >
+              Edit members group
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="flex-row items-center">
+            <Text
+              className="text-red-500"
+              style={{
+                fontWeight: 500,
+                fontSize: 14,
+              }}
+            >
+              Remove group
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
