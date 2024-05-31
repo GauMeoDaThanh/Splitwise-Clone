@@ -139,6 +139,16 @@ class UserService {
     }
   }
 
+  async getUsername(uid) {
+    try {
+      const q = query(collection(db, USER_COLLECTION), where("uid", "==", uid));
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs[0].data().username;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   async getUserIDWithMail(mail) {
     try {
       console.log("start get user with mail");

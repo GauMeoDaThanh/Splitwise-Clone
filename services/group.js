@@ -136,7 +136,11 @@ class GroupService {
     try {
       console.log("start update group");
       const groupRef = doc(db, GROUP_COLLECTION, groupId);
+      const groupSnap = await getDoc(groupRef);
+      const currentName = groupSnap.data().name;
+
       await updateDoc(groupRef, { name, type }, { merge: true });
+      ActivityService.getInstance().aEditGroupName(groupId, currentName, name);
 
       if (imgUri) {
         await this.uploadAvatar(groupId, imgUri);

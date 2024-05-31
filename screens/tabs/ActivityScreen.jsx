@@ -43,14 +43,16 @@ const ActivityScreen = () => {
           Recent activity
         </Text>
       </View>
-      <FlatList
-        className="flex-col mb-10"
-        showsVerticalScrollIndicator={false}
-        data={activityData}
-        renderItem={({ item }) => (
-          <NotificationRender type={item.type} data={item} />
-        )}
-      />
+      {Array.isArray(activityData) && activityData.every((item) => item) && (
+        <FlatList
+          className="flex-col mb-10"
+          showsVerticalScrollIndicator={false}
+          data={activityData}
+          renderItem={({ item }) => (
+            <NotificationRender type={item.type} data={item} />
+          )}
+        />
+      )}
       {/* <ActivityAddGroup></ActivityAddGroup>
         <ActivityDeleteGroup></ActivityDeleteGroup>
         <ActivityEditGroup></ActivityEditGroup>
@@ -66,16 +68,22 @@ const ActivityScreen = () => {
 const notifycationMapping = {
   addGroup: ActivityAddGroup,
   deleteGroup: ActivityDeleteGroup,
-  editGroup: ActivityEditGroup,
+  editGroupName: ActivityEditGroup,
+  editGroupAvatar: ActivityEditGroup,
   addMember: ActivityAddMember,
   deleteMember: ActivityDeleteMember,
   editWhiteboard: ActivityEditWhiteboard,
-  addFriends: ActivityAddFriends,
-  deleteFriends: ActivityDeleteFriends,
+  addFriend: ActivityAddFriends,
+  deleteFriend: ActivityDeleteFriends,
 };
 
 const NotificationRender = ({ type, data }) => {
   const Component = notifycationMapping[type];
+
+  if (!Component) {
+    return null;
+  }
+
   return <Component data={data} />;
 };
 

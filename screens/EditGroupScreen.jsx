@@ -15,7 +15,7 @@ const EditGroupsScreen = ({ route }) => {
   const navigation = useNavigation();
   const { group } = route.params;
   const [groupName, setGroupName] = useState(group.name);
-  const [imageUri, setImageUri] = useState(group.imageuri);
+  const [imageUri, setImageUri] = useState(null);
   const [selectedTypeText, setSelectedTypeText] = useState(group.type);
   const [buttons, setButtons] = useState([
     {
@@ -112,12 +112,13 @@ const EditGroupsScreen = ({ route }) => {
         <TouchableOpacity
           className="flex-row items-center px-16"
           onPress={handleUpdateGroup}
+          disabled={groupName === group.name}
         >
           <Text
             style={{
               fontSize: 15,
               fontWeight: "bold",
-              color: "#0B9D7E",
+              color: groupName === group.name ? "gray" : "#0B9D7E",
             }}
           >
             Save
@@ -129,7 +130,13 @@ const EditGroupsScreen = ({ route }) => {
           <View className="relative items-center">
             <Image
               // source={require('../assets/images/group_image.jpg')}
-              source={imageUri ? { uri: imageUri } : undefined}
+              source={
+                imageUri
+                  ? { uri: imageUri }
+                  : group.imageuri
+                  ? { uri: group.imageuri }
+                  : undefined
+              }
               style={{
                 borderWidth: 1,
                 width: 60,

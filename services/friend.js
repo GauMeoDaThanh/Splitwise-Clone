@@ -15,6 +15,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { Alert } from "react-native";
+import ActivityService from "./activity";
 
 class FriendService {
   constructor() {
@@ -70,6 +71,9 @@ class FriendService {
         await updateDoc(friendRef, {
           friends: arrayUnion(uid),
         });
+
+        // Add activity
+        ActivityService.getInstance().aAddFriend(friendUid);
         Alert.alert("Success", "Add friend successfully", [
           {
             text: "OK",
@@ -104,6 +108,9 @@ class FriendService {
             await updateDoc(friendRef, {
               friends: arrayRemove(uid),
             });
+
+            ActivityService.getInstance().aDeleteFriend(friendUid);
+
             Alert.alert("Success", "Remove friend successfully", [
               {
                 text: "OK",

@@ -17,12 +17,13 @@ import UserService from "./user";
 const ACTIVITY_TYPES = {
   group: [
     "addGroup",
-    "editGroup",
+    "editGroupName",
+    "editGroupAvatar",
     "editWhiteboard",
     "deleteGroup",
     "addMember",
   ],
-  friend: ["addFriend", , "settle expense friend"],
+  friend: ["addFriend", "deleteFriend"],
 };
 
 class ActivityService {
@@ -60,6 +61,10 @@ class ActivityService {
               activity["createAt"] = formatDate(activity["createAt"].toDate());
               activity["createByAvatar"] =
                 await UserService.getInstance().getAvatar(activity["createBy"]);
+              activity["createByName"] =
+                await UserService.getInstance().getUsername(
+                  activity["createBy"]
+                );
               return activity;
             }
           })
@@ -86,6 +91,76 @@ class ActivityService {
       };
 
       console.log("start add create group log");
+      const activityRef = await addDoc(
+        collection(db, ACTIVITY_COLLECTION),
+        activity
+      );
+      console.log("Document written with ID: ", activityRef.id);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async aAddFriend(friendId) {
+    try {
+      const friendName = await UserService.getInstance().getUsername(friendId);
+      const activity = {
+        createBy: auth.currentUser.uid,
+        createAt: serverTimestamp(),
+        type: ACTIVITY_TYPES["friend"][0],
+        additionalInfo: {
+          friendId: friendId,
+          friendName: friendName,
+        },
+      };
+
+      console.log("start add add friend log");
+      const activityRef = await addDoc(
+        collection(db, ACTIVITY_COLLECTION),
+        activity
+      );
+      console.log("Document written with ID: ", activityRef.id);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async aDeleteFriend(friendId) {
+    try {
+      const friendName = await UserService.getInstance().getUsername(friendId);
+      const activity = {
+        createBy: auth.currentUser.uid,
+        createAt: serverTimestamp(),
+        type: ACTIVITY_TYPES["friend"][1],
+        additionalInfo: {
+          friendId: friendId,
+          friendName: friendName,
+        },
+      };
+      console.log("start add delete friend log");
+      const activityRef = await addDoc(
+        collection(db, ACTIVITY_COLLECTION),
+        activity
+      );
+      console.log("Document written with ID: ", activityRef.id);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async aEditGroupName(groupId, oldName, newName) {
+    try {
+      const activity = {
+        createBy: auth.currentUser.uid,
+        createAt: serverTimestamp(),
+        type: ACTIVITY_TYPES["group"][1],
+        additionalInfo: {
+          groupId: groupId,
+          oldName: oldName,
+          newName: newName,
+        },
+      };
+      console.log("start add edit group name log");
       const activityRef = await addDoc(
         collection(db, ACTIVITY_COLLECTION),
         activity
