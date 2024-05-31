@@ -15,8 +15,14 @@ import {
 import UserService from "./user";
 
 const ACTIVITY_TYPES = {
-  group: ["add group", "edit group", " create expense group"],
-  friend: ["add friend", "create expense friend", "settle expense friend"],
+  group: [
+    "addGroup",
+    "editGroup",
+    "editWhiteboard",
+    "deleteGroup",
+    "addMember",
+  ],
+  friend: ["addFriend", , "settle expense friend"],
 };
 
 class ActivityService {
@@ -49,13 +55,13 @@ class ActivityService {
       const unsubscribe = onSnapshot(q, async (querySnapshot) => {
         const activityData = await Promise.all(
           querySnapshot.docs.map(async (doc) => {
-            const activity = doc.data();
-            activity["createAt"] = this.formatDate(
-              activity["createAt"].toDate()
-            );
-            activity["createByAvatar"] =
-              await UserService.getInstance().getAvatar(activity["createBy"]);
-            return activity;
+            let activity = doc.data();
+            if (activity["createAt"]) {
+              activity["createAt"] = formatDate(activity["createAt"].toDate());
+              activity["createByAvatar"] =
+                await UserService.getInstance().getAvatar(activity["createBy"]);
+              return activity;
+            }
           })
         );
         callback(activityData);
@@ -65,18 +71,6 @@ class ActivityService {
     } catch (e) {
       console.error(e);
     }
-  }
-
-  formatDate(date) {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    };
-    return date.toLocaleDateString("en-GB", options);
   }
 
   async aCreateGroup(groupId, groupName) {
@@ -91,7 +85,7 @@ class ActivityService {
         },
       };
 
-      console.log("start add aCreateGroup");
+      console.log("start add create group log");
       const activityRef = await addDoc(
         collection(db, ACTIVITY_COLLECTION),
         activity
@@ -102,5 +96,16 @@ class ActivityService {
     }
   }
 }
+
+const formatDate = (date) => {
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return date.toLocaleDateString("en-GB", options);
+};
 
 export default ActivityService;

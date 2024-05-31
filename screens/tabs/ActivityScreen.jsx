@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   TextInput,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  FlatList,
 } from "react-native";
 import ActivityAddGroup from "../../components/ActivityAddGroup";
 import ActivityAddFriends from "../../components/ActivityAddFriends";
@@ -17,6 +18,8 @@ import ActivityDeleteMember from "../../components/ActivityDeleteMember";
 import ActivityEditWhiteboard from "../../components/ActivityEditWhiteboard";
 import ActivityAddMember from "../../components/ActivityAddMember";
 import ActivityDeleteFriends from "../../components/ActivityDeleteFriends";
+import ActivityService from "../../services/activity";
+
 const ActivityScreen = () => {
   const navigation = useNavigation();
   const [activityData, setActivityData] = useState([]);
@@ -40,17 +43,40 @@ const ActivityScreen = () => {
           Recent activity
         </Text>
       </View>
-      <ScrollView className="flex-col mb-16">
-        <ActivityAddGroup></ActivityAddGroup>
+      <FlatList
+        className="flex-col mb-10"
+        showsVerticalScrollIndicator={false}
+        data={activityData}
+        renderItem={({ item }) => (
+          <NotificationRender type={item.type} data={item} />
+        )}
+      />
+      {/* <ActivityAddGroup></ActivityAddGroup>
         <ActivityDeleteGroup></ActivityDeleteGroup>
         <ActivityEditGroup></ActivityEditGroup>
         <ActivityAddMember></ActivityAddMember>
         <ActivityDeleteMember></ActivityDeleteMember>
         <ActivityEditWhiteboard></ActivityEditWhiteboard>
         <ActivityAddFriends></ActivityAddFriends>
-        <ActivityDeleteFriends></ActivityDeleteFriends>
-      </ScrollView>
+        <ActivityDeleteFriends></ActivityDeleteFriends> */}
     </View>
   );
 };
+
+const notifycationMapping = {
+  addGroup: ActivityAddGroup,
+  deleteGroup: ActivityDeleteGroup,
+  editGroup: ActivityEditGroup,
+  addMember: ActivityAddMember,
+  deleteMember: ActivityDeleteMember,
+  editWhiteboard: ActivityEditWhiteboard,
+  addFriends: ActivityAddFriends,
+  deleteFriends: ActivityDeleteFriends,
+};
+
+const NotificationRender = ({ type, data }) => {
+  const Component = notifycationMapping[type];
+  return <Component data={data} />;
+};
+
 export default ActivityScreen;
