@@ -182,7 +182,7 @@ const TabNavigator = () => {
                     return(
                         <View style = {{
                             alignItems: 'center',
-                            borderTopColor: focused ?  '#0B9D7E': 'white',
+                            borderTopColor: focused ?  '#0B9D7E': 'transparent',
                             borderTopWidth: 3,
                             padding: 3
 
@@ -206,7 +206,7 @@ const TabNavigator = () => {
                     return(
                         <View style = {{
                             alignItems: 'center',
-                            borderTopColor: focused ?  '#0B9D7E': 'white',
+                            borderTopColor: focused ?  '#0B9D7E': 'transparent',
                             borderTopWidth: 3,  
                             padding: 3
 
@@ -230,7 +230,7 @@ const TabNavigator = () => {
                     return(
                         <View style = {{
                             alignItems: 'center',
-                            borderTopColor: focused ?  '#0B9D7E': 'white',
+                            borderTopColor: focused ?  '#0B9D7E': 'transparent',
                             borderTopWidth: 3,
                             padding: 3
 
@@ -255,7 +255,7 @@ const TabNavigator = () => {
                     return(
                         <View style = {{
                             alignItems: 'center',
-                            borderTopColor: focused ?  '#0B9D7E': 'white',
+                            borderTopColor: focused ?  '#0B9D7E': 'transparent',
                             borderTopWidth: 3,
                             padding: 3
 
