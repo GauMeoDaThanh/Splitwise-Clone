@@ -117,9 +117,8 @@ class UserService {
     }
   }
 
-  async getAvatar() {
+  async getAvatar(uid) {
     try {
-      const uid = auth.currentUser.uid;
       const q = query(collection(db, USER_COLLECTION), where("uid", "==", uid));
       const querySnapshot = await getDocs(q);
       return querySnapshot.docs[0].data().avatarUrl;

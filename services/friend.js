@@ -118,6 +118,12 @@ class FriendService {
     ]);
   }
 
+  async getFriendAvatar(friendUid) {
+    const friendRef = doc(db, USER_COLLECTION, friendUid);
+    const friendSnap = await getDoc(friendRef);
+    return friendSnap.data().avatarUrl;
+  }
+
   async getFriendsAvatarAndName(uid) {
     const friendsList = await this.getFriendList(uid);
     if (friendsList) {
