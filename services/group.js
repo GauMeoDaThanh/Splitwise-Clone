@@ -132,18 +132,30 @@ class GroupService {
     }
   }
 
-  async updateGroup(groupId, name, type, imgUri, navigation) {
+  async updateGroup(groupId, name, type, imgUri, members, navigation) {
     try {
       console.log("start update group");
       const groupRef = doc(db, GROUP_COLLECTION, groupId);
       const groupSnap = await getDoc(groupRef);
       const currentName = groupSnap.data().name;
 
-      await updateDoc(groupRef, { name, type }, { merge: true });
-      ActivityService.getInstance().aEditGroupName(groupId, currentName, name);
+      if (name !== currentName) {
+        await updateDoc(groupRef, { name, type }, { merge: true });
+        ActivityService.getInstance().aEditGroupName(
+          groupId,
+          currentName,
+          name,
+          members
+        );
+      }
 
       if (imgUri) {
         await this.uploadAvatar(groupId, imgUri);
+        ActivityService.getInstance().aEditGroupAvatar(
+          groupId,
+          currentName,
+          members
+        );
       }
 
       Alert.alert("Success", "Group updated successfully", [
@@ -189,6 +201,18 @@ class GroupService {
     }
   }
 
+  async getGroupMembers(groupId) {
+    try {
+      console.log("start get group members");
+      const groupRef = doc(db, GROUP_COLLECTION, groupId);
+      const groupSnap = await getDoc(groupRef);
+      const members = groupSnap.data().members;
+      return members;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   async getGroupInfo(groupId) {
     try {
       console.log("start get group infomation");
@@ -204,13 +228,19 @@ class GroupService {
     }
   }
 
-  async setGroupInformation(groupId, groupInfomation) {
+  async setGroupInformation(groupId, groupName, groupInfomation, members) {
     try {
       console.log("start set group information");
       const groupRef = doc(db, GROUP_COLLECTION, groupId);
       await setDoc(groupRef, { information: groupInfomation }, { merge: true });
       console.log(
         `Document with ID ${groupId} updated with username ${auth.currentUser.uid}`
+      );
+      // Add activity
+      ActivityService.getInstance().aEditWhiteboard(
+        groupId,
+        groupName,
+        members
       );
     } catch (e) {
       console.log(e);

@@ -13,11 +13,12 @@ import {
 import ActivityAddGroup from "../../components/ActivityAddGroup";
 import ActivityAddFriends from "../../components/ActivityAddFriends";
 import ActivityDeleteGroup from "../../components/ActivityDeleteGroup";
-import ActivityEditGroup from "../../components/ActivityEditGroup";
+import ActivityEditGroupName from "../../components/ActivityEditGroupName";
 import ActivityDeleteMember from "../../components/ActivityDeleteMember";
 import ActivityEditWhiteboard from "../../components/ActivityEditWhiteboard";
 import ActivityAddMember from "../../components/ActivityAddMember";
 import ActivityDeleteFriends from "../../components/ActivityDeleteFriends";
+import ActivityEditGroupAvatar from "../../components/ActivityEditGroupAvatar";
 import ActivityService from "../../services/activity";
 
 const ActivityScreen = () => {
@@ -68,8 +69,8 @@ const ActivityScreen = () => {
 const notifycationMapping = {
   addGroup: ActivityAddGroup,
   deleteGroup: ActivityDeleteGroup,
-  editGroupName: ActivityEditGroup,
-  editGroupAvatar: ActivityEditGroup,
+  editGroupName: ActivityEditGroupName,
+  editGroupAvatar: ActivityEditGroupAvatar,
   addMember: ActivityAddMember,
   deleteMember: ActivityDeleteMember,
   editWhiteboard: ActivityEditWhiteboard,

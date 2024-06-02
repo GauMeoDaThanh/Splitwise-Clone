@@ -148,7 +148,7 @@ class ActivityService {
     }
   }
 
-  async aEditGroupName(groupId, oldName, newName) {
+  async aEditGroupName(groupId, oldName, newName, members) {
     try {
       const activity = {
         createBy: auth.currentUser.uid,
@@ -158,9 +158,72 @@ class ActivityService {
           groupId: groupId,
           oldName: oldName,
           newName: newName,
+          members: members,
         },
       };
       console.log("start add edit group name log");
+      const activityRef = await addDoc(
+        collection(db, ACTIVITY_COLLECTION),
+        activity
+      );
+      console.log("Document written with ID: ", activityRef.id);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async aEditGroupAvatar(groupId, groupName, members) {
+    try {
+      const activity = {
+        createBy: auth.currentUser.uid,
+        createAt: serverTimestamp(),
+        type: ACTIVITY_TYPES["group"][2],
+        additionalInfo: {
+          groupId: groupId,
+          groupName: groupName,
+          members: members,
+        },
+      };
+      console.log("start add edit group avatar log");
+      const activityRef = await addDoc(
+        collection(db, ACTIVITY_COLLECTION),
+        activity
+      );
+      console.log("Document written with ID: ", activityRef.id);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async aEditWhiteboard(groupId, groupName, members) {
+    try {
+      //get member name
+      // const memberMap = await Promise.all(
+      //   members.map(async (memberId) => {
+      //     const username = await UserService.getInstance().getUsername(
+      //       memberId
+      //     );
+      //     return [memberId, username];
+      //   })
+      // ).then((memberPairs) => {
+      //   return memberPairs.reduce((acc, [id, username]) => {
+      //     acc[id] = username;
+      //     return acc;
+      //   }, {});
+      // });
+
+      const activity = {
+        createBy: auth.currentUser.uid,
+        createAt: serverTimestamp(),
+        type: ACTIVITY_TYPES["group"][3],
+        additionalInfo: {
+          groupId: groupId,
+          groupName: groupName,
+          // membersInfo: memberMap,
+          members: members,
+        },
+      };
+      console.log("start add edit whiteboard log");
       const activityRef = await addDoc(
         collection(db, ACTIVITY_COLLECTION),
         activity

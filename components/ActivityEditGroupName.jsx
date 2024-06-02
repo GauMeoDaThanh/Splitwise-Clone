@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { auth } from "../firebaseConfig";
 
-const ActivityAddGroup = ({ data }) => {
+const ActivityEditGroupName = ({ data }) => {
   const dateTime = data.createAt.split(", ");
   return (
     <View
@@ -56,9 +56,9 @@ const ActivityAddGroup = ({ data }) => {
               fontWeight: "500",
             }}
           >
-            You
+            {data.createBy === auth.currentUser.uid ? "You" : data.createByName}
           </Text>
-          <Text>have created group</Text>
+          <Text>have edited the group</Text>
           <Text
             className="text-gray-700 ml-1"
             style={{
@@ -66,7 +66,17 @@ const ActivityAddGroup = ({ data }) => {
               fontWeight: "500",
             }}
           >
-            {data.additionalInfo.name}
+            {data.additionalInfo.oldName}
+          </Text>
+          <Text> name to</Text>
+          <Text
+            className="text-gray-700 ml-1"
+            style={{
+              fontSize: 16,
+              fontWeight: "500",
+            }}
+          >
+            {data.additionalInfo.newName}
           </Text>
         </View>
         <View className="flex-row">
@@ -85,4 +95,4 @@ const ActivityAddGroup = ({ data }) => {
   );
 };
 
-export default ActivityAddGroup;
+export default ActivityEditGroupName;

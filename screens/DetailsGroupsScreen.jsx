@@ -164,6 +164,7 @@ const DetailsGroupsScreen = ({ route }) => {
               groupName: group.name,
               groupInfo: group.information,
               groupId: group.id,
+              groupMembers: group.members,
             })
           }
         >

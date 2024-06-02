@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { auth } from "../firebaseConfig";
 
-const ActivityEditGroup = ({ data }) => {
+const ActivityEditGroupAvatar = ({ data }) => {
   const dateTime = data.createAt.split(", ");
   return (
     <View
@@ -58,7 +58,7 @@ const ActivityEditGroup = ({ data }) => {
           >
             {data.createBy === auth.currentUser.uid ? "You" : data.createByName}
           </Text>
-          <Text>have edited the group</Text>
+          <Text>have edited</Text>
           <Text
             className="text-gray-700 ml-1"
             style={{
@@ -66,24 +66,9 @@ const ActivityEditGroup = ({ data }) => {
               fontWeight: "500",
             }}
           >
-            {data.type === "editGroupName"
-              ? data.additionalInfo.oldName
-              : "avatar"}
+            {data.additionalInfo.groupName}
           </Text>
-          {data.type === "editGroupName" ? (
-            <>
-              <Text> name to</Text>
-              <Text
-                className="text-gray-700 ml-1"
-                style={{
-                  fontSize: 16,
-                  fontWeight: "500",
-                }}
-              >
-                {data.additionalInfo.newName}
-              </Text>
-            </>
-          ) : null}
+          <Text> avatar</Text>
         </View>
         <View className="flex-row">
           <Text
@@ -93,7 +78,7 @@ const ActivityEditGroup = ({ data }) => {
               fontWeight: "500",
             }}
           >
-            18 tháng 5 2024 at 15:35
+            {dateTime[0]} at {dateTime[1]}
           </Text>
         </View>
       </View>
@@ -101,4 +86,4 @@ const ActivityEditGroup = ({ data }) => {
   );
 };
 
-export default ActivityEditGroup;
+export default ActivityEditGroupAvatar;

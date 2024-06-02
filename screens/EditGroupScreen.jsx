@@ -77,6 +77,7 @@ const EditGroupsScreen = ({ route }) => {
       groupName,
       selectedTypeText,
       imageUri,
+      group.members,
       navigation
     );
   };
@@ -112,13 +113,16 @@ const EditGroupsScreen = ({ route }) => {
         <TouchableOpacity
           className="flex-row items-center px-16"
           onPress={handleUpdateGroup}
-          disabled={groupName === group.name}
+          disabled={groupName === group.name && imageUri === null}
         >
           <Text
             style={{
               fontSize: 15,
               fontWeight: "bold",
-              color: groupName === group.name ? "gray" : "#0B9D7E",
+              color:
+                groupName === group.name && imageUri === null
+                  ? "gray"
+                  : "#0B9D7E",
             }}
           >
             Save
