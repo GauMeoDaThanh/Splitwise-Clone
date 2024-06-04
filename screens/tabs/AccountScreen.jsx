@@ -12,18 +12,30 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import AuthenticateService from "../../services/authentication";
 import UserService from "../../services/user";
+import { auth } from "../../firebaseConfig";
 
 const AccountScreen = () => {
   const navigation = useNavigation();
   const [imageUri, setImageUri] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [userId, setUserId] = useState(auth.currentUser.uid);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserId(user.uid);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     UserService.getInstance().listenToUserInfo((user) => {
       setUserData(user);
       setImageUri(user.avatarUrl);
     });
-  }, []);
+  }, [userId]);
 
   const updateTabBarIcon = useCallback(() => {
     navigation.setOptions({

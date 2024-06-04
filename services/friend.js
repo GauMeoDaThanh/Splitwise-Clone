@@ -15,6 +15,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { Alert } from "react-native";
+import ActivityService from "./activity";
 
 class FriendService {
   constructor() {
@@ -40,6 +41,16 @@ class FriendService {
     return () => unsubscribe();
   }
 
+  async listenToFriendDetail(friendId, callback) {
+    const friendRef = doc(db, USER_COLLECTION, friendId);
+    const unsubscribe = onSnapshot(friendRef, (friendInfo) => {
+      let friendData = friendInfo.data();
+      callback(friendData);
+    });
+
+    return () => unsubscribe();
+  }
+
   async addFriend(fMail, navigation) {
     const uid = auth.currentUser.uid;
     const friendUid = await UserService.getInstance().getUserIDWithMail(fMail);
@@ -60,6 +71,9 @@ class FriendService {
         await updateDoc(friendRef, {
           friends: arrayUnion(uid),
         });
+
+        // Add activity
+        ActivityService.getInstance().aAddFriend(friendUid);
         Alert.alert("Success", "Add friend successfully", [
           {
             text: "OK",
@@ -74,16 +88,47 @@ class FriendService {
     }
   }
 
-  async deleteFriend(friendUid) {
-    const uid = auth.currentUser.uid;
-    const userRef = doc(db, USER_COLLECTION, uid);
-    try {
-      await updateDoc(userRef, {
-        friends: arrayRemove(friendUid),
-      });
-    } catch (e) {
-      console.error(e);
-    }
+  deleteFriend(friendUid, navigation) {
+    //warning box
+    Alert.alert("Warning", "Are you sure to delete this friend?", [
+      {
+        text: "No",
+        style: "cancel",
+      },
+      {
+        text: "Yes",
+        onPress: async () => {
+          const uid = auth.currentUser.uid;
+          const userRef = doc(db, USER_COLLECTION, uid);
+          const friendRef = doc(db, USER_COLLECTION, friendUid);
+          try {
+            await updateDoc(userRef, {
+              friends: arrayRemove(friendUid),
+            });
+            await updateDoc(friendRef, {
+              friends: arrayRemove(uid),
+            });
+
+            ActivityService.getInstance().aDeleteFriend(friendUid);
+
+            Alert.alert("Success", "Remove friend successfully", [
+              {
+                text: "OK",
+                onPress: () => navigation.navigate("Friends"),
+              },
+            ]);
+          } catch (e) {
+            console.error(e);
+          }
+        },
+      },
+    ]);
+  }
+
+  async getFriendAvatar(friendUid) {
+    const friendRef = doc(db, USER_COLLECTION, friendUid);
+    const friendSnap = await getDoc(friendRef);
+    return friendSnap.data().avatarUrl;
   }
 
   async getFriendsAvatarAndName(uid) {
@@ -113,6 +158,16 @@ class FriendService {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  async getFriendListInGroup(groupId) {
+    const uid = auth.currentUser.uid;
+    const groupRef = doc(db, GROUP_COLLECTION, groupId);
+    const groupSnap = await getDoc(groupRef);
+    const groupMembers = groupSnap.data().members;
+    const friendList = await this.getFriendsAvatarAndName(uid);
+
+    return friendList.filter((friend) => groupMembers.includes(friend.id));
   }
 
   async getFriendListNotInGroup(groupId) {

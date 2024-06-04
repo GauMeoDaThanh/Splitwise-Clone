@@ -1,5 +1,5 @@
 import { auth, db } from "../firebaseConfig";
-import { collection, addDoc, doc, setDoc, query, getDoc, updateDoc, getDocs, where} from "firebase/firestore";
+import { collection, addDoc, doc, setDoc, query, getDoc, updateDoc, getDocs, where,onSnapshot,} from "firebase/firestore";
 import FriendService from "./friend";
 import AuthenticateService from "./authentication";
 import UserService from "./user";
@@ -8,7 +8,7 @@ import {
   ref,
   getStorage,
   getDownloadURL,
-  uploadBytesResumable,
+    uploadBytesResumable,
 } from "firebase/storage";
 import { storage} from "../firebaseConfig";
 import { useRef } from "react";
@@ -315,6 +315,15 @@ class ExpenseService {
         });
         return expenses;
     }
+
+    async listenToFriendDetail(expenseId, callback) {
+    const expenseRef = doc(db, "expenses", expenseId);
+    const unsubscribe = onSnapshot(expenseRef, (expenseInfo) => {
+      let expenseData = expenseInfo.data();
+      callback(expenseData);
+    });
+    return () => unsubscribe();
+  }
 }
 
 export default ExpenseService;

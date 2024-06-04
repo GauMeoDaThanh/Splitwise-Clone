@@ -117,9 +117,8 @@ class UserService {
     }
   }
 
-  async getAvatar() {
+  async getAvatar(uid = auth.currentUser.uid) {
     try {
-      const uid = auth.currentUser.uid;
       const q = query(collection(db, USER_COLLECTION), where("uid", "==", uid));
       const querySnapshot = await getDocs(q);
       return querySnapshot.docs[0].data().avatarUrl;
@@ -135,6 +134,16 @@ class UserService {
     try {
       await setDoc(userRef, { username }, { merge: true });
       console.log(`Document with ID ${uid} updated with username ${username}`);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async getUsername(uid) {
+    try {
+      const q = query(collection(db, USER_COLLECTION), where("uid", "==", uid));
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs[0].data().username;
     } catch (e) {
       console.error(e);
     }

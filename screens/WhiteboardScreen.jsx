@@ -14,7 +14,7 @@ import GroupService from "../services/group";
 
 const WhiteboardScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { groupName, groupInfo, groupId } = route.params;
+  const { groupName, groupInfo, groupId, groupMembers } = route.params;
   const [whiteboard, setWhiteboard] = useState(groupInfo);
   const [isTextChanged, setIsTextChanged] = useState(false);
 
@@ -27,7 +27,12 @@ const WhiteboardScreen = ({ route }) => {
   }, [whiteboard]);
 
   handleEditGroupWhiteboard = async () => {
-    await GroupService.getInstance().setGroupInformation(groupId, whiteboard);
+    await GroupService.getInstance().setGroupInformation(
+      groupId,
+      groupName,
+      whiteboard,
+      groupMembers
+    );
     Alert.alert("Success", "change group whiteboard successfully", [
       {
         text: "OK",

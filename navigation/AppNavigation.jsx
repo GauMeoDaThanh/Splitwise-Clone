@@ -32,8 +32,10 @@ import BalancesScreen from "../screens/BalancesScreen";
 import WhiteboardScreen from "../screens/WhiteboardScreen";
 import TotalsScreen from "../screens/TotalsScreen";
 import AddMemberGroupsScreen from "../screens/AddMemberGroupsScreen";
-import AddImageExpense from "../screens/AddImageExpense";
-
+import EditGroupMemberScreen from "../screens/EditGroupMemberScreen";
+import EditGroupsScreen from "../screens/EditGroupScreen";
+import DetailFriendsScreen from "../screens/DetailsFriendsScreen";
+import DetailsExpense from "../screens/DetailsExpense";
 
 const AppNavigation = () => {
   return (
@@ -114,9 +116,19 @@ const AppNavigation = () => {
           options={{ headerShown: false }}
         ></Stack.Screen>
         <Stack.Screen
-          name="AddImageExpense"
-          component={AddImageExpense}
-          options={{ headerShown: false, }}
+          name="EditGroupMember"
+          component={EditGroupMemberScreen}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+        <Stack.Screen
+          name="EditGroups"
+          component={EditGroupsScreen}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+          <Stack.Screen
+          name="DetailExpense"
+          component={DetailsExpense}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -142,6 +154,24 @@ const GroupsStackScreen = () => {
   );
 };
 
+const FriendsStack = createNativeStackNavigator();
+const FriendStackScreen = () => {
+  return (
+    <FriendsStack.Navigator>
+      <FriendsStack.Screen
+        name="Friends"
+        component={FriendsScreen}
+        options={{ headerShown: false }}
+      />
+      <FriendsStack.Screen
+        name="FriendDetail"
+        component={DetailFriendsScreen}
+        options={{ headerShown: false }}
+      />
+    </FriendsStack.Navigator>
+  );
+};
+
 const TabNavigator = () => {
   const [imageUri, setImageUri] = React.useState(null);
   React.useEffect(() => {
@@ -154,7 +184,7 @@ const TabNavigator = () => {
 
   return (
     <Tab.Navigator
-      initialRouteName="Friends"
+      initialRouteName="FriendsStackScreen"
       screenOptions={{
         tabBarStyle: {
           position: "absolute",
@@ -203,8 +233,8 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Friends"
-        component={FriendsScreen}
+        name="FriendsStackScreen"
+        component={FriendStackScreen}
         options={{
           title: "Friends",
           tabBarIcon: ({ focused }) => {

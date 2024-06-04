@@ -13,14 +13,33 @@ import {
 import DetailsToolBar from "../components/DetailsToolBar";
 // import BottomAppBar from "../components/BottomAppBar";
 import { useNavigation } from "@react-navigation/native";
+import ExpenseService from "../services/expense";
+import UserService from "../services/user";
 
-const DetailsExpense = (props) => {
+const DetailsExpense = ({ route }) => {
   const comments = [
     { name: "You", content: "This is your comment." },
     { name: "Tan Dung", content: "This is a comment from Tan Dung." },
     { name: "Nhung", content: "Another comment from Nhung." },
   ];
+  const navigation = useNavigation();
+  const { expenseId } = route.params;
+  const [expenseInfo, setExpenseInfo] = useState([])
+const [paidByUser, setPaidByUser] = useState(); // New state to store user information
 
+useEffect(() => {
+  ExpenseService.getInstance().listenToFriendDetail(expenseId, async (expenseInfo) => {
+    setExpenseInfo(expenseInfo);
+    const paidById = expenseInfo.paidBy;
+    try {
+      const user = await UserService.getInstance().getUserById(paidById);
+      setPaidByUser(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  });
+}, []);
+  
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]}>
       <View style={[{ flex: 7 }]}>
@@ -62,12 +81,12 @@ const DetailsExpense = (props) => {
             <Text
               style={{ fontSize: 18, fontWeight: "400", marginVertical: 2 }}
             >
-              PBL05
+                {expenseInfo.description}
             </Text>
             <Text
               style={{ fontSize: 20, fontWeight: "500", marginVertical: 5 }}
             >
-              300.000 dong
+            {expenseInfo.amounts} vnd
             </Text>
             <Text
               style={{
@@ -76,8 +95,9 @@ const DetailsExpense = (props) => {
                 marginVertical: 8,
                 width: 250,
               }}
-            >
-              Add by Nhung on 18 may 2024
+              >
+                Add {paidByUser?.username}  {expenseInfo?.createAt? 'on ' + new Date(expenseInfo.createAt.seconds * 1000 + expenseInfo.createAt.nanoseconds / 1000000).toLocaleDateString('en-GB'):''}
+
             </Text>
           </View>
           <TouchableOpacity style={{ width: 60, height: 60, position: "absolute", right: 12 }}>
@@ -193,7 +213,7 @@ const DetailsExpense = (props) => {
         />
       </View>
       <View style={{ flex: 10, borderTopColor: "#CCCCCC", borderTopWidth: 1 }}>
-        <BottomAppBar />
+        {/* <BottomAppBar /> */}
       </View>
     </View>
   );

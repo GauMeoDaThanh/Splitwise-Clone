@@ -8,44 +8,40 @@ import {
   Image,
   ScrollView,
   FlatList,
-  Alert,
 } from "react-native";
-import CheckBox from "react-native-check-box";
 import FriendService from "../services/friend";
 import GroupService from "../services/group";
 
-const AddMemberGroupsScreen = ({ route }) => {
+const EditGroupMemberScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { groupId, groupMembers, groupName } = route.params;
-  const [selectedFriends, setSelectedFriends] = useState([]);
-  const [friends, setFriends] = useState([]);
-  const [search, setSearch] = useState("");
+  const { group } = route.params;
+  const [membersInfo, setMembersInfo] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [deleteMembers, setDeleteMembers] = useState([]);
 
   useEffect(() => {
-    const getFriendList = async () => {
-      const FriendList =
-        await FriendService.getInstance().getFriendListNotInGroup(groupId);
-      setFriends(FriendList);
+    const getMembersInfo = async () => {
+      const members = await FriendService.getInstance().getFriendListInGroup(
+        group.id
+      );
+      setMembersInfo(members);
     };
-    getFriendList();
+    getMembersInfo();
   }, []);
 
-  const handleAddMembers = async () => {
-    const selectedFriendIds = Object.keys(selectedFriends).filter(
-      (friendId) => selectedFriends[friendId]
+  const getDeleteMemberInfo = (id) => {
+    setDeleteMembers([...deleteMembers, id]);
+    setMembersInfo(membersInfo.filter((member) => member.id !== id));
+  };
+
+  const handleDeleteMember = () => {
+    GroupService.getInstance().removeGroupMembers(
+      group.id,
+      group.name,
+      group.members,
+      deleteMembers,
+      navigation
     );
-    await GroupService.getInstance().addGroupMembers(
-      groupId,
-      groupName,
-      groupMembers,
-      selectedFriendIds
-    );
-    Alert.alert("success", "Add members successfully", [
-      {
-        text: "OK",
-        onPress: () => navigation.goBack(),
-      },
-    ]);
   };
 
   return (
@@ -70,12 +66,18 @@ const AddMemberGroupsScreen = ({ route }) => {
             fontWeight: 400,
           }}
         >
-          Add group members
+          Edit members group
         </Text>
         <View className="flex-row px-9">
-          <TouchableOpacity className="flex-row" onPress={handleAddMembers}>
+          <TouchableOpacity
+            className="flex-row"
+            onPress={handleDeleteMember}
+            disabled={deleteMembers.length === 0}
+          >
             <Text
-              className="text-gray-700"
+              className={
+                deleteMembers.length === 0 ? "text-gray-300" : "text-green-500"
+              }
               style={{
                 fontSize: 14,
                 fontWeight: 500,
@@ -102,14 +104,13 @@ const AddMemberGroupsScreen = ({ route }) => {
             top: -24,
             height: 32,
           }}
-          value={search}
-          onChangeText={(text) => setSearch(text)}
+          onChangeText={(text) => setSearchTerm(text)}
         ></TextInput>
       </View>
       <View className="flex-row pb-2 px-4 border-b border-gray-300">
         <TouchableOpacity
           className="flex-row items-center space-x-4 py-1"
-          onPress={() => navigation.navigate("AddFriendScreen")}
+          onPress={() => navigation.navigate("AddMember")}
         >
           <Image
             source={require("../assets/icons/addFriends_icon.png")}
@@ -136,60 +137,57 @@ const AddMemberGroupsScreen = ({ route }) => {
             fontSize: 13,
           }}
         >
-          List Friend
+          Group Members
         </Text>
         <FlatList
-          data={friends.filter((friend) =>
-            friend.name.toLowerCase().includes(search.toLowerCase())
-          )}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            return (
-              <View className="flex-row py-3 items-center space-x-4 border-b border-gray-300">
-                <View className="flex-row ">
-                  <CheckBox
-                    isChecked={selectedFriends[item.id]}
-                    onClick={() => {
-                      setSelectedFriends({
-                        ...selectedFriends,
-                        [item.id]: !selectedFriends[item.id],
-                      });
-                    }}
-                    checkBoxColor="#0B9D7E"
+          data={membersInfo.filter((member) => {
+            return member.name
+              .toLowerCase()
+              .includes(searchTerm.trim().toLowerCase());
+          })}
+          renderItem={({ item }) => (
+            <View className="flex-row py-4 items-center space-x-4">
+              <View className="flex-row ">
+                <TouchableOpacity
+                  className="flex-row"
+                  onPress={() => getDeleteMemberInfo(item.id)}
+                >
+                  <Image
+                    source={require("../assets/icons/delete_icon.png")}
                     style={{
                       width: 20,
                       height: 20,
                       marginRight: 20,
                     }}
-                  ></CheckBox>
-                </View>
-                <Image
-                  source={
-                    item.avatar
-                      ? { uri: item.avatar }
-                      : require("../assets/images/avatar_image.jpg")
-                  }
-                  style={{
-                    borderRadius: 25,
-                    width: 50,
-                    height: 50,
-                  }}
-                ></Image>
-                <Text
-                  style={{
-                    color: "rgb(75 85 99)",
-                    fontWeight: 500,
-                    fontSize: 17,
-                  }}
-                >
-                  {item.name}
-                </Text>
+                  ></Image>
+                </TouchableOpacity>
               </View>
-            );
-          }}
+              <Image
+                source={
+                  item.avatar
+                    ? { uri: item.avatar }
+                    : require("../assets/images/Splitwise_logo.png")
+                }
+                style={{
+                  borderRadius: 25,
+                  width: 50,
+                  height: 50,
+                }}
+              ></Image>
+              <Text
+                style={{
+                  color: "rgb(75 85 99)",
+                  fontWeight: 500,
+                  fontSize: 17,
+                }}
+              >
+                {item.name}
+              </Text>
+            </View>
+          )}
         ></FlatList>
       </View>
     </View>
   );
 };
-export default AddMemberGroupsScreen;
+export default EditGroupMemberScreen;
