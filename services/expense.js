@@ -315,10 +315,6 @@ class ExpenseService {
         });
         return expenses;
     }
-
-    
-
-
 }
 
 export default ExpenseService;

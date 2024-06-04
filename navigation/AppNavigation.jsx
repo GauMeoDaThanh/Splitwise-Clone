@@ -34,6 +34,7 @@ import TotalsScreen from "../screens/TotalsScreen";
 import AddMemberGroupsScreen from "../screens/AddMemberGroupsScreen";
 import AddImageExpense from "../screens/AddImageExpense";
 
+
 const AppNavigation = () => {
   return (
     <NavigationContainer>
@@ -103,8 +104,8 @@ const AppNavigation = () => {
           options={{ headerShown: false }}
         ></Stack.Screen>
         <Stack.Screen
-          name="ListFriends"
-          component={ListFriendsScreen}
+          name="AddMemberGroupsScreen"
+          component={AddMemberGroupsScreen}
           options={{ headerShown: false }}
         ></Stack.Screen>
         <Stack.Screen

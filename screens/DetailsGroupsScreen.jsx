@@ -122,14 +122,16 @@ const DetailsGroupsScreen = ({ route }) => {
             {group.name}
           </Text>
           <View className="flex-row space-x-1">
-            <Text className="text-gray-600">Chau N. owes you</Text>
+            <Text className="text-gray-600">
+              {/* Chau N. owes you */}
+            </Text>
             <Text
               style={{
                 color: "#0B9D7E",
                 fontWeight: 400,
               }}
             >
-              3.000.000vnđ
+              {/* 3.000.000vnđ */}
             </Text>
           </View>
         </View>
@@ -210,7 +212,7 @@ const DetailsGroupsScreen = ({ route }) => {
             borderColor: "#0B9D7E",
           }}
           onPress={() =>
-            navigation.navigate("ListFriends", { groupId: group.id })
+            navigation.navigate("AddMemberGroupsScreen", { groupId: group.id })
           }
         >
           <Image

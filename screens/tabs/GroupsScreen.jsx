@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   TextInput,
@@ -14,32 +14,15 @@ import AppBar from "../../components/AppBar";
 import AddToolBar from "../../components/AddToolBar";
 import ButtonAddExpense from "../../components/ButtonAddExpense";
 import GroupService from "../../services/group";
-import RadioButtons from "react-native-radio-buttons";
 import ExpenseService from "../../services/expense";
 import UserService from "../../services/user";
+import { auth } from "../../firebaseConfig";
 
 const GroupsScreen = () => {
-  console.warn = () => {};
   const navigation = useNavigation();
   const [groups, setGroups] = useState([]);
-  const [showFilterOptions, setShowFilterOptions] = useState(false);
-  const [selectedId, setSelectedId] = useState("All groups");
-  const radioButtons = [
-    "All groups",
-    "Groups you owe",
-    "Groups that owe you",
-    "Trip",
-    "Home",
-    "Couple",
-    "Friend",
-    "Other",
-  ];
-  const toggleFilterOptions = () => {
-    setShowFilterOptions(!showFilterOptions);
-  };
-  const [expenses, setExpenses] = useState([])
-  const [totalAmount, setTotalAmount] = useState([]);
-  const [participants, setParticipants] = useState([]);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [yourExpenseByGroup, setYourExpenseByGroup] = useState([])
 
   useEffect(() => {
       GroupService.getInstance().listenToGroupList((groups) => {
@@ -50,45 +33,31 @@ const GroupsScreen = () => {
        try {
         //  Tìm các hoá đơn theo group
          expensesList = []
-         let totalExpenses = []
-         let participantsList = []
+         let differenceList = [];
         for (group of groups) {
           const expensesByGr = await ExpenseService.getInstance().getExpensesByGroupId(group.id);
           expensesList.push(expensesByGr)
           let sumByGr = 0;
-          let participantByGr = [];
+          let yourOwe = 0;
+          let yourLent = 0
           for (expense of expensesByGr) {
-            sumByGr = sumByGr + parseFloat(expense.participants.slice(1).reduce((acc, curr) => acc + curr.amount, 0).toFixed(2))
-            for (par of expense.participants.slice(1)) {
-              const user = await UserService.getInstance().getUserById(par.userId)
-              participantByGr.push({
-                userName: user.username,
-                amount: par.amount
-              })
+            sumByGr = sumByGr + parseFloat(expense.participants.reduce((acc, curr) => acc + curr.amount, 0).toFixed(2))
+            for (par of expense.participants) {
+              if (par.userId === auth.currentUser.uid) {
+                yourOwe += parseFloat(par.amount);
+              }
+            }
+            // Khoản bạn đã trả trong group đó
+            if (expense.paidBy === auth.currentUser.uid) {
+              yourLent += parseFloat(expense.amounts);
             }
           }
-          participantsList.push(participantByGr)
-          totalExpenses.push(sumByGr);
+          differenceList.push((yourLent - yourOwe).toFixed(3));
          }
-        // Tính tổng nợ của các user trong group
-        const groupedExpenses = participantsList.reduce((acc, currExpenses) => {
-          acc.push(currExpenses.reduce((innerAcc, currExpense) => {
-            if (!innerAcc.some(group => group.userName === currExpense.userName)) {
-              innerAcc.push({ userName: currExpense.userName, amount: 0 });
-              }
-              const group = innerAcc.find(group => group.userName === currExpense.userName);
-              if (group) {
-                group.amount += currExpense.amount;
-              } else {
-                innerAcc.push({ userName: currExpense.userName, amount: currExpense.amount });
-              }
-              return innerAcc;
-            }, []));
-            return acc;
-          }, []);
-        setExpenses(expensesList)
-        setTotalAmount(totalExpenses)
-         setParticipants(groupedExpenses)
+          const numberArray = differenceList.map(parseFloat);
+          const totalDifference = numberArray.reduce((sum, current) => sum + current, 0);
+          setTotalAmount(totalDifference)
+          setYourExpenseByGroup(differenceList);
       } catch (error) {
         console.error("Error fetching expenses:", error);
       }
@@ -109,7 +78,9 @@ const GroupsScreen = () => {
       <View className="flex-cols px-3">
         <View className="flex-row space-x-40">
           <View className="flex-col py-4">
-            <Text className="font-bold text-xl">Groups owe you</Text>
+            <Text className="font-bold text-xl">
+              {totalAmount > 0 ? 'Groups owe you ' : 'You owe groups '}
+            </Text>
             <Text
               className="font-bold"
               style={{
@@ -117,32 +88,34 @@ const GroupsScreen = () => {
                 fontSize: 17,
               }}
             >
-             {totalAmount.reduce((acc, curr) => acc + curr, 0)}
+             {totalAmount} vnd
             </Text>
           </View>
           <View className="flex-row items-center">
-            <TouchableOpacity
-              className="flex-row items-center"
-              onPress={toggleFilterOptions}
-            >
-              <Image
-                source={require("../../assets/icons/filter_icon.png")}
-                style={{
-                  width: 30,
-                  height: 30,
-                  tintColor: "#0B9D7E",
-                }}
-              ></Image>
-            </TouchableOpacity>
+            <Image
+              source={require("../../assets/icons/filter_icon.png")}
+              style={{
+                width: 30,
+                height: 30,
+                tintColor: "#0B9D7E",
+              }}
+            ></Image>
           </View>
         </View>
+        <View className="flex-row mb-3">
+          <Text
+            style={{
+              fontSize: 13,
+              fontWeight: 400,
+            }}
+          >
+            Showing only groups that owe you
+          </Text>
+        </View>
         <View className="flex-row" style={{ height: "75%" }}>
+          {/* Viết code để lấy item bỏ vào FlatList */}
           <FlatList
-            data={groups.filter(
-              (group) =>
-                selectedId === "All groups" ||
-                group.type.toLowerCase() === selectedId.toLowerCase()
-            )}
+            data={groups}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
               return (
@@ -183,26 +156,10 @@ const GroupsScreen = () => {
                         }}
                       >
                         {
-                          totalAmount[index] === 0 ? 'All settle up':"You are owed " + `${totalAmount[index]?totalAmount[index]:0}` + " vnđ"
-                          // `${totalAmount[index]?0:0`"You are owed " + `${totalAmount[index]?totalAmount[index]:0}` + " vnđ"
+                          yourExpenseByGroup[index] > 0 ? 'You are owed ' + yourExpenseByGroup[index] + ' vnd'
+                                  : (yourExpenseByGroup[index] == 0 ? 'You settled up': 'You owed ' + yourExpenseByGroup[index] + ' vnd')
                        }
                       </Text>
-
-                      {
-                        participants[index]?participants[index].map((participant, pos) => (
-                        <View key={pos} className="flex-row">
-                        <Text>{participant.userName} owes you </Text>
-                        <Text
-                          style={{
-                            color: "#0B9D7E",
-                            fontWeight: "500",
-                          }}
-                        >
-                          {participant.amount.toFixed(2)}
-                        </Text>
-                      </View>
-                        )):null
-                      }
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -252,67 +209,6 @@ const GroupsScreen = () => {
           <ButtonAddExpense />
         </View>
       </View>
-      {showFilterOptions && (
-        <View
-          className="border-2 border-gray-300 "
-          style={{
-            position: "absolute",
-            top: 130,
-            right: 5,
-            backgroundColor: "white",
-            borderRadius: 10,
-            padding: 10,
-            zIndex: 1,
-            borderRadius: 10,
-          }}
-        >
-          <RadioButtons
-            options={radioButtons}
-            onSelection={(option) => {
-              setSelectedId(option);
-            }}
-            selectedOption={selectedId}
-            renderOption={(option, selected, onSelect, index) => (
-              <TouchableOpacity key={index} onPress={onSelect}>
-                <View className="flex-row items-center py-1 space-x-2">
-                  <View
-                    style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: 10,
-                      borderWidth: 2,
-                      marginRight: 8,
-                      borderColor: selected ? "#0B9D7E" : "rgb(75, 85, 99)",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    {selected && (
-                      <View
-                        style={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: 5,
-                          backgroundColor: "#0B9D7E",
-                        }}
-                      />
-                    )}
-                  </View>
-                  <Text
-                    style={{
-                      color: "rgb(75, 85, 99)",
-                      fontWeight: 500,
-                      fontSize: 14,
-                    }}
-                  >
-                    {option}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      )}
     </View>
   );
 };

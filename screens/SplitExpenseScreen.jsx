@@ -95,13 +95,6 @@ const SplitExpenseScreen = (props) => {
         });
           break;
       }
-        // Reset lại màn hình SplitScreen sau khi điều hướng tới AddExpenseScreen
-    // navigation.dispatch(
-    //   CommonActions.reset({
-    //     index: 0,
-    //     routes: [{ name: 'SplitExpenseScreen' }]
-    //   })
-    // );
   }
 
   const allSelected = selectedFriends.length === friendsList.length;
@@ -124,13 +117,14 @@ const amountOfPerson = (amounts / selectedFriends.length).toFixed(5);
 
 const imageSource = () => {
   switch (selectedButton) {
-    case 0:
-      
     case 1:
-
+    return require("../assets/icons/split2.png");
     case 2:
-
-}
+    return require("../assets/icons/split3.png");
+    case 0:
+    default:
+    return require("../assets/icons/split1.png");
+  }
 };
   // console.log("S")
 const renderTextContent = () => {
@@ -181,7 +175,6 @@ const renderGeneral = () => {
                 alignItems: "center",
                 justifyContent: "center",
               }}
-               className='py-5'
             >
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
                   {totalValueInput} dong of {amounts} dong
@@ -204,7 +197,6 @@ const renderGeneral = () => {
                 }}
             >
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>
-                {totalValueInput}% of 100%
                 {totalValueInput}% of 100%
                 </Text>
                  <Text style={{ fontSize: 14, fontWeight: 400, color: leftPercentage<0 ? 'red' : 'black' }}>{leftPercentage}% left</Text>
@@ -282,7 +274,7 @@ const renderGeneral = () => {
     }
   };
   return (
-    <View style={[{ flex: 100, backgroundColor: "white" }]}>
+    <View style={[{ flex: 100, backgroundColor: "white" }]} className='py-5'>
       <View style={{ flex: 7 }}>
         <AddToolBar
           navigation={props.navigation}
