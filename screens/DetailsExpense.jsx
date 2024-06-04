@@ -13,6 +13,7 @@ import {
 import DetailsToolBar from "../components/DetailsToolBar";
 import BottomAppBar from "../components/BottomAppBar";
 import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
 
 const DetailsExpense = (props) => {
   const comments = [
@@ -21,6 +22,17 @@ const DetailsExpense = (props) => {
     { name: "Nhung", content: "Another comment from Nhung." },
   ];
 
+  const chooseImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled) {
+      // await UserService.getInstance().uploadAvatar(result.assets[0].uri);
+    }
+  };
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]}>
       <View style={[{ flex: 7 }]}>
@@ -80,7 +92,7 @@ const DetailsExpense = (props) => {
               Add by Nhung on 18 may 2024
             </Text>
           </View>
-          <TouchableOpacity style={{ width: 60, height: 60, position: "absolute", right: 12 }}>
+          <TouchableOpacity style={{ width: 60, height: 60, position: "absolute", right: 12 }} onPress={chooseImage}>
           <Image
             source={require("../assets/icons/photo.png")}
             style={{ width: 60, height: 60}}
