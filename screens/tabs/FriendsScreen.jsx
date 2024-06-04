@@ -22,12 +22,23 @@ const FriendsScreen = () => {
   const [userAvatar, setUserAvatar] = React.useState(null);
   const [listFriends, setListFriends] = React.useState(null);
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [userId, setUserId] = React.useState(auth.currentUser.uid);
+
+  React.useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserId(user.uid);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   React.useEffect(() => {
     FriendService.getInstance().listenToFriendList((friends) => {
       setListFriends(friends);
     });
-  }, []);
+  }, [userId]);
 
   React.useEffect(() => {
     if (isForcused) {

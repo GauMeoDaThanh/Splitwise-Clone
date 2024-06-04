@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import ButtonAddExpense from "../components/ButtonAddExpense";
 import GroupService from "../services/group";
+import { auth } from "../firebaseConfig";
 
 const DetailsGroupsScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -208,7 +209,11 @@ const DetailsGroupsScreen = ({ route }) => {
             borderColor: "#0B9D7E",
           }}
           onPress={() =>
-            navigation.navigate("AddMemberGroupsScreen", { groupId: group.id })
+            navigation.navigate("AddMemberGroupsScreen", {
+              groupId: group.id,
+              groupName: group.name,
+              groupMembers: group.members,
+            })
           }
         >
           <Image
@@ -504,20 +509,22 @@ const DetailsGroupsScreen = ({ route }) => {
               Edit members group
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            className="flex-row items-center"
-            onPress={handleRemoveGroup}
-          >
-            <Text
-              className="text-red-500"
-              style={{
-                fontWeight: 500,
-                fontSize: 14,
-              }}
+          {group.createBy === auth.currentUser.uid ? (
+            <TouchableOpacity
+              className="flex-row items-center"
+              onPress={handleRemoveGroup}
             >
-              Remove group
-            </Text>
-          </TouchableOpacity>
+              <Text
+                className="text-red-500"
+                style={{
+                  fontWeight: 500,
+                  fontSize: 14,
+                }}
+              >
+                Remove group
+              </Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
       )}
     </View>

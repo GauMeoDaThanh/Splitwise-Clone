@@ -17,19 +17,30 @@ import ActivityEditGroupName from "../../components/ActivityEditGroupName";
 import ActivityDeleteMember from "../../components/ActivityDeleteMember";
 import ActivityEditWhiteboard from "../../components/ActivityEditWhiteboard";
 import ActivityAddMember from "../../components/ActivityAddMember";
-import ActivityDeleteFriends from "../../components/ActivityDeleteFriends";
 import ActivityEditGroupAvatar from "../../components/ActivityEditGroupAvatar";
 import ActivityService from "../../services/activity";
+import { auth } from "../../firebaseConfig";
 
 const ActivityScreen = () => {
   const navigation = useNavigation();
   const [activityData, setActivityData] = useState([]);
+  const [userId, setUserId] = useState(auth.currentUser.uid);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserId(user.uid);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     ActivityService.getInstance().listenActivity((data) => {
       setActivityData(data);
     });
-  }, []);
+  }, [userId]);
 
   return (
     <View className="flex-1 bg-white py-5">
@@ -75,7 +86,6 @@ const notifycationMapping = {
   deleteMember: ActivityDeleteMember,
   editWhiteboard: ActivityEditWhiteboard,
   addFriend: ActivityAddFriends,
-  deleteFriend: ActivityDeleteFriends,
 };
 
 const NotificationRender = ({ type, data }) => {

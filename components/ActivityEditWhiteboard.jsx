@@ -51,16 +51,7 @@ const ActivityEditWhiteboard = ({ data }) => {
           >
             {data.createBy === auth.currentUser.uid ? "You" : data.createByName}
           </Text>
-          <Text className="mr-1">have edited</Text>
-          <Text
-            className="text-gray-700 mr-1"
-            style={{
-              fontSize: 16,
-              fontWeight: "500",
-            }}
-          >
-            Whiteboard
-          </Text>
+          <Text className="mr-1">have edited whiteboard</Text>
           <Text className="mr-1">of group</Text>
           <Text
             className="text-gray-700 ml-1"

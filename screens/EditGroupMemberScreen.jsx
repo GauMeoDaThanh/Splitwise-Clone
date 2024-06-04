@@ -37,6 +37,8 @@ const EditGroupMemberScreen = ({ route }) => {
   const handleDeleteMember = () => {
     GroupService.getInstance().removeGroupMembers(
       group.id,
+      group.name,
+      group.members,
       deleteMembers,
       navigation
     );

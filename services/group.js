@@ -258,20 +258,35 @@ class GroupService {
     }
   }
 
-  async addGroupMembers(groupId, members) {
+  async addGroupMembers(groupId, groupName, currentMembers, newMembers) {
     try {
       console.log("start add new members to group");
       const groupRef = doc(db, GROUP_COLLECTION, groupId);
       await updateDoc(groupRef, {
-        members: arrayUnion(...members),
+        members: arrayUnion(...newMembers),
       });
+
+      // Add activity
+      ActivityService.getInstance().aAddMember(
+        groupId,
+        groupName,
+        currentMembers,
+        newMembers
+      );
+
       console.log("add members successfully");
     } catch (e) {
       console.log(e);
     }
   }
 
-  removeGroupMembers(groupId, membersId, navigation) {
+  removeGroupMembers(
+    groupId,
+    groupName,
+    currentMembers,
+    membersId,
+    navigation
+  ) {
     try {
       Alert.alert("Warning", "Are you sure you want to delete this member?", [
         {
@@ -287,6 +302,14 @@ class GroupService {
             await updateDoc(groupRef, {
               members: arrayRemove(...membersId),
             });
+
+            //Add activity
+            ActivityService.getInstance().aDeteleMember(
+              groupId,
+              groupName,
+              currentMembers,
+              membersId
+            );
             Alert.alert("Success", "Delete group members successfully", [
               {
                 text: "OK",

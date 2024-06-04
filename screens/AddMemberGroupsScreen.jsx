@@ -16,7 +16,7 @@ import GroupService from "../services/group";
 
 const AddMemberGroupsScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { groupId } = route.params;
+  const { groupId, groupMembers, groupName } = route.params;
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [friends, setFriends] = useState([]);
   const [search, setSearch] = useState("");
@@ -36,6 +36,8 @@ const AddMemberGroupsScreen = ({ route }) => {
     );
     await GroupService.getInstance().addGroupMembers(
       groupId,
+      groupName,
+      groupMembers,
       selectedFriendIds
     );
     Alert.alert("success", "Add members successfully", [

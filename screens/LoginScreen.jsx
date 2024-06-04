@@ -20,6 +20,8 @@ const LoginScreen = () => {
 
   const signIn = async () => {
     authenticateService.handleSignIn(email, password, navigation);
+    setEmail("");
+    setPassword("");
   };
   const signInWithFacebook = () => {
     // authenticateService.handleSignInWithFacebook();
@@ -58,6 +60,7 @@ const LoginScreen = () => {
             <TextInput
               className="p-2 bg-gray-100 text-gray-700 rounded-2xl mb-3"
               placeholder="Enter Email"
+              value={email}
               onChangeText={setEmail}
             ></TextInput>
             <Text className="text-gray-700 ">Password</Text>
@@ -66,6 +69,7 @@ const LoginScreen = () => {
                 className="p-2 bg-gray-100 text-gray-700 rounded-2xl"
                 secureTextEntry={!showPassword}
                 placeholder="Enter Password"
+                value={password}
                 onChangeText={setPassword}
               />
               <TouchableOpacity

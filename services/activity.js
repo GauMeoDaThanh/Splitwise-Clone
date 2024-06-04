@@ -20,7 +20,7 @@ const ACTIVITY_TYPES = {
     "editGroupName",
     "editGroupAvatar",
     "editWhiteboard",
-    "deleteGroup",
+    "deleteMember",
     "addMember",
   ],
   friend: ["addFriend", "deleteFriend"],
@@ -197,21 +197,6 @@ class ActivityService {
 
   async aEditWhiteboard(groupId, groupName, members) {
     try {
-      //get member name
-      // const memberMap = await Promise.all(
-      //   members.map(async (memberId) => {
-      //     const username = await UserService.getInstance().getUsername(
-      //       memberId
-      //     );
-      //     return [memberId, username];
-      //   })
-      // ).then((memberPairs) => {
-      //   return memberPairs.reduce((acc, [id, username]) => {
-      //     acc[id] = username;
-      //     return acc;
-      //   }, {});
-      // });
-
       const activity = {
         createBy: auth.currentUser.uid,
         createAt: serverTimestamp(),
@@ -219,11 +204,78 @@ class ActivityService {
         additionalInfo: {
           groupId: groupId,
           groupName: groupName,
-          // membersInfo: memberMap,
           members: members,
         },
       };
       console.log("start add edit whiteboard log");
+      const activityRef = await addDoc(
+        collection(db, ACTIVITY_COLLECTION),
+        activity
+      );
+      console.log("Document written with ID: ", activityRef.id);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async aAddMember(groupId, groupName, members, newMembers) {
+    try {
+      const allMembers = members.concat(newMembers);
+
+      //get member name from newMembers
+      for (let i = 0; i < newMembers.length; i++) {
+        newMembers[i] = await UserService.getInstance().getUsername(
+          newMembers[i]
+        );
+      }
+
+      const activity = {
+        createBy: auth.currentUser.uid,
+        createAt: serverTimestamp(),
+        type: ACTIVITY_TYPES["group"][4],
+        additionalInfo: {
+          groupId: groupId,
+          groupName: groupName,
+          members: allMembers,
+          newMembersName: newMembers,
+        },
+      };
+      console.log("start add add member log");
+      const activityRef = await addDoc(
+        collection(db, ACTIVITY_COLLECTION),
+        activity
+      );
+      console.log("Document written with ID: ", activityRef.id);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async aDeteleMember(groupId, groupName, members, deletedMembers) {
+    try {
+      // const allMembers = members.filter(
+      //   (member) => !deletedMembers.includes(member)
+      // );
+
+      //get member name from deletedMembers
+      for (let i = 0; i < deletedMembers.length; i++) {
+        deletedMembers[i] = await UserService.getInstance().getUsername(
+          deletedMembers[i]
+        );
+      }
+
+      const activity = {
+        createBy: auth.currentUser.uid,
+        createAt: serverTimestamp(),
+        type: ACTIVITY_TYPES["group"][5],
+        additionalInfo: {
+          groupId: groupId,
+          groupName: groupName,
+          members: members,
+          deletedMembersName: deletedMembers,
+        },
+      };
+      console.log("start add delete member log");
       const activityRef = await addDoc(
         collection(db, ACTIVITY_COLLECTION),
         activity

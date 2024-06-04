@@ -17,6 +17,7 @@ import AddToolBar from "../../components/AddToolBar";
 import ButtonAddExpense from "../../components/ButtonAddExpense";
 import GroupService from "../../services/group";
 import RadioButtons from "react-native-radio-buttons";
+import { auth } from "../../firebaseConfig";
 
 const GroupsScreen = () => {
   console.warn = () => {};
@@ -26,6 +27,8 @@ const GroupsScreen = () => {
   const [showFilterOptions, setShowFilterOptions] = useState(false);
   const [selectedId, setSelectedId] = useState("All groups");
   const [searchTerm, setSearchTerm] = useState("");
+  const [userId, setUserId] = useState(auth.currentUser.uid);
+
   const radioButtons = [
     "All groups",
     "Groups you owe",
@@ -36,6 +39,17 @@ const GroupsScreen = () => {
     "Friend",
     "Other",
   ];
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserId(user.uid);
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
   const toggleFilterOptions = () => {
     setShowFilterOptions(!showFilterOptions);
   };
@@ -52,7 +66,7 @@ const GroupsScreen = () => {
     GroupService.getInstance().listenToGroupList((groups) => {
       setGroups(groups);
     });
-  }, []);
+  }, [userId]);
 
   return (
     <TouchableWithoutFeedback onPress={() => setShowFilterOptions(false)}>
