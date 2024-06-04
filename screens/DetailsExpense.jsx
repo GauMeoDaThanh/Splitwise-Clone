@@ -15,6 +15,7 @@ import DetailsToolBar from "../components/DetailsToolBar";
 import { useNavigation } from "@react-navigation/native";
 import ExpenseService from "../services/expense";
 import UserService from "../services/user";
+import * as ImagePicker from "expo-image-picker";
 
 const DetailsExpense = ({ route }) => {
   const comments = [
@@ -40,6 +41,17 @@ useEffect(() => {
   });
 }, []);
   
+  const chooseImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled) {
+      // await UserService.getInstance().uploadAvatar(result.assets[0].uri);
+    }
+  };
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]}>
       <View style={[{ flex: 7 }]}>
@@ -100,7 +112,7 @@ useEffect(() => {
 
             </Text>
           </View>
-          <TouchableOpacity style={{ width: 60, height: 60, position: "absolute", right: 12 }}>
+          <TouchableOpacity style={{ width: 60, height: 60, position: "absolute", right: 12 }} onPress={chooseImage}>
           <Image
             source={require("../assets/icons/photo.png")}
             style={{ width: 60, height: 60}}
@@ -166,7 +178,7 @@ useEffect(() => {
             
           </View>
         </View>
-        <View
+        {/* <View
           style={[
             {
               flex: 23,
@@ -176,8 +188,8 @@ useEffect(() => {
               padding: 12,
             },
           ]}
-        >
-          <Text style={{ fontSize: 15, fontWeight: "500" }}>Comments</Text>
+        > */}
+          {/* <Text style={{ fontSize: 15, fontWeight: "500" }}>Comments</Text>
           {comments.map((comment, index) => (
             <View
               key={index}
@@ -187,8 +199,8 @@ useEffect(() => {
                   ? styles.commentContainerYou
                   : styles.commentContainerOther,
               ]}
-            >
-              <Text
+            > */}
+              {/* <Text
                 style={[
                   styles.commentName,
                   comment.name === "You" ? styles.commentNameYou : null,
@@ -197,11 +209,11 @@ useEffect(() => {
                 {comment.name}
               </Text>
               <Text style={styles.commentContent}>{comment.content}</Text>
-            </View>
-          ))}
-        </View>
+            </View> */}
+          {/* ))} */}
+        {/* </View> */}
       </ScrollView>
-      </View>
+      {/* </View>
       <View style={{ flex: 7, flexDirection:'row', borderTopColor: "#EEEEEE", borderTopWidth: 1, justifyContent: 'center', alignItems: 'center' }}>
         <TextInput
         style={{fontSize: 16,paddingVertical: 7, paddingHorizontal: 10, borderRadius: 30, borderColor: '#548B54', borderWidth: 1, width: 360, height: 32, }}
@@ -211,8 +223,8 @@ useEffect(() => {
            source={require("../assets/icons/send.png")}
           style={{ width: 26, height: 24, margin: 5, tintColor: '#32CD32' }}
         />
-      </View>
-      <View style={{ flex: 10, borderTopColor: "#CCCCCC", borderTopWidth: 1 }}>
+      </View> */}
+      {/* <View style={{ flex: 10, borderTopColor: "#CCCCCC", borderTopWidth: 1 }}> */}
         {/* <BottomAppBar /> */}
       </View>
     </View>
