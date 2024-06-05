@@ -1,5 +1,6 @@
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
+import { useFocusEffect } from '@react-navigation/native';
 import {
   Text,
   TextInput,
@@ -53,6 +54,8 @@ const GroupsScreen = () => {
     return unsubscribe;
   }, []);
 
+
+
   const toggleFilterOptions = () => {
     setShowFilterOptions(!showFilterOptions);
   };
@@ -66,45 +69,32 @@ const GroupsScreen = () => {
   }, [isFocused]);
 
   useEffect(() => {
-      GroupService.getInstance().listenToGroupList((groups) => {
+      GroupService.getInstance().listenToGroupList(async (groups) => {
         setGroups(groups);
       });
-    
-     const fetchExpenses = async () => {
-       try {
-        //  Tìm các hoá đơn theo group
-         expensesList = []
-         let differenceList = [];
-        for (group of groups) {
-          const expensesByGr = await ExpenseService.getInstance().getExpensesByGroupId(group.id);
-          expensesList.push(expensesByGr)
-          let sumByGr = 0;
-          let yourOwe = 0;
-          let yourLent = 0
-          for (expense of expensesByGr) {
-            sumByGr = sumByGr + parseFloat(expense.participants.reduce((acc, curr) => acc + curr.amount, 0).toFixed(2))
-            for (par of expense.participants) {
-              if (par.userId === auth.currentUser.uid) {
-                yourOwe += parseFloat(par.amount);
-              }
-            }
-            // Khoản bạn đã trả trong group đó
-            if (expense.paidBy === auth.currentUser.uid) {
-              yourLent += parseFloat(expense.amounts);
-            }
-          }
-          differenceList.push((yourLent - yourOwe).toFixed(3));
-         }
-          const numberArray = differenceList.map(parseFloat);
-          const totalDifference = numberArray.reduce((sum, current) => sum + current, 0);
-          setTotalAmount(totalDifference)
-          setYourExpenseByGroup(differenceList);
-      } catch (error) {
-        console.error("Error fetching expenses:", error);
-      }
-    };
-    fetchExpenses();
   }, [userId]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchExpenses = async () => {
+        try {
+          // Tổng chi phí đã trả trong group
+          let differenceList = [];
+          expensesList = [];
+          for (group of groups) {
+            const expensesByGr = await ExpenseService.getInstance().getExpensesByGroupId(group.id);
+            expensesList.push(expensesByGr);
+            differenceList.push(await ExpenseService.getInstance().getYourPaidByGroup(expensesByGr));
+          }
+          setTotalAmount(await ExpenseService.getInstance().getTotalDifference(differenceList));
+          setYourExpenseByGroup(differenceList);
+        } catch (error) {
+          console.error("Error fetching expenses:", error);
+        }
+      };
+      fetchExpenses();
+    }, [groups])
+  );
 
   return (
     <TouchableWithoutFeedback onPress={() => setShowFilterOptions(false)}>
@@ -134,7 +124,7 @@ const GroupsScreen = () => {
                   fontSize: 17,
                 }}
                  >
-             {totalAmount} vnd
+             {Math.abs(totalAmount)} vnd
             </Text>
             </View>
             <View className="flex-row items-center">
@@ -203,7 +193,7 @@ const GroupsScreen = () => {
                         >
                         {
                           yourExpenseByGroup[index] > 0 ? 'You are owed ' + yourExpenseByGroup[index] + ' vnd'
-                                  : (yourExpenseByGroup[index] == 0 ? 'You settled up': 'You owed ' + yourExpenseByGroup[index] + ' vnd')
+                                  : (yourExpenseByGroup[index] == 0 ? 'You settled up': 'You owed ' + -yourExpenseByGroup[index] + ' vnd')
                        }
                         </Text>
                       </View>

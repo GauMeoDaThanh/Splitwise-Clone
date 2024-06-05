@@ -1,5 +1,5 @@
 import { auth, db } from "../firebaseConfig";
-import { collection, addDoc, doc, setDoc, query, getDoc, updateDoc, getDocs, where,onSnapshot,} from "firebase/firestore";
+import { collection, addDoc, doc, setDoc, query, getDoc, updateDoc, getDocs, where,onSnapshot, orderBy,} from "firebase/firestore";
 import FriendService from "./friend";
 import AuthenticateService from "./authentication";
 import UserService from "./user";
@@ -63,8 +63,6 @@ class ExpenseService {
                 expense
             );
             console.log("Add expense successfully with ID: ", docRef.id);
-            expenseId = docRef.id;
-            console.log("ID Exp", this.expenseId)
         } catch (e) {
             console.error("Error adding expense ", e);
         }
@@ -110,7 +108,6 @@ class ExpenseService {
         groupList = await groupService.getGroupOfIdAcc(
             auth.currentUser?.uid
         );
-        // console.log("Group", groupList);
         const searchTerm = text.toLowerCase().trim();
 
         // Filter users based on search term
@@ -309,11 +306,20 @@ class ExpenseService {
 
     async getExpensesByGroupId(groupId) {
         const expenses = [];
-        const querySnapshot = await getDocs(query(collection(db, "expenses"),where("groupId", "array-contains",groupId)));
+        const querySnapshot = await getDocs(query(collection(db, "expenses"), where("groupId", "array-contains", groupId),
+            orderBy("createAt", "desc")
+        )
+        );
         querySnapshot.forEach((doc) => {
             expenses.push({ id: doc.id, ...doc.data() });
         });
         return expenses;
+    }
+
+    async getExpenseById(expenseId) {
+        const expenseRef = doc(db, "expenses", expenseId);
+        const expense = await getDoc(expenseRef, expenseId)
+        return expense.data();
     }
 
     async listenToFriendDetail(expenseId, callback) {
@@ -323,7 +329,92 @@ class ExpenseService {
       callback(expenseData);
     });
     return () => unsubscribe();
-  }
+    }
+    
+    async getDebtInfo(expenseId, userPaidBy) {
+        try {
+            const debt = [];
+            const expense = await this.getExpenseById(expenseId);
+            const participants = expense.participants;
+            debt.push(userPaidBy + " paid " + expense.amounts + " vnd");
+
+            const usernames = await Promise.all(participants.map(async (participant) => {
+            const user = await UserService.getInstance().getUserById(participant.userId);
+            if (user) {
+                return user.username;
+            } else {
+                console.warn("Error fetching user data for participant:", participant.userId);
+                return null; 
+            }
+            }));
+
+            for (let i = 1; i < participants.length; i++) {
+            debt.push(usernames[i] + " owes " + userPaidBy + " " + participants[i].amount + " vnd");
+                    }
+            return debt;
+        } catch (e) {
+            console.log(e.message);
+        }
+    }
+
+    async getYourPaidByGroup(expensesByGroup) {
+          let sumByGr = 0;
+          let yourOwe = 0;
+          let yourLent = 0
+          for (expense of expensesByGroup) {
+            sumByGr = sumByGr + parseFloat(expense.participants.reduce((acc, curr) => acc + curr.amount, 0).toFixed(2))
+            for (par of expense.participants) {
+              if (par.userId === auth.currentUser.uid) {
+                yourOwe += parseFloat(par.amount);
+              }
+            }
+            // Khoản bạn đã trả trong group đó
+            if (expense.paidBy === auth.currentUser.uid) {
+              yourLent += parseFloat(expense.amounts);
+            }
+          }
+          return (yourLent - yourOwe).toFixed(0);
+    }
+    
+    async getTotalDifference(differenceList) {
+        const numberArray = differenceList.map(parseFloat);
+        const totalDifference = numberArray.reduce(
+            (sum, current) => sum + current,
+            0
+        );
+        return totalDifference;
+    }
+
+   async handlePayment(expenseId, userId) {
+    const expenseRef = doc(db, 'expenses', expenseId);
+    try {
+        const expenseDoc = await getDoc(expenseRef);
+        const expenseData = expenseDoc.data();
+        const participants = expenseData.participants;
+
+        const participantIndex = participants.findIndex((participant) => participant.userId === userId);
+        if (participantIndex === -1) {
+        throw new Error('User not found in expense participants');
+        }
+
+        const updatedParticipants = [
+        ...participants.slice(0, participantIndex), 
+        { ...participants[participantIndex], settleUp: true }, 
+        ...participants.slice(participantIndex + 1), 
+        ];
+        await updateDoc(expenseRef, { participants: updatedParticipants });
+        // Cập nhật nếu hoá đơn thanh toán hết rồi
+        const allSettled = participants.every(participant => participant.settleUp === true);
+        if (allSettled) {
+            await updateDoc(expenseRef, { isSettle: true });
+            console.log('Expense is now fully settled');
+        }
+     
+    } catch (error) {
+        console.error('Error processing payment:', error.message); // Handle errors
+    }
 }
+
+    }
 
 export default ExpenseService;

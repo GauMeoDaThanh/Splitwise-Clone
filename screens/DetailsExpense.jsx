@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import ExpenseService from "../services/expense";
 import UserService from "../services/user";
 import * as ImagePicker from "expo-image-picker";
+import { auth } from "../firebaseConfig";
 
 const DetailsExpense = ({ route }) => {
   const comments = [
@@ -26,18 +27,23 @@ const DetailsExpense = ({ route }) => {
   const navigation = useNavigation();
   const { expenseId } = route.params;
   const [expenseInfo, setExpenseInfo] = useState([])
-const [paidByUser, setPaidByUser] = useState(); // New state to store user information
-
-useEffect(() => {
+  const [paidByUser, setPaidByUser] = useState(); // New state to store user information
+  const [debt, setDebt] = useState([]);
+  const [participants, setParticipants] = useState([]);
+  useEffect(() => {
   ExpenseService.getInstance().listenToFriendDetail(expenseId, async (expenseInfo) => {
     setExpenseInfo(expenseInfo);
+    // Get ra nguoi tra
     const paidById = expenseInfo.paidBy;
     try {
       const user = await UserService.getInstance().getUserById(paidById);
       setPaidByUser(user);
+      setParticipants(expenseInfo.participants)
+      setDebt(await ExpenseService.getInstance().getDebtInfo(expenseId, user.username))
     } catch (error) {
       console.error("Error fetching user:", error);
     }
+
   });
 }, []);
   
@@ -52,6 +58,10 @@ useEffect(() => {
       // await UserService.getInstance().uploadAvatar(result.assets[0].uri);
     }
   };
+
+  const handlePayment = async(userId) => {
+    await ExpenseService.getInstance().handlePayment(expenseId, userId);
+  }
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]}>
       <View style={[{ flex: 7 }]}>
@@ -108,8 +118,7 @@ useEffect(() => {
                 width: 250,
               }}
               >
-                Add {paidByUser?.username}  {expenseInfo?.createAt? 'on ' + new Date(expenseInfo.createAt.seconds * 1000 + expenseInfo.createAt.nanoseconds / 1000000).toLocaleDateString('en-GB'):''}
-
+                Added by {paidByUser?.username}  {expenseInfo?.createAt? 'on ' + new Date(expenseInfo.createAt.seconds * 1000 + expenseInfo.createAt.nanoseconds / 1000000).toLocaleDateString('en-GB'):''}
             </Text>
           </View>
           <TouchableOpacity style={{ width: 60, height: 60, position: "absolute", right: 12 }} onPress={chooseImage}>
@@ -136,16 +145,11 @@ useEffect(() => {
               style={{ width: 40, height: 40, borderRadius: 20 }}
             />
             <View style={{ paddingHorizontal: 20, width: "68%" }}>
-              <Text style={{ fontSize: 18, fontWeight: "500" }}>Nhung paid 1000 dong</Text>
+                <Text style={{ fontSize: 18, fontWeight: "500" }}>{debt[0]}</Text>
             </View>
-            <TouchableOpacity style={{backgroundColor: '#43CD80', borderColor: '#00CD66', borderWidth: 1, borderRadius: 20, padding: 10, }}>
-           <Text style={{fontSize: 16, fontWeight: 400}}>
-            Settle up
-           </Text>
-            </TouchableOpacity>
           </View>
           <View style={{ paddingStart: 60, marginTop: 10 }}>
-            <Text
+            {/* <Text
               style={{
                 justifyContent: "center",
                 textAlign: "left",
@@ -154,8 +158,8 @@ useEffect(() => {
               }}
             >
               Tan Dung owes you 35.000 đồng
-            </Text>
-            <Text
+            </Text> */}
+            {/* <Text
               style={{
                 justifyContent: "center",
                 textAlign: "left",
@@ -164,17 +168,44 @@ useEffect(() => {
               }}
             >
               You owe Tan Dung 35.000 đồng
-            </Text>
-            <Text
-              style={{
-                justifyContent: "center",
-                textAlign: "left",
-                paddingVertical: 6,
-                color: "#777777",
-              }}
-            >
-              You owe Tan Dung 35.000 đồng
-            </Text>
+            </Text> */}
+          {
+                debt.slice(1).map((debt, index) => (
+                  <View key={index}>
+                   <Text
+                      style={{
+                        justifyContent: "center",
+                        textAlign: "left",
+                        paddingVertical: 6,
+                        color: "#777777",
+                      }}
+                    >
+                      {debt}
+                    </Text>
+                    {
+                      participants[index+1]?.userId === auth.currentUser?.uid && participants[index+1].settleUp === false &&(
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#43CD80',
+                          borderColor: '#00CD66',
+                          borderWidth: 1,
+                          borderRadius: 12,
+                          padding: 4,
+                            width: 90,
+                        }}
+                        onPress={
+                          () => handlePayment(participants[index+1]?.userId)
+                        }
+                      >
+                        <Text style={{ fontSize: 13, fontWeight: 400, textAlign: 'center', color: '#fff' }}>Settle Up</Text>
+                      </TouchableOpacity>
+                      )
+                    }
+                   
+
+                  </View>
+                ) )      
+          }
             
           </View>
         </View>

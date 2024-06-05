@@ -8,6 +8,7 @@ import {
   Image,
   ScrollView,
   FlatList,
+  LogBox
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ButtonAddExpense from "../components/ButtonAddExpense";
@@ -23,13 +24,16 @@ const DetailsGroupsScreen = ({ route }) => {
   const [expenses, setExpenses] = useState([])
   const [createBy, setCreateBy] = useState([])
   const [showEditOptions, setShowEditOptions] = useState(false);
-
+  
+    LogBox.ignoreLogs([
+    "Possible Unhandled Promise Rejection",
+    "TypeError: Cannot read property 'indexOf' of undefined",
+    ]);
+  
   useEffect(() => {
-      GroupService.getInstance().listenToGroupDetail(groupId, (group) => {
+      GroupService.getInstance().listenToGroupDetail(groupId, async (group) => {
         setGroup(group);
-      });
-    const fetchExpenses = async () => {
-      try {
+        try {
         const expenseList = await ExpenseService.getInstance().getExpensesByGroupId(groupId);
         setExpenses(expenseList); // Cập nhật state với dữ liệu thực
         let paidUsers = []
@@ -37,11 +41,10 @@ const DetailsGroupsScreen = ({ route }) => {
           paidUsers.push(await UserService.getInstance().getUserById(expense.createBy))
         }
         setCreateBy(paidUsers)
-      } catch (error) {
-        console.error("Error fetching expenses:", error);
-      }
-    };
-    fetchExpenses();
+        } catch (error) {
+          console.log("Error to fetch data, ", error)
+        }
+      });
   }, [groupId]);
 
     const toggleEditOptions = () => {
@@ -254,109 +257,14 @@ const DetailsGroupsScreen = ({ route }) => {
           </Text>
         </TouchableOpacity>
       </View>
-      {/* Viết code vô Flastlist */}
-      {/* <View className = 'flex-col space-y-6 px-1'>
-                <FlatList>
-                    <View className = 'flex-col px-2 space-y-3'>
-                        <Text className = 'text-gray-700 px-1'
-                            style = {{
-                                fontSize: 13,
-                                fontWeight: 500
-                            }}
-                        >
-                            Tháng 5 2024
-                        </Text>
-                        <View className = 'flex-row'>
-                            <TouchableOpacity flex-row space-x-5 px-1 items-center>
-                                <View className = 'flex-col items-center'>
-                                    <Text 
-                                        className = 'text-gray-600'
-                                        style = {{
-                                            fontSize: 12
-                                        }}
-                                    >
-                                        Th5
-                                    </Text>
-                                    <Text
-                                        className = 'text-gray-600'
-                                        style = {{
-                                            fontSize: 17,
-                                            fontWeight: 500
-                                        }}
-                                    >
-                                        11
-                                    </Text>
-                                </View>
-                                <View className = 'flex-row p-2 items-center border border-gray-400 bg-gray-200'>
-                                    <Image
-                                        source={require('../assets/icons/icon_bill.png')}
-                                        style = {{
-                                            width: 22,
-                                            height: 22
-                                        }} 
-                                    >
-                                    </Image>
-                                </View>
-                                <View className='flex-col items-start'>
-                                    <Text
-                                        className = 'text-gray-600'
-                                        style = {{
-                                            fontSize: 16,
-                                            fontWeight: 500
-                                        }}
-                                    >
-                                        bill share1
-                                    </Text>
-                                    <Text
-                                        className = 'text-gray-500'
-                                        style = {{
-                                            fontSize: 12
-                                        }}
-                                    >
-                                        Nhung paid 200.000vnđ
-                                    </Text>
-                                </View>
-                                <View className='flex-col items-end'>
-                                    <Text
-                                        className = 'text-red-600'
-                                        style = {{
-                                            fontSize: 12,
-                                            fontWeight: 500
-                                        }}
-                                    >
-                                        you borrowed
-                                    </Text>
-                                    <Text
-                                        className = 'text-red-600'
-                                        style = {{
-                                            fontSize: 13,
-                                            fontWeight: 500
-                                        }}
-                                    >
-                                    200.000vnđ
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </FlatList> 
-            </View> */}
-
       <View className="flex-col space-y-6 px-1">
 
         <View className="flex-col px-2 space-y-3">
-          {/* <Text
-            className="text-gray-700 px-1"
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-            }}
-          >
-            Tháng 5 2024
-          </Text> */}
           {
             expenses.map((expense, index) => (
-            <View key={index} className="flex-row ">
+              <View
+                key={index}
+                className="flex-row ">
             <TouchableOpacity className="flex-row space-x-5 px-1 items-center" onPress={() => navigation.navigate("DetailExpense",{expenseId:expense.id})}>
               <View className="flex-col items-center">
                 <Text
@@ -402,7 +310,7 @@ const DetailsGroupsScreen = ({ route }) => {
                     fontSize: 12,
                   }}
                 >
-                  {createBy[index] ? `${createBy[index].username} paid ${expense.amounts}` : 'Loading...'}
+                  {createBy[index]?.username ? `${createBy[index]?.username} paid ${expense.amounts}` : 'Loading...'}
                 </Text>
               </View>
               <View className="flex-col items-end">
@@ -413,7 +321,7 @@ const DetailsGroupsScreen = ({ route }) => {
                     fontWeight: 500,
                   }}
                 >
-                    {(createBy[index] ? (createBy[index].uid == auth.currentUser.uid)?("you lent"):`${createBy[index].username} lent`:'')}
+                    {expense.participants.length > 1?((createBy[index]?.uid ? (createBy[index]?.uid == auth.currentUser.uid)?("you lent"):`${createBy[index]?.username} lent`:'')):''}
                 </Text>
                 <Text
                   className="text-red-600"
@@ -423,7 +331,7 @@ const DetailsGroupsScreen = ({ route }) => {
                   }}
                 >
                   {
-                        expense.participants.slice(1).reduce((acc, curr) => acc + curr.amount, 0).toFixed(2)
+                        expense.participants.length > 1?expense.participants.slice(1).reduce((acc, curr) => acc + curr.amount, 0).toFixed(0):''
                   }
                 </Text>
               </View>
@@ -432,58 +340,6 @@ const DetailsGroupsScreen = ({ route }) => {
             ))
           }
         </View>
-        {/* <View className="flex-col px-2 space-y-3">
-          <Text
-            className="text-gray-700 px-1"
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-            }}
-          >
-            Tháng 6 2024
-          </Text>
-          <View className="flex-row">
-            <TouchableOpacity className="flex-row space-x-5 px-1 items-center">
-              <View className="flex-col items-center">
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 12,
-                  }}
-                >
-                  Th6
-                </Text>
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 500,
-                  }}
-                >
-                  15
-                </Text>
-              </View>
-              <View className="flex-row p-2 items-center">
-                <Image
-                  source={require("../assets/icons/money_icon.png")}
-                  style={{
-                    width: 23,
-                    height: 23,
-                  }}
-                ></Image>
-              </View>
-              <Text
-                className="text-gray-600"
-                style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                }}
-              >
-                Dat V. paid Nhung 200.000vnđ
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View> */}
       </View>
 
       <View

@@ -30,9 +30,9 @@ const AddExpenseScreen = (props) => {
         textInputRef.current.focus();
     }, []); // Chỉ chạy một lần sau khi mở trang
 
-    const handleAddImageExpense = () => {
-        navigation.navigate('AddImageExpense');
-        };
+    // const handleAddImageExpense = () => {
+    //     navigation.navigate('AddImageExpense');
+    //     };
     
     // Làm Gợi ý khi nhận mail hoặc tên user
     const [suggestions, setSuggestions] = useState([]);
@@ -68,73 +68,9 @@ const AddExpenseScreen = (props) => {
             console.log("Friend or group is already selected!");
         }
     };
-
-    //Tạo hoá đơn
-    const handleCreateExpense = async () => {
-        const selectedParticipants = JSON.parse(props.route.params.selectedParticipants)
-        let groupId = []
-        for (par of selectedParticipants) {
-            if (par.groupId) {
-               groupId.push(par.groupId)
-           }
-        }
-        const splitType = props.route.params.splitType
-        let friendsList = [];
-        let valueInputs = {};
-        if (splitType != "equally") {
-            friendsList = JSON.parse(props.route.params.friendsList)
-            valueInputs = props.route.params.valueInputs
-        }
-        console.log("splitType:", splitType)
-        let participants = []
-            switch (splitType) {
-                case "equally":
-                    selectedFriends = JSON.parse(props.route.params.selectedFriends)
-                    for (friend of selectedFriends) {
-                        console.log("Friend: ", friend)
-                        participants.push({
-                            userId: friend.uid,
-                            amount: parseFloat(money) / selectedFriends.length.toFixed(4)
-                        })
-                    }
-                    break;
-                case "unequally":
-                    console.log("Fr", friendsList)
-                    for (friend of friendsList) {
-                        participants.push({
-                            userId: friend.uid,
-                            amount: parseFloat(valueInputs[friend.uid])
-                        })
-                    }
-                    break;
-                case "percent":
-                    for (friend of friendsList) {
-                        participants.push({
-                            userId: friend.uid,
-                            amount: parseFloat(valueInputs[friend.uid]) / 100 * money
-                        })
-                    }
-                    break;
-            }
-        try {
-            await expenseService.createExpense(
-            new Date(),
-            parseFloat(money),
-            groupId,
-            description,
-            participants
-            );
-            navigation.navigate('Friends');
-        //     // const uid = expenseService.expenseId;
-        //     // const imageUri = props.route.params.imageUri;
-        //     // await expenseService.uploadImgExpense(uid, imageUri);
-        } catch (e) {
-            console.error("Fail to add expense ", e);
-        }
-    };
     // Chia hoá đơn
     const handleSplitExpense = () => {
-        navigation.navigate('SplitExpenseScreen', { selectedParticipants, description, money });
+        navigation.navigate('SplitExpenseScreen', { selectedParticipants:selectedParticipants, description:description, money:money });
         setSelectedParticipants([{userId: auth.currentUser.uid}])
   };
     return (
@@ -146,7 +82,7 @@ const AddExpenseScreen = (props) => {
                     action={"Save"}
                     isDisabled={!isBothFieldsFilled}
                     disabled={!isBothFieldsFilled}
-                    onPress={handleCreateExpense}
+                    // onPress={handleCreateExpense}
                 ></AddToolBar>
             </View>
             <View
@@ -183,9 +119,9 @@ const AddExpenseScreen = (props) => {
                 {suggestions.length > 0 ? (
                     <FlatList
                         data={suggestions} // Truyền trạng thái gợi ý cập nhật
-                        renderItem={({ item }) => (
+                        renderItem={({ item, index }) => (
                             <TouchableOpacity
-                                key={item.uid?item.uid:item.id}
+                                key = {index}
                                 onPress={() => handleSuggestionSelect(item)}
                             >
                                 <Text>{item.type?item.name:item.username}</Text>
@@ -294,14 +230,14 @@ const AddExpenseScreen = (props) => {
              <View
         style={[{ flex: 10, borderTopColor: "#EEEEEE", borderTopWidth: 1 }]}
       >
-        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: 'flex-end' }} onPress={handleAddImageExpense}>
+        {/* <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: 'flex-end' }} onPress={handleAddImageExpense}>
        
           <Image
             source={require("../assets/icons/camera.png")}
             style={{ width: 60, height: 60 }}
           />
   
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       {/* <View style={[{ isFocused === 2 ? flex: 50 : flex: 36 }]}>
         <KeyboardAvoidingView

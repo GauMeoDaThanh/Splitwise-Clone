@@ -343,6 +343,25 @@ class GroupService {
       console.error(e);
     }
   }
+
+     async getGroupOfIdAcc(idAcc) {
+        const myGroup = [];
+        for (const group of await this.getAllGroup()) {
+            if (group.members.includes(idAcc) || group.createBy.includes(idAcc)) {
+                myGroup.push(group);
+            }
+        }
+        return myGroup;
+  } 
+
+     async getAllGroup() {
+        const groupList = [];
+        const querySnapshot = await getDocs(collection(db, GROUP_COLLECTION));
+        querySnapshot.forEach((doc) => {
+            groupList.push({ id: doc.id, ...doc.data() });
+        });
+        return groupList;
+    }
 }
 
 export default GroupService;

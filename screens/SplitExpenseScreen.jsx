@@ -16,29 +16,30 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { CommonActions } from "@react-navigation/native";
 const expenseService = ExpenseService.getInstance();
 
-const SplitExpenseScreen = (props) => {
-  const [selectedButton, setSelectedButton] = useState(0); // Track selected button 
-  const [participants, setParticipants] = useState([]); // Use state for participants
-  const description = props.route.params.description;
-  const amounts = props.route.params.money
+const SplitExpenseScreen = ({ route }) => {
+  const navigation = useNavigation()
+  const description = route.params.description;
+  const amounts = route.params.money
+
+  const [selectedButton, setSelectedButton] = useState(0);
+  const [participants, setParticipants] = useState([]); 
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedParticipants, setSelectedParticipants] = useState([])
   
   useEffect(() => {
     const fetchParticipants = async () => {
       try {
-        // setSelectedParticipants([]);
-        const selectedPar = props.route.params.selectedParticipants;
-        console.log("Split: ", selectedParticipants);
+        const selectedPar = route.params.selectedParticipants;
         setSelectedParticipants(selectedPar);
         const participantsList = await expenseService.getParticipants(selectedPar);
-        setParticipants(participantsList); // Update state with fetched data
+        setParticipants(participantsList); 
       } catch (error) {
         console.error("Error fetching participants:", error);
     }
     };
     fetchParticipants();
   }, [selectedParticipants]);
+
   // Danh sách người chia hoá đơn
   const friendsList = []
   for (participant of participants) {
@@ -46,7 +47,7 @@ const SplitExpenseScreen = (props) => {
   }
 
   const handleButtonPress = (index) => {
-  setSelectedButton(index); // Update selected button state
+  setSelectedButton(index); 
   };
 
   const handleFriendToggle = (item) => {
@@ -54,49 +55,87 @@ const SplitExpenseScreen = (props) => {
       prevSelectedFriends.filter((friend) => friend.uid !== item.uid)?[...prevSelectedFriends, item]:[...prevSelectedFriends]
   );
   };
-  // Xử lí chia hoàn thành
-    const navigation = useNavigation()
-    const handleDoneSplit = async () => {
-      let splitType = ""
-      switch (selectedButton) {
-        case 0:
-          Alert.alert('Success', 'Split expense successfully!');
-          splitType = "equally"
-          await navigation.navigate("AddExpenseScreen", {
-          selectedFriends: JSON.stringify(selectedFriends),
-          selectedParticipants: JSON.stringify(selectedParticipants),
-          splitType,
-          description,
-          amounts,
-        });
-          break;
-        case 1:
-          Alert.alert('Success', 'Split expense successfully!');
-          splitType = "unequally";
-          await navigation.navigate("AddExpenseScreen", {
-          valueInputs,
-          selectedParticipants: JSON.stringify(selectedParticipants),
-          splitType,
-          description,
-          amounts,
-          friendsList: JSON.stringify(friendsList)
-        });
-          break;
-        case 2:
-          Alert.alert('Success', 'Split expense successfully!');
-          splitType = "percent";
-          await navigation.navigate("AddExpenseScreen", {
-          valueInputs,
-          selectedParticipants: JSON.stringify(selectedParticipants),
-          splitType,
-          description,
-          amounts,
-          friendsList: JSON.stringify(friendsList)
-        });
-          break;
+  
+  const checkInput = (valueInputs, fullNumber) => {
+     // Kiểm tra chia không đủ
+       let sum = 0;
+      for (const [key, value] of Object.entries(valueInputs)) {
+        if (isNaN(value)) {
+          alert("Please fill in the complete division number");
+          return;
+        }
+        sum += parseFloat(value);
       }
-  }
-
+      console.log("Sum", sum)
+      if (sum != fullNumber) {
+        alert('Invalid division number for invoice');
+        return false;
+      }
+      return true;
+    }
+//Tạo hoá đơn
+  const handleDoneSplit = async () => {
+      let groupId = []
+      let splitType = ""
+      let splitParticipants = []
+      switch (selectedButton) {
+        case 0: splitType = 'equally'
+                break;
+        case 1: splitType = 'unequally'
+                break;
+        case 2: splitType = 'percent'
+                break;
+    }
+      for (par of selectedParticipants) {
+            if (par.groupId) {
+               groupId.push(par.groupId)
+           }
+      }
+            switch (splitType) {
+              case "equally":
+                    for (friend of selectedFriends) {
+                        splitParticipants.push({
+                            userId: friend.uid,
+                            amount: parseFloat(amounts) / selectedFriends.length.toFixed(0),
+                            settleUp: false
+                        })
+                    }
+                    break;
+              case "unequally":
+                    if (!checkInput(valueInputs, amounts)) return;
+                    for (friend of friendsList) {
+                        splitParticipants.push({
+                            userId: friend.uid,
+                            amount: parseFloat(valueInputs[friend.uid]),
+                            settleUp: false
+                        })
+                    }
+                    break;
+              case "percent":
+                if (!checkInput(valueInputs, 100)) return;
+                    for (friend of friendsList) {
+                        splitParticipants.push({
+                            userId: friend.uid,
+                            amount: parseFloat(valueInputs[friend.uid]) / 100 * amounts,
+                            settleUp: false
+                        })
+                    }
+                    break;
+      }
+        try {
+            await expenseService.createExpense(
+            new Date(),
+            parseFloat(amounts),
+            groupId,
+            description,
+            splitParticipants
+            );
+            navigation.navigate('Friends');
+        } catch (e) {
+            console.error("Fail to add expense ", e);
+        }
+  };
+  
   const allSelected = selectedFriends.length === friendsList.length;
   const [valueInputs, setValueInputs] = useState({});
   const handleValueInputChange = (friendId, value) => {
@@ -113,7 +152,7 @@ const totalValueInput = Object.values(valueInputs).reduce(
 
 const leftPercentage = 100 - totalValueInput;
 const leftAmount = amounts - totalValueInput;
-const amountOfPerson = (amounts / selectedFriends.length).toFixed(5);
+const amountOfPerson = (amounts / selectedFriends.length).toFixed(0);
 
 const imageSource = () => {
   switch (selectedButton) {
@@ -126,7 +165,8 @@ const imageSource = () => {
     return require("../assets/icons/split1.png");
   }
 };
-  // console.log("S")
+
+  
 const renderTextContent = () => {
     switch (selectedButton) {
         case 1:
@@ -277,10 +317,10 @@ const renderGeneral = () => {
     <View style={[{ flex: 100, backgroundColor: "white" }]} className='py-5'>
       <View style={{ flex: 7 }}>
         <AddToolBar
-          navigation={props.navigation}
+          navigation={route.navigation}
           title={"Split options"}
           action={"Done"}
-          // isDisabled={selectedFriends.length === 0}
+          isDisabled={selectedFriends.length === 0 && selectedButton === 0}
           onPress={handleDoneSplit}
         ></AddToolBar>
       </View>
