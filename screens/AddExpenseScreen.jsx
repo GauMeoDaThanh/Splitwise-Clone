@@ -10,9 +10,21 @@ import {
 } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import AddToolBar from "../components/AddToolBar";
-import { useNavigation } from '@react-navigation/native';
-
-
+import { useNavigation } from "@react-navigation/native";
+import BtnAddFriendToBill from "../components/BtnAddFriendToBill";
+// Danh sách các bạn bè
+const searchFriendsList = [
+  { name: "Tấn Dũng", avatar: require("../assets/icons/account.png") },
+  { name: "John Doe", avatar: require("../assets/icons/account.png") },
+  {
+    name: "Nguyễn Đoàn Bảo Châu",
+    avatar: require("../assets/icons/account.png"),
+  },
+];
+// Danh sách các bạn bè
+const selectFriendsList = [
+  { name: "Ái Lam", avatar: require("../assets/icons/account.png") },
+];
 const AddExpenseScreen = (props) => {
   const textInputRef = useRef(null);
   const descriptionInputRef = useRef(null);
@@ -35,11 +47,11 @@ const AddExpenseScreen = (props) => {
 
   const navigation = useNavigation();
   const handleAddImageExpense = () => {
-    navigation.navigate('AddImageExpense');
+    navigation.navigate("AddImageExpense");
   };
 
   const handleSplitExpense = () => {
-    navigation.navigate('SplitExpenseScreen');
+    navigation.navigate("SplitExpenseScreen");
   };
 
   return (
@@ -82,6 +94,22 @@ const AddExpenseScreen = (props) => {
             descriptionInputRef.current.focus();
           }}
         ></TextInput>
+      </View>
+      <View style={styles.buttonListContainer}>
+        {selectFriendsList.map((friend, index) => (
+          <BtnAddFriendToBill
+            name={friend.name}
+            avatar={require("../assets/icons/account.png")}
+            isSelected={true} 
+          ></BtnAddFriendToBill>
+        ))}
+        {searchFriendsList.map((friend, index) => (
+          <BtnAddFriendToBill
+            name={friend.name}
+            avatar={require("../assets/icons/account.png")}
+            isSelected={false}  // Kiểm tra xem nút này có được chọn không
+          ></BtnAddFriendToBill>
+        ))}
       </View>
       <View
         style={[
@@ -145,7 +173,11 @@ const AddExpenseScreen = (props) => {
             <Text> you </Text>
           </TouchableOpacity>
           <Text> and split </Text>
-          <TouchableOpacity style={[styles.buttonStyle]} onPress={handleSplitExpense} disabled={!isBothFieldsFilled}>
+          <TouchableOpacity
+            style={[styles.buttonStyle]}
+            onPress={handleSplitExpense}
+            disabled={!isBothFieldsFilled}
+          >
             <Text>equally</Text>
           </TouchableOpacity>
         </View>
@@ -153,13 +185,18 @@ const AddExpenseScreen = (props) => {
       <View
         style={[{ flex: 10, borderTopColor: "#EEEEEE", borderTopWidth: 1 }]}
       >
-        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: 'flex-end' }} onPress={handleAddImageExpense}>
-       
+        <TouchableOpacity
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
+          onPress={handleAddImageExpense}
+        >
           <Image
             source={require("../assets/icons/camera.png")}
             style={{ width: 60, height: 60 }}
           />
-  
         </TouchableOpacity>
       </View>
       {/* <View style={[{ isFocused === 2 ? flex: 50 : flex: 36 }]}>
@@ -170,11 +207,15 @@ const AddExpenseScreen = (props) => {
         ></KeyboardAvoidingView>
       </View> */}
       {isFocused === 2 && (
-        <View style={{ flex: 36 }}>{<KeyboardAvoidingView></KeyboardAvoidingView>}</View>
+        <View style={{ flex: 36 }}>
+          {<KeyboardAvoidingView></KeyboardAvoidingView>}
+        </View>
       )}
 
       {isFocused !== 2 && (
-        <View style={{ flex: 50 }}>{<KeyboardAvoidingView></KeyboardAvoidingView>}</View>
+        <View style={{ flex: 50 }}>
+          {<KeyboardAvoidingView></KeyboardAvoidingView>}
+        </View>
       )}
     </View>
   );
@@ -193,5 +234,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 6,
     padding: 3,
+  },
+  buttonListContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    borderBottomColor: "#EEEEEE",
+    borderBottomWidth: 1,
+    flexWrap: "wrap", // Để các nút tự động xuống dòng khi hết chỗ
+    marginTop: 10,
   },
 });

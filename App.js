@@ -32,6 +32,7 @@ import AppNavigation from './navigation/AppNavigation';
 import AddExpenseScreen from './screens/AddExpenseScreen';
 import SplitExpenseScreen from './screens/SplitExpenseScreen';
 import DetailsExpense from './screens/DetailsExpense';
+import BtnAddFriendToBill from './components/BtnAddFriendToBill';
 
 const App = () => {
   // Lấy kích thước của màn hình thiết bị
@@ -48,8 +49,8 @@ const App = () => {
   return (
     <SafeAreaView style={containerStyle}>
       <View style={containerStyle}>
-        {/* <AppNavigation /> */}
-        <DetailsExpense></DetailsExpense>
+        <AppNavigation />
+        {/* <BtnAddFriendToBill></BtnAddFriendToBill> */}
       </View>
     </SafeAreaView>
   );
