@@ -13,14 +13,13 @@ const AddToolBar = (props) => {
         </Text>
       </TouchableOpacity>
       <Text style={{ fontWeight: "500", fontSize: 16 }}>{props.title}</Text>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={props.onAddPress}>
         <Text
           style={{
             fontWeight: "500",
             fontSize: 16,
             color: props.isDisabled ? "#999999" : "#009966",
           }}
-          onPress={props.onAddPress}
         >
           {props.action}
         </Text>

@@ -6,6 +6,7 @@ import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import AccountScreen from "../screens/tabs/AccountScreen";
+import SplitExpenseScreen from "../screens/SplitExpenseScreen";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 import {
@@ -31,9 +32,6 @@ import BalancesScreen from "../screens/BalancesScreen";
 import WhiteboardScreen from "../screens/WhiteboardScreen";
 import TotalsScreen from "../screens/TotalsScreen";
 import AddMemberGroupsScreen from "../screens/AddMemberGroupsScreen";
-import EditGroupMemberScreen from "../screens/EditGroupMemberScreen";
-import EditGroupsScreen from "../screens/EditGroupScreen";
-import DetailFriendsScreen from "../screens/DetailsFriendsScreen";
 
 const AppNavigation = () => {
   return (
@@ -42,6 +40,11 @@ const AppNavigation = () => {
         <Stack.Screen
           name="LoadScreen"
           component={LoadScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SplitExpenseScreen"
+          component={SplitExpenseScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
@@ -107,16 +110,6 @@ const AppNavigation = () => {
         <Stack.Screen
           name="AddMember"
           component={AddMemberGroupsScreen}
-          options={{ headerShown: false }}
-        ></Stack.Screen>
-        <Stack.Screen
-          name="EditGroupMember"
-          component={EditGroupMemberScreen}
-          options={{ headerShown: false }}
-        ></Stack.Screen>
-        <Stack.Screen
-          name="EditGroups"
-          component={EditGroupsScreen}
           options={{ headerShown: false }}
         ></Stack.Screen>
       </Stack.Navigator>

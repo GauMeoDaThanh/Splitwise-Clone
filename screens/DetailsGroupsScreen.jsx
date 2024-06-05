@@ -12,6 +12,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import ButtonAddExpense from "../components/ButtonAddExpense";
 import GroupService from "../services/group";
+import ExpenseService from "../services/expense";
+import UserService from "../services/user";
 import { auth } from "../firebaseConfig";
 
 const DetailsGroupsScreen = ({ route }) => {
@@ -19,12 +21,31 @@ const DetailsGroupsScreen = ({ route }) => {
   const groupId = route.params?.groupInfo;
   const [group, setGroup] = useState(route.params?.groupInfo);
   const [showEditOptions, setShowEditOptions] = useState(false);
+  const [expenses, setExpenses] = useState([]);
+  const [createBy, setCreateBy] = useState([]);
 
   useEffect(() => {
     GroupService.getInstance().listenToGroupDetail(groupId, (group) => {
       setGroup(group);
     });
-  }, []);
+    const fetchExpenses = async () => {
+      try {
+        const expenseList =
+          await ExpenseService.getInstance().getExpensesByGroupId(groupId);
+        setExpenses(expenseList); // Cập nhật state với dữ liệu thực
+        let paidUsers = [];
+        for (expense of expenseList) {
+          paidUsers.push(
+            await UserService.getInstance().getUserById(expense.createBy)
+          );
+        }
+        setCreateBy(paidUsers);
+      } catch (error) {
+        console.error("Error fetching expenses:", error);
+      }
+    };
+    fetchExpenses();
+  }, [groupId]);
 
   const toggleEditOptions = () => {
     setShowEditOptions(!showEditOptions);
@@ -120,14 +141,14 @@ const DetailsGroupsScreen = ({ route }) => {
             {group.name}
           </Text>
           <View className="flex-row space-x-1">
-            <Text className="text-gray-600">Chau N. owes you</Text>
+            <Text className="text-gray-600">{/* Chau N. owes you */}</Text>
             <Text
               style={{
                 color: "#0B9D7E",
                 fontWeight: 400,
               }}
             >
-              3.000.000vnđ
+              {/* 3.000.000vnđ */}
             </Text>
           </View>
         </View>
@@ -324,7 +345,7 @@ const DetailsGroupsScreen = ({ route }) => {
 
       <View className="flex-col space-y-6 px-1">
         <View className="flex-col px-2 space-y-3">
-          <Text
+          {/* <Text
             className="text-gray-700 px-1"
             style={{
               fontSize: 13,
@@ -332,80 +353,108 @@ const DetailsGroupsScreen = ({ route }) => {
             }}
           >
             Tháng 5 2024
-          </Text>
-          <View className="flex-row ">
-            <TouchableOpacity className="flex-row space-x-5 px-1 items-center">
-              <View className="flex-col items-center">
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 12,
-                  }}
-                >
-                  Th5
-                </Text>
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 500,
-                  }}
-                >
-                  11
-                </Text>
-              </View>
-              <View className="flex-row p-2 items-center border border-gray-400 bg-gray-200">
-                <Image
-                  source={require("../assets/icons/icon_bill.png")}
-                  style={{
-                    width: 22,
-                    height: 22,
-                  }}
-                ></Image>
-              </View>
-              <View className="flex-col items-start">
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 500,
-                  }}
-                >
-                  bill share1
-                </Text>
-                <Text
-                  className="text-gray-500"
-                  style={{
-                    fontSize: 12,
-                  }}
-                >
-                  Nhung paid 200.000vnđ
-                </Text>
-              </View>
-              <View className="flex-col items-end">
-                <Text
-                  className="text-red-600"
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 500,
-                  }}
-                >
-                  you borrowed
-                </Text>
-                <Text
-                  className="text-red-600"
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 500,
-                  }}
-                >
-                  200.000vnđ
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+          </Text> */}
+          {expenses.map((expense, index) => (
+            <View key={index} className="flex-row ">
+              <TouchableOpacity className="flex-row space-x-5 px-1 items-center">
+                <View className="flex-col items-center">
+                  <Text
+                    className="text-gray-600"
+                    style={{
+                      fontSize: 12,
+                    }}
+                  >
+                    {"T" +
+                      (new Date(
+                        expense.createAt.seconds * 1000 +
+                          expense.createAt.nanoseconds / 1000000
+                      ).getMonth() +
+                        1) +
+                      "/" +
+                      new Date(
+                        expense.createAt.seconds * 1000 +
+                          expense.createAt.nanoseconds / 1000000
+                      ).getFullYear()}
+                  </Text>
+                  <Text
+                    className="text-gray-600"
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {new Date(
+                      expense.createAt.seconds * 1000 +
+                        expense.createAt.nanoseconds / 1000000
+                    ).getDate()}
+                  </Text>
+                </View>
+                <View className="flex-row p-2 items-center border border-gray-400 bg-gray-200">
+                  <Image
+                    source={
+                      expense.imageuri
+                        ? { uri: imageuri }
+                        : require("../assets/icons/icon_bill.png")
+                    }
+                    style={{
+                      width: 22,
+                      height: 22,
+                    }}
+                  ></Image>
+                </View>
+                <View className="flex-col items-start">
+                  <Text
+                    className="text-gray-600"
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {expense.description}
+                  </Text>
+                  <Text
+                    className="text-gray-500"
+                    style={{
+                      fontSize: 12,
+                    }}
+                  >
+                    {createBy[index]
+                      ? `${createBy[index].username} paid ${expense.amounts}`
+                      : "Loading..."}
+                  </Text>
+                </View>
+                <View className="flex-col items-end">
+                  <Text
+                    className="text-red-600"
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {createBy[index]
+                      ? createBy[index].uid == auth.currentUser.uid
+                        ? "you lent"
+                        : `${createBy[index].username} lent`
+                      : ""}
+                  </Text>
+                  <Text
+                    className="text-red-600"
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {expense.participants
+                      .slice(1)
+                      .reduce((acc, curr) => acc + curr.amount, 0)
+                      .toFixed(2)}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
-        <View className="flex-col px-2 space-y-3">
+        {/* <View className="flex-col px-2 space-y-3">
           <Text
             className="text-gray-700 px-1"
             style={{
@@ -456,7 +505,7 @@ const DetailsGroupsScreen = ({ route }) => {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> */}
       </View>
 
       <View

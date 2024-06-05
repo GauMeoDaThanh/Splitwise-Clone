@@ -166,7 +166,20 @@ class UserService {
     } catch (e) {
       console.log(e);
     }
-  }
+    }
+    
+     async getUserById(uid) {
+        // console.log(`start get user ${uid}`);
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            // console.log(userSnap.data());
+            return userSnap.data();
+        } else {
+            console.log("Khong tim thay");
+            return null;
+        }
+    }
 }
 
 export default UserService;
