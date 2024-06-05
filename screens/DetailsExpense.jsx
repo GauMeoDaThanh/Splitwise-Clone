@@ -13,107 +13,173 @@ import {
 import DetailsToolBar from "../components/DetailsToolBar";
 // import BottomAppBar from "../components/BottomAppBar";
 import { useNavigation } from "@react-navigation/native";
+import ExpenseService from "../services/expense";
+import UserService from "../services/user";
+import * as ImagePicker from "expo-image-picker";
+import { auth } from "../firebaseConfig";
 
-const DetailsExpense = (props) => {
+const DetailsExpense = ({ route }) => {
   const comments = [
     { name: "You", content: "This is your comment." },
     { name: "Tan Dung", content: "This is a comment from Tan Dung." },
     { name: "Nhung", content: "Another comment from Nhung." },
   ];
+  const navigation = useNavigation();
+  const { expenseId } = route.params;
+  const [expenseInfo, setExpenseInfo] = useState([]);
+  const [paidByUser, setPaidByUser] = useState(); // New state to store user information
+  const [debt, setDebt] = useState([]);
+  const [participants, setParticipants] = useState([]);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    ExpenseService.getInstance().listenToFriendDetail(
+      expenseId,
+      async (expenseInfo) => {
+        setExpenseInfo(expenseInfo);
+        // Get ra nguoi tra
+        const paidById = expenseInfo.paidBy;
+        try {
+          const user = await UserService.getInstance().getUserById(paidById);
+          setUser(user);
+          setPaidByUser(user);
+          setParticipants(expenseInfo.participants);
+          setDebt(
+            await ExpenseService.getInstance().getDebtInfo(
+              expenseId,
+              user.username
+            )
+          );
+          console.log("debt", debt);
+        } catch (error) {
+          console.error("Error fetching user:", error);
+        }
+      }
+    );
+  }, []);
 
+  const chooseImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled) {
+      // await UserService.getInstance().uploadAvatar(result.assets[0].uri);
+    }
+  };
+
+  const handlePayment = async (userId) => {
+    await ExpenseService.getInstance().handlePayment(expenseId, userId);
+    alert("You settled up successfully");
+  };
   return (
-    <View style={[{ flex: 100, backgroundColor: "white" }]}>
+    <View style={[{ flex: 100, backgroundColor: "white" }]} className="py-5">
       <View style={[{ flex: 7 }]}>
         <DetailsToolBar></DetailsToolBar>
       </View>
       <View style={{ flex: 76, flexDirection: "column" }}>
-      <ScrollView >
-        <View
-          style={[
-            {
-              flex: 30,
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              backgroundColor: "#EEEEEE",
-              borderBottomColor: "#EEEEEE",
-              borderBottomWidth: 1,
-              paddingHorizontal: 12,
-              paddingVertical: 16,
-              position: "relative",
-            },
-          ]}
-        >
-          <Image
-            source={require("../assets/icons/bill6.png")}
-            style={{ width: 60, height: 60 }}
-          />
+        <ScrollView>
           <View
             style={[
               {
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "flex-start",
-                marginStart: 10,
-                marginEnd: 10,
+                flex: 30,
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                backgroundColor: "#EEEEEE",
+                borderBottomColor: "#EEEEEE",
+                borderBottomWidth: 1,
+                paddingHorizontal: 12,
+                paddingVertical: 16,
+                position: "relative",
               },
             ]}
           >
-            <Text
-              style={{ fontSize: 18, fontWeight: "400", marginVertical: 2 }}
-            >
-              PBL05
-            </Text>
-            <Text
-              style={{ fontSize: 20, fontWeight: "500", marginVertical: 5 }}
-            >
-              300.000 dong
-            </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: "400",
-                marginVertical: 8,
-                width: 250,
-              }}
-            >
-              Add by Nhung on 18 may 2024
-            </Text>
-          </View>
-          <TouchableOpacity style={{ width: 60, height: 60, position: "absolute", right: 12 }}>
-          <Image
-            source={require("../assets/icons/photo.png")}
-            style={{ width: 60, height: 60}}
-          />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={[
-            {
-              flex: 30,
-              flexDirection: "column",
-              justifyContent: "flex-start",
-              alignItems: "flex-start",
-              padding: 12,
-            },
-          ]}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image
-              source={require("../assets/icons/account.png")}
-              style={{ width: 40, height: 40, borderRadius: 20 }}
+              source={require("../assets/icons/bill6.png")}
+              style={{ width: 60, height: 60 }}
             />
-            <View style={{ paddingHorizontal: 20, width: "68%" }}>
-              <Text style={{ fontSize: 18, fontWeight: "500" }}>Nhung paid 1000 dong</Text>
+            <View
+              style={[
+                {
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "flex-start",
+                  marginStart: 10,
+                  marginEnd: 10,
+                },
+              ]}
+            >
+              <Text
+                style={{ fontSize: 18, fontWeight: "400", marginVertical: 2 }}
+              >
+                {expenseInfo.description}
+              </Text>
+              <Text
+                style={{ fontSize: 20, fontWeight: "500", marginVertical: 5 }}
+              >
+                {Math.abs(expenseInfo.amounts?.toFixed(0)).toLocaleString(
+                  "de-De"
+                )}{" "}
+                vnd
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "400",
+                  marginVertical: 8,
+                  width: 250,
+                }}
+              >
+                Added by {paidByUser?.username}{" "}
+                {expenseInfo?.createAt
+                  ? "on " +
+                    new Date(
+                      expenseInfo.createAt.seconds * 1000 +
+                        expenseInfo.createAt.nanoseconds / 1000000
+                    ).toLocaleDateString("en-GB")
+                  : ""}
+              </Text>
             </View>
-            <TouchableOpacity style={{backgroundColor: '#43CD80', borderColor: '#00CD66', borderWidth: 1, borderRadius: 20, padding: 10, }}>
-           <Text style={{fontSize: 16, fontWeight: 400}}>
-            Settle up
-           </Text>
+            <TouchableOpacity
+              style={{ width: 60, height: 60, position: "absolute", right: 12 }}
+              onPress={chooseImage}
+            >
+              <Image
+                source={require("../assets/icons/photo.png")}
+                style={{ width: 60, height: 60 }}
+              />
             </TouchableOpacity>
           </View>
-          <View style={{ paddingStart: 60, marginTop: 10 }}>
-            <Text
+          <View
+            style={[
+              {
+                flex: 30,
+                flexDirection: "column",
+                justifyContent: "flex-start",
+                alignItems: "flex-start",
+                padding: 12,
+              },
+            ]}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Image
+                source={
+                  user?.avatarUrl
+                    ? { uri: user.avatarUrl }
+                    : require("../assets/icons/account.png")
+                }
+                style={{ width: 40, height: 40, borderRadius: 20 }}
+              />
+              <View style={{ paddingHorizontal: 20, width: "68%" }}>
+                <Text style={{ fontSize: 18, fontWeight: "500" }}>
+                  {debt[0]}
+                </Text>
+              </View>
+            </View>
+            <View style={{ paddingStart: 60, marginTop: 10 }}>
+              {/* <Text
               style={{
                 justifyContent: "center",
                 textAlign: "left",
@@ -122,8 +188,8 @@ const DetailsExpense = (props) => {
               }}
             >
               Tan Dung owes you 35.000 đồng
-            </Text>
-            <Text
+            </Text> */}
+              {/* <Text
               style={{
                 justifyContent: "center",
                 textAlign: "left",
@@ -132,21 +198,51 @@ const DetailsExpense = (props) => {
               }}
             >
               You owe Tan Dung 35.000 đồng
-            </Text>
-            <Text
-              style={{
-                justifyContent: "center",
-                textAlign: "left",
-                paddingVertical: 6,
-                color: "#777777",
-              }}
-            >
-              You owe Tan Dung 35.000 đồng
-            </Text>
-            
+            </Text> */}
+              {debt.slice(1).map((debt, index) => (
+                <View key={index}>
+                  <Text
+                    style={{
+                      justifyContent: "center",
+                      textAlign: "left",
+                      paddingVertical: 6,
+                      color: "#777777",
+                    }}
+                  >
+                    {debt}
+                  </Text>
+                  {participants[index + 1]?.userId === auth.currentUser?.uid &&
+                    participants[index + 1].settleUp === false && (
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: "#43CD80",
+                          borderColor: "#00CD66",
+                          borderWidth: 1,
+                          borderRadius: 12,
+                          padding: 4,
+                          width: 90,
+                        }}
+                        onPress={() =>
+                          handlePayment(participants[index + 1]?.userId)
+                        }
+                      >
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 400,
+                            textAlign: "center",
+                            color: "#fff",
+                          }}
+                        >
+                          Settle Up
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
-        <View
+          {/* <View
           style={[
             {
               flex: 23,
@@ -156,8 +252,8 @@ const DetailsExpense = (props) => {
               padding: 12,
             },
           ]}
-        >
-          <Text style={{ fontSize: 15, fontWeight: "500" }}>Comments</Text>
+        > */}
+          {/* <Text style={{ fontSize: 15, fontWeight: "500" }}>Comments</Text>
           {comments.map((comment, index) => (
             <View
               key={index}
@@ -167,8 +263,8 @@ const DetailsExpense = (props) => {
                   ? styles.commentContainerYou
                   : styles.commentContainerOther,
               ]}
-            >
-              <Text
+            > */}
+          {/* <Text
                 style={[
                   styles.commentName,
                   comment.name === "You" ? styles.commentNameYou : null,
@@ -177,11 +273,11 @@ const DetailsExpense = (props) => {
                 {comment.name}
               </Text>
               <Text style={styles.commentContent}>{comment.content}</Text>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-      </View>
+            </View> */}
+          {/* ))} */}
+          {/* </View> */}
+        </ScrollView>
+        {/* </View>
       <View style={{ flex: 7, flexDirection:'row', borderTopColor: "#EEEEEE", borderTopWidth: 1, justifyContent: 'center', alignItems: 'center' }}>
         <TextInput
         style={{fontSize: 16,paddingVertical: 7, paddingHorizontal: 10, borderRadius: 30, borderColor: '#548B54', borderWidth: 1, width: 360, height: 32, }}
@@ -191,9 +287,9 @@ const DetailsExpense = (props) => {
            source={require("../assets/icons/send.png")}
           style={{ width: 26, height: 24, margin: 5, tintColor: '#32CD32' }}
         />
-      </View>
-      <View style={{ flex: 10, borderTopColor: "#CCCCCC", borderTopWidth: 1 }}>
-        <BottomAppBar />
+      </View> */}
+        {/* <View style={{ flex: 10, borderTopColor: "#CCCCCC", borderTopWidth: 1 }}> */}
+        {/* <BottomAppBar /> */}
       </View>
     </View>
   );

@@ -35,6 +35,7 @@ import AddMemberGroupsScreen from "../screens/AddMemberGroupsScreen";
 import DetailFriendsScreen from "../screens/DetailsFriendsScreen";
 import EditGroupMemberScreen from "../screens/EditGroupMemberScreen";
 import EditGroupsScreen from "../screens/EditGroupScreen";
+import DetailsExpense from "../screens/DetailsExpense";
 
 const AppNavigation = () => {
   return (
@@ -123,6 +124,11 @@ const AppNavigation = () => {
         <Stack.Screen
           name="EditGroups"
           component={EditGroupsScreen}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+          <Stack.Screen
+          name="DetailExpense"
+          component={DetailsExpense}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

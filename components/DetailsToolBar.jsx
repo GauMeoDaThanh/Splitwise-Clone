@@ -1,5 +1,8 @@
-import { Text, TouchableOpacity, StyleSheet, View, Image, Alert} from "react-native";
+import { Text, TouchableOpacity, StyleSheet, View, Image, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+
 const DetailsToolBar = (props) => {
+  const navigation = useNavigation();
     const handleDelete = () => {
         Alert.alert(
           "Delete Expense",
@@ -22,7 +25,7 @@ const DetailsToolBar = (props) => {
         { borderBottomColor: "#EEEEEE", borderBottomWidth: 1 },
       ]}
     >
-      <TouchableOpacity onPress={() => props.navigation.goBack()}>
+      <TouchableOpacity onPress={() => navigation.navigate("DetailGroups")}>
         <Image
           source={require("../assets/icons/back.png")}
           style={{ width: 20, height: 20 }}

@@ -8,7 +8,7 @@ import {
   Image,
   ScrollView,
   FlatList,
-  LogBox,
+  LogBox
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ButtonAddExpense from "../components/ButtonAddExpense";
@@ -29,6 +29,12 @@ const DetailsGroupsScreen = ({ route }) => {
   const [expenses, setExpenses] = useState([]);
   const [createBy, setCreateBy] = useState([]);
   const [showEditOptions, setShowEditOptions] = useState(false);
+  
+    LogBox.ignoreLogs([
+    "Possible Unhandled Promise Rejection",
+    "TypeError: Cannot read property 'indexOf' of undefined",
+    ]);
+  
   useEffect(() => {
     GroupService.getInstance().listenToGroupDetail(groupId, async (group) => {
       setGroup(group);
@@ -49,7 +55,7 @@ const DetailsGroupsScreen = ({ route }) => {
     });
   }, [groupId]);
 
-  const toggleEditOptions = () => {
+    const toggleEditOptions = () => {
     setShowEditOptions(!showEditOptions);
   };
   const handleOptionPress = (screen) => {
@@ -238,14 +244,7 @@ const DetailsGroupsScreen = ({ route }) => {
         >
           {expenses.map((expense, index) => (
             <View key={index} className="flex-row ">
-              <TouchableOpacity
-                className="flex-row space-x-5 px-1 items-center"
-                // onPress={() =>
-                //   navigation.navigate("DetailExpense", {
-                //     expenseId: expense.id,
-                //   })
-                // }
-              >
+              <TouchableOpacity className="flex-row space-x-5 px-1 items-center" onPress={() => navigation.navigate("DetailExpense",{expenseId:expense.id})}>
                 <View className="flex-col items-center">
                   <Text
                     className="text-gray-600"
