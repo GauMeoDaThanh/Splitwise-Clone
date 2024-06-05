@@ -39,18 +39,18 @@ const initGroup = {
 };
 
 class GroupService {
-    constructor() {
-        if (GroupService.instance == null) {
-            GroupService.instance = this;
-      }
-        return GroupService.instance;
+  constructor() {
+    if (GroupService.instance == null) {
+      GroupService.instance = this;
     }
-    static getInstance() {
-        if (!GroupService.instance) {
-            GroupService.instance = new GroupService();
-        }
-        return GroupService.instance;
+    return GroupService.instance;
+  }
+  static getInstance() {
+    if (!GroupService.instance) {
+      GroupService.instance = new GroupService();
     }
+    return GroupService.instance;
+  }
 
   async listenToGroupList(callback) {
     try {
@@ -214,11 +214,11 @@ class GroupService {
       let groupInfo = groupSnap.data();
       groupInfo["createAt"] = groupInfo["createAt"]?.toDate().toDateString();
 
-            return groupInfo;
-        } catch (e) {
-            console.error(e);
-        }
+      return groupInfo;
+    } catch (e) {
+      console.error(e);
     }
+  }
 
   async setGroupInformation(groupId, groupName, groupInfomation, members) {
     try {
@@ -238,17 +238,18 @@ class GroupService {
       console.log(e);
     }
   }
+  
 
-    async setGroupName(groupId, name) {
-        try {
-            console.log("start set group name");
-            const groupRef = doc(db, GROUP_COLLECTION, groupId);
-            await setDoc(groupRef, { name }, { merge: true });
-            console.log("set group name successfully");
-        } catch (e) {
-            console.log(e);
-        }
+  async setGroupName(groupId, name) {
+    try {
+      console.log("start set group name");
+      const groupRef = doc(db, GROUP_COLLECTION, groupId);
+      await setDoc(groupRef, { name }, { merge: true });
+      console.log("set group name successfully");
+    } catch (e) {
+      console.log(e);
     }
+  }
 
   async addGroupMembers(groupId, groupName, currentMembers, newMembers) {
     try {
@@ -344,6 +345,7 @@ class GroupService {
     }
   }
 
+
      async getGroupOfIdAcc(idAcc) {
         const myGroup = [];
         for (const group of await this.getAllGroup()) {
@@ -354,7 +356,7 @@ class GroupService {
         return myGroup;
   } 
 
-     async getAllGroup() {
+    async getAllGroup() {
         const groupList = [];
         const querySnapshot = await getDocs(collection(db, GROUP_COLLECTION));
         querySnapshot.forEach((doc) => {
@@ -362,6 +364,5 @@ class GroupService {
         });
         return groupList;
     }
-}
-
+  }
 export default GroupService;

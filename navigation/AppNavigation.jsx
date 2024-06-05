@@ -32,9 +32,9 @@ import BalancesScreen from "../screens/BalancesScreen";
 import WhiteboardScreen from "../screens/WhiteboardScreen";
 import TotalsScreen from "../screens/TotalsScreen";
 import AddMemberGroupsScreen from "../screens/AddMemberGroupsScreen";
+import DetailFriendsScreen from "../screens/DetailsFriendsScreen";
 import EditGroupMemberScreen from "../screens/EditGroupMemberScreen";
 import EditGroupsScreen from "../screens/EditGroupScreen";
-import DetailFriendsScreen from "../screens/DetailsFriendsScreen";
 import DetailsExpense from "../screens/DetailsExpense";
 
 const AppNavigation = () => {
@@ -46,10 +46,11 @@ const AppNavigation = () => {
           component={LoadScreen}
           options={{ headerShown: false }}
         />
-          <Stack.Screen
-        name="SplitExpenseScreen"
-        component={SplitExpenseScreen}
-        options={{ headerShown: false, }} />
+        <Stack.Screen
+          name="SplitExpenseScreen"
+          component={SplitExpenseScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Login"
           component={LoginScreen}

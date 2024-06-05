@@ -16,45 +16,48 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { CommonActions } from "@react-navigation/native";
 const expenseService = ExpenseService.getInstance();
 
-const SplitExpenseScreen = ({ route }) => {
+const SplitExpenseScreen = (props) => {
   const navigation = useNavigation()
-  const description = route.params.description;
-  const amounts = route.params.money
-
+  const description = props.route.params.description;
+  const amounts = props.route.params.money
   const [selectedButton, setSelectedButton] = useState(0);
   const [participants, setParticipants] = useState([]); 
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedParticipants, setSelectedParticipants] = useState([])
+  const [friendsList, setFriendsList] = useState([])
   
-  useEffect(() => {
-    const fetchParticipants = async () => {
-      try {
-        const selectedPar = route.params.selectedParticipants;
-        setSelectedParticipants(selectedPar);
-        const participantsList = await expenseService.getParticipants(selectedPar);
-        setParticipants(participantsList); 
-      } catch (error) {
-        console.error("Error fetching participants:", error);
-    }
-    };
-    fetchParticipants();
-  }, [selectedParticipants]);
-
-  // Danh sách người chia hoá đơn
-  const friendsList = []
-  for (participant of participants) {
-     friendsList.push({uid: participant.uid, name: participant.username, avatar: participant.avatarUrl})
-  }
-
-  const handleButtonPress = (index) => {
-  setSelectedButton(index); 
-  };
-
-  const handleFriendToggle = (item) => {
-    setSelectedFriends((prevSelectedFriends) =>
-      prevSelectedFriends.filter((friend) => friend.uid !== item.uid)?[...prevSelectedFriends, item]:[...prevSelectedFriends]
+// use FocusEffect to get all the expense when focus
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchParticipants = async () => {
+        try {
+          const selectedPar = props.route.params.selectedParticipants;
+          setSelectedParticipants(selectedPar);
+          // Danh sách người chia hoá đơn
+          const friendsList = []
+          const participantsList = await expenseService.getParticipants(selectedPar);
+          setParticipants(participantsList);
+          for (participant of participantsList) {
+            friendsList.push({ uid: participant.uid, name: participant.username, avatar: participant.avatarUrl })
+          }
+          setFriendsList(friendsList)
+          setSelectedFriends(friendsList.map((friend) => friend))
+          setSelectedParticipants(selectedPar);
+        } catch (error) {
+          console.error("Error fetching participants:", error);
+        }
+      };
+      fetchParticipants();
+    }, [selectedParticipants])
   );
-  };
+
+ const handleFriendToggle = (item) => {
+setSelectedFriends((prevSelectedFriends) =>
+    prevSelectedFriends.includes(item)
+    ? prevSelectedFriends.filter((friend) => friend.uid !== item.uid)
+    : [...prevSelectedFriends, item]
+);
+};
   
   const checkInput = (valueInputs, fullNumber) => {
      // Kiểm tra chia không đủ
@@ -66,7 +69,6 @@ const SplitExpenseScreen = ({ route }) => {
         }
         sum += parseFloat(value);
       }
-      console.log("Sum", sum)
       if (sum != fullNumber) {
         alert('Invalid division number for invoice');
         return false;
@@ -93,35 +95,41 @@ const SplitExpenseScreen = ({ route }) => {
       }
             switch (splitType) {
               case "equally":
-                    for (friend of selectedFriends) {
-                        splitParticipants.push({
-                            userId: friend.uid,
-                            amount: parseFloat(amounts) / selectedFriends.length.toFixed(0),
-                            settleUp: false
-                        })
+                    let isFirstFriend = true;
+                    for (const friend of selectedFriends) {
+                      splitParticipants.push({
+                        userId: friend.uid,
+                        amount: parseFloat(amounts) / selectedFriends.length.toFixed(0),
+                        settleUp: isFirstFriend
+                      });
+                      isFirstFriend = false; 
                     }
                     break;
               case "unequally":
                     if (!checkInput(valueInputs, amounts)) return;
+                    isFirstFriend = true;
                     for (friend of friendsList) {
                         splitParticipants.push({
                             userId: friend.uid,
                             amount: parseFloat(valueInputs[friend.uid]),
-                            settleUp: false
+                            settleUp: isFirstFriend
                         })
+                      isFirstFriend = false; 
                     }
                     break;
               case "percent":
-                if (!checkInput(valueInputs, 100)) return;
+                    if (!checkInput(valueInputs, 100)) return;
+                    isFirstFriend = true;
                     for (friend of friendsList) {
                         splitParticipants.push({
                             userId: friend.uid,
                             amount: parseFloat(valueInputs[friend.uid]) / 100 * amounts,
                             settleUp: false
                         })
-                    }
+                      isFirstFriend = false;
+                  }
                     break;
-      }
+            }
         try {
             await expenseService.createExpense(
             new Date(),
@@ -143,6 +151,10 @@ const SplitExpenseScreen = ({ route }) => {
       ...prevValueInputs,
       [friendId]: value,
     }));
+  };
+
+  const handleButtonPress = (index) => {
+  setSelectedButton(index); 
   };
 
 const totalValueInput = Object.values(valueInputs).reduce(
@@ -317,7 +329,7 @@ const renderGeneral = () => {
     <View style={[{ flex: 100, backgroundColor: "white" }]} className='py-5'>
       <View style={{ flex: 7 }}>
         <AddToolBar
-          navigation={route.navigation}
+          navigation= {props.navigation}
           title={"Split options"}
           action={"Done"}
           isDisabled={selectedFriends.length === 0 && selectedButton === 0}

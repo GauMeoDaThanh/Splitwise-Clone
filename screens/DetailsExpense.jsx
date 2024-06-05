@@ -61,6 +61,7 @@ const DetailsExpense = ({ route }) => {
 
   const handlePayment = async(userId) => {
     await ExpenseService.getInstance().handlePayment(expenseId, userId);
+    alert("You settled up successfully");
   }
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]}>

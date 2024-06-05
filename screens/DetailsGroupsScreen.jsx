@@ -18,11 +18,16 @@ import UserService from "../services/user";
 import { auth } from "../firebaseConfig";
 
 const DetailsGroupsScreen = ({ route }) => {
+  LogBox.ignoreLogs([
+    "Possible Unhandled Promise Rejection",
+    "TypeError: Cannot read property 'indexOf' of undefined",
+  ]);
+
   const navigation = useNavigation();
   const groupId = route.params?.groupInfo;
   const [group, setGroup] = useState(route.params?.groupInfo);
-  const [expenses, setExpenses] = useState([])
-  const [createBy, setCreateBy] = useState([])
+  const [expenses, setExpenses] = useState([]);
+  const [createBy, setCreateBy] = useState([]);
   const [showEditOptions, setShowEditOptions] = useState(false);
   
     LogBox.ignoreLogs([
@@ -31,20 +36,23 @@ const DetailsGroupsScreen = ({ route }) => {
     ]);
   
   useEffect(() => {
-      GroupService.getInstance().listenToGroupDetail(groupId, async (group) => {
-        setGroup(group);
-        try {
-        const expenseList = await ExpenseService.getInstance().getExpensesByGroupId(groupId);
+    GroupService.getInstance().listenToGroupDetail(groupId, async (group) => {
+      setGroup(group);
+      try {
+        const expenseList =
+          await ExpenseService.getInstance().getExpensesByGroupId(groupId);
         setExpenses(expenseList); // Cập nhật state với dữ liệu thực
-        let paidUsers = []
+        let paidUsers = [];
         for (expense of expenseList) {
-          paidUsers.push(await UserService.getInstance().getUserById(expense.createBy))
+          paidUsers.push(
+            await UserService.getInstance().getUserById(expense.createBy)
+          );
         }
-        setCreateBy(paidUsers)
-        } catch (error) {
-          console.log("Error to fetch data, ", error)
-        }
-      });
+        setCreateBy(paidUsers);
+      } catch (error) {
+        console.log("Error to fetch data, ", error);
+      }
+    });
   }, [groupId]);
 
     const toggleEditOptions = () => {
@@ -134,25 +142,23 @@ const DetailsGroupsScreen = ({ route }) => {
           <Text
             style={{
               color: "rgb(75 85 99)",
-              fontWeight: 500,
+              fontWeight: "bold",
               fontSize: 17,
             }}
           >
             {group.name}
           </Text>
-          <View className="flex-row space-x-1">
-            <Text className="text-gray-600">
-              {/* Chau N. owes you */}
-            </Text>
+          {/* <View className="flex-row space-x-1">
+            <Text className="text-gray-600">Chau N. owes you</Text>
             <Text
               style={{
                 color: "#0B9D7E",
                 fontWeight: 400,
               }}
             >
-              {/* 3.000.000vnđ */}
+              {amountOwed}
             </Text>
-          </View>
+          </View> */}
         </View>
       </View>
       <View
@@ -161,7 +167,7 @@ const DetailsGroupsScreen = ({ route }) => {
           top: -35,
         }}
       >
-        <TouchableOpacity
+        {/* <TouchableOpacity
           className="flex-row border border-gray-400 rounded-md px-4 py-1.5"
           style={{
             borderBottomWidth: 3,
@@ -177,7 +183,7 @@ const DetailsGroupsScreen = ({ route }) => {
           >
             Balances
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           className="flex-row border border-gray-400 rounded-md px-4 py-1.5"
           style={{
@@ -258,87 +264,123 @@ const DetailsGroupsScreen = ({ route }) => {
         </TouchableOpacity>
       </View>
       <View className="flex-col space-y-6 px-1">
-
         <View className="flex-col px-2 space-y-3">
-          {
-            expenses.map((expense, index) => (
-              <View
-                key={index}
-                className="flex-row ">
-            <TouchableOpacity className="flex-row space-x-5 px-1 items-center" onPress={() => navigation.navigate("DetailExpense",{expenseId:expense.id})}>
-              <View className="flex-col items-center">
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 12,
-                  }}
-                >
-                      {"T"+ (new Date(expense.createAt.seconds*1000 + expense.createAt.nanoseconds/1000000).getMonth() + 1) + "/" + new Date(expense.createAt.seconds*1000 + expense.createAt.nanoseconds/1000000).getFullYear() }
-                </Text>
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 500,
-                  }}
-                >
-                  {new Date(expense.createAt.seconds*1000 + expense.createAt.nanoseconds/1000000).getDate()}
-                </Text>
-              </View>
-              <View className="flex-row p-2 items-center border border-gray-400 bg-gray-200">
-                <Image
-                  source={expense.imageuri?{uri: imageuri}:require("../assets/icons/icon_bill.png")}
-                  style={{
-                    width: 22,
-                    height: 22,
-                  }}
-                ></Image>
-              </View>
-              <View className="flex-col items-start">
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 500,
-                  }}
-                >
-                 {expense.description}
-                </Text>
-                <Text
-                  className="text-gray-500"
-                  style={{
-                    fontSize: 12,
-                  }}
-                >
-                  {createBy[index]?.username ? `${createBy[index]?.username} paid ${expense.amounts}` : 'Loading...'}
-                </Text>
-              </View>
-              <View className="flex-col items-end">
-                <Text
-                  className="text-red-600"
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 500,
-                  }}
-                >
-                    {expense.participants.length > 1?((createBy[index]?.uid ? (createBy[index]?.uid == auth.currentUser.uid)?("you lent"):`${createBy[index]?.username} lent`:'')):''}
-                </Text>
-                <Text
-                  className="text-red-600"
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 500,
-                  }}
-                >
-                  {
-                        expense.participants.length > 1?expense.participants.slice(1).reduce((acc, curr) => acc + curr.amount, 0).toFixed(0):''
-                  }
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-            ))
-          }
+          {expenses.map((expense, index) => (
+            <View key={index} className="flex-row ">
+              <TouchableOpacity className="flex-row space-x-5 px-1 items-center" onPress={() => navigation.navigate("DetailExpense",{expenseId:expense.id})}>
+                <View className="flex-col items-center">
+                  <Text
+                    className="text-gray-600"
+                    style={{
+                      fontSize: 12,
+                    }}
+                  >
+                    {"T" +
+                      (new Date(
+                        expense.createAt.seconds * 1000 +
+                          expense.createAt.nanoseconds / 1000000
+                      ).getMonth() +
+                        1) +
+                      "/" +
+                      new Date(
+                        expense.createAt.seconds * 1000 +
+                          expense.createAt.nanoseconds / 1000000
+                      ).getFullYear()}
+                  </Text>
+                  <Text
+                    className="text-gray-600"
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {new Date(
+                      expense.createAt.seconds * 1000 +
+                        expense.createAt.nanoseconds / 1000000
+                    ).getDate()}
+                  </Text>
+                </View>
+                <View className="flex-row p-2 items-center border border-gray-400 bg-gray-200">
+                  <Image
+                    source={
+                      expense?.imageuri
+                        ? { uri: imageuri }
+                        : require("../assets/icons/icon_bill.png")
+                    }
+                    style={{
+                      width: 22,
+                      height: 22,
+                    }}
+                  ></Image>
+                </View>
+                <View className="flex-col items-start">
+                  <Text
+                    className="text-gray-600"
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {expense.description}
+                  </Text>
+                  <Text
+                    className="text-gray-500"
+                    style={{
+                      fontSize: 12,
+                    }}
+                  >
+                    {createBy[index]?.uid
+                      ? createBy[index]?.uid == auth.currentUser.uid
+                        ? `you paid ${Math.abs(expense.amounts).toLocaleString(
+                            "de-De"
+                          )}`
+                        : `${createBy[index]?.username} paid ${Math.abs(
+                            expense.amounts
+                          ).toLocaleString("de-De")}`
+                      : ""}
+                  </Text>
+                </View>
+                <View className="flex-col items-end">
+                  <Text
+                    className={
+                      createBy[index]?.uid == auth.currentUser.uid
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {createBy[index]?.uid
+                      ? createBy[index]?.uid == auth.currentUser.uid
+                        ? "you lent"
+                        : `${createBy[index]?.username} lent`
+                      : ""}
+                  </Text>
+                  <Text
+                    className={
+                      createBy[index]?.uid == auth.currentUser.uid
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {Math.abs(
+                      expense.participants
+                        .slice(1)
+                        .reduce((acc, curr) => acc + curr.amount, 0)
+                        .toFixed(0)
+                    ).toLocaleString("de-De")}{" "}
+                    vnd
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
       </View>
 

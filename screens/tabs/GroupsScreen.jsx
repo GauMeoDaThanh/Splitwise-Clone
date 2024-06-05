@@ -1,6 +1,9 @@
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import { useFocusEffect } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Text,
   TextInput,
@@ -17,11 +20,12 @@ import AppBar from "../../components/AppBar";
 import AddToolBar from "../../components/AddToolBar";
 import ButtonAddExpense from "../../components/ButtonAddExpense";
 import GroupService from "../../services/group";
-import ExpenseService from "../../services/expense";
-import UserService from "../../services/user";
+import RadioButtons from "react-native-radio-buttons";
 import { auth } from "../../firebaseConfig";
+import ExpenseService from "../../services/expense";
 
 const GroupsScreen = () => {
+  console.warn = () => {};
   const isFocused = useIsFocused();
   const navigation = useNavigation();
   const [groups, setGroups] = useState([]);
@@ -43,6 +47,9 @@ const GroupsScreen = () => {
     "Friend",
     "Other",
   ];
+  const toggleFilterOptions = () => {
+    setShowFilterOptions(!showFilterOptions);
+  };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -55,11 +62,6 @@ const GroupsScreen = () => {
   }, []);
 
 
-
-  const toggleFilterOptions = () => {
-    setShowFilterOptions(!showFilterOptions);
-  };
-
   useEffect(() => {
     if (!isFocused) {
       setSelectedId("All groups");
@@ -67,6 +69,29 @@ const GroupsScreen = () => {
       setSearchTerm("");
     }
   }, [isFocused]);
+
+  // use FocusEffect to get all the expense when focus
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchExpenses = async () => {
+        try {
+          // Tổng chi phí đã trả trong group
+          let differenceList = [];
+          expensesList = [];
+          for (group of groups) {
+            const expensesByGr = await ExpenseService.getInstance().getExpensesByGroupId(group.id);
+            expensesList.push(expensesByGr);
+            differenceList.push(await ExpenseService.getInstance().getYourPaidByGroup(expensesByGr));
+          }
+          setTotalAmount(await ExpenseService.getInstance().getTotalDifference(differenceList));
+          setYourExpenseByGroup(differenceList);
+        } catch (error) {
+          console.error("Error fetching expenses:", error);
+        }
+      };
+      fetchExpenses();
+    }, [groups])
+  );
 
   useEffect(() => {
       GroupService.getInstance().listenToGroupList(async (groups) => {
@@ -148,6 +173,10 @@ const GroupsScreen = () => {
               data={groups.filter(
                 (group) =>
                   (selectedId === "All groups" ||
+                    (selectedId === "Groups you owe" &&
+                      group.amountOwned < 0) ||
+                    (selectedId === "Groups that owe you" &&
+                      group.amountOwned > 0) ||
                     group.type.toLowerCase() === selectedId.toLowerCase()) &&
                   group.name
                     .toLowerCase()
@@ -187,14 +216,26 @@ const GroupsScreen = () => {
                         </Text>
                         <Text
                           style={{
-                            color: "#0B9D7E",
+                            color:
+                              yourExpenseByGroup[index] >= 0
+                                ? "#0B9D7E"
+                                : "#990000",
                             fontWeight: 500,
                           }}
                         >
-                        {
-                          yourExpenseByGroup[index] > 0 ? 'You are owed ' + yourExpenseByGroup[index] + ' vnd'
-                                  : (yourExpenseByGroup[index] == 0 ? 'You settled up': 'You owed ' + -yourExpenseByGroup[index] + ' vnd')
-                       }
+                          {yourExpenseByGroup[index] > 0
+                            ? "You lent " +
+                              Math.abs(
+                                yourExpenseByGroup[index]
+                              ).toLocaleString("de-DE") +
+                              " vnd"
+                            : yourExpenseByGroup[index] == 0
+                            ? "Settled up"
+                            : "You owed " +
+                              Math.abs(
+                                yourExpenseByGroup[index]
+                              ).toLocaleString("de-De") +
+                              " vnd"}
                         </Text>
                       </View>
                     </View>
