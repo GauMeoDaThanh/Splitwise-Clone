@@ -1,4 +1,8 @@
-import { useIsFocused, useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Text,
@@ -18,6 +22,7 @@ import ButtonAddExpense from "../../components/ButtonAddExpense";
 import GroupService from "../../services/group";
 import RadioButtons from "react-native-radio-buttons";
 import { auth } from "../../firebaseConfig";
+import ExpenseService from "../../services/expense";
 
 const GroupsScreen = () => {
   console.warn = () => {};
@@ -28,6 +33,8 @@ const GroupsScreen = () => {
   const [selectedId, setSelectedId] = useState("All groups");
   const [searchTerm, setSearchTerm] = useState("");
   const [userId, setUserId] = useState(auth.currentUser.uid);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [yourExpenseByGroup, setYourExpenseByGroup] = useState([]);
 
   const radioButtons = [
     "All groups",
@@ -39,6 +46,9 @@ const GroupsScreen = () => {
     "Friend",
     "Other",
   ];
+  const toggleFilterOptions = () => {
+    setShowFilterOptions(!showFilterOptions);
+  };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -50,10 +60,6 @@ const GroupsScreen = () => {
     return unsubscribe;
   }, []);
 
-  const toggleFilterOptions = () => {
-    setShowFilterOptions(!showFilterOptions);
-  };
-
   useEffect(() => {
     if (!isFocused) {
       setSelectedId("All groups");
@@ -61,6 +67,60 @@ const GroupsScreen = () => {
       setSearchTerm("");
     }
   }, [isFocused]);
+
+  // use FocusEffect to get all the expense when focus
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchExpenses = async () => {
+        try {
+          //  Tìm các hoá đơn theo group
+          expensesList = [];
+          let differenceList = [];
+          for (group of groups) {
+            const expensesByGr =
+              await ExpenseService.getInstance().getExpensesByGroupId(group.id);
+            expensesList.push(expensesByGr);
+            let sumByGr = 0;
+            let yourOwe = 0;
+            let yourLent = 0;
+            for (expense of expensesByGr) {
+              sumByGr =
+                sumByGr +
+                parseFloat(
+                  expense.participants
+                    .reduce((acc, curr) => acc + curr.amount, 0)
+                    .toFixed(0)
+                );
+              for (par of expense.participants) {
+                if (par.userId === auth.currentUser.uid) {
+                  yourOwe += parseFloat(par.amount);
+                }
+              }
+              // Khoản bạn đã trả trong group đó
+              if (expense.paidBy === auth.currentUser.uid) {
+                yourLent += parseFloat(expense.amounts);
+              }
+            }
+            differenceList.push((yourLent - yourOwe).toFixed(0));
+          }
+          const numberArray = differenceList.map(parseFloat);
+          const totalDifference = numberArray.reduce(
+            (sum, current) => sum + current,
+            0
+          );
+          setTotalAmount(totalDifference);
+          setYourExpenseByGroup(differenceList);
+          // add amount owned property to each group
+          for (let i = 0; i < groups.length; i++) {
+            groups[i].amountOwned = differenceList[i];
+          }
+        } catch (error) {
+          console.error("Error fetching expenses:", error);
+        }
+      };
+      fetchExpenses();
+    }, [groups])
+  );
 
   useEffect(() => {
     GroupService.getInstance().listenToGroupList((groups) => {
@@ -86,16 +146,33 @@ const GroupsScreen = () => {
         <View className="flex-cols px-3">
           <View className="flex-row space-x-40">
             <View className="flex-col py-4">
-              <Text className="font-bold text-xl">Groups owe you</Text>
-              <Text
-                className="font-bold"
-                style={{
-                  color: "#0B9D7E",
-                  fontSize: 17,
-                }}
-              >
-                3.500.00vnđ
-              </Text>
+              {totalAmount > 0 ? (
+                <>
+                  <Text className="font-bold text-xl">Groups owe you</Text>
+                  <Text
+                    className="font-bold"
+                    style={{
+                      color: "#0B9D7E",
+                      fontSize: 17,
+                    }}
+                  >
+                    {Math.abs(totalAmount).toLocaleString("de-DE")} vnd
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text className="font-bold text-xl">You owe groups</Text>
+                  <Text
+                    className="font-bold"
+                    style={{
+                      color: "#990000",
+                      fontSize: 17,
+                    }}
+                  >
+                    {Math.abs(totalAmount).toLocaleString("de-DE")} vnd
+                  </Text>
+                </>
+              )}
             </View>
             <View className="flex-row items-center">
               <TouchableOpacity
@@ -118,13 +195,17 @@ const GroupsScreen = () => {
               data={groups.filter(
                 (group) =>
                   (selectedId === "All groups" ||
+                    (selectedId === "Groups you owe" &&
+                      group.amountOwned < 0) ||
+                    (selectedId === "Groups that owe you" &&
+                      group.amountOwned > 0) ||
                     group.type.toLowerCase() === selectedId.toLowerCase()) &&
                   group.name
                     .toLowerCase()
                     .includes(searchTerm.trim().toLowerCase())
               )}
               keyExtractor={(item) => item.id}
-              renderItem={({ item }) => {
+              renderItem={({ item, index }) => {
                 return (
                   <TouchableOpacity
                     onPress={() => {
@@ -157,23 +238,27 @@ const GroupsScreen = () => {
                         </Text>
                         <Text
                           style={{
-                            color: "#0B9D7E",
+                            color:
+                              yourExpenseByGroup[index] >= 0
+                                ? "#0B9D7E"
+                                : "#990000",
                             fontWeight: 500,
                           }}
                         >
-                          you are owed 3.000.000vnđ
+                          {yourExpenseByGroup[index] > 0
+                            ? "You lent " +
+                              Math.abs(
+                                yourExpenseByGroup[index]
+                              ).toLocaleString("de-DE") +
+                              " vnd"
+                            : yourExpenseByGroup[index] == 0
+                            ? "settled up"
+                            : "You owed " +
+                              Math.abs(
+                                yourExpenseByGroup[index]
+                              ).toLocaleString("de-De") +
+                              " vnd"}
                         </Text>
-                        <View className="flex-row">
-                          <Text>Đạt owes you </Text>
-                          <Text
-                            style={{
-                              color: "#0B9D7E",
-                              fontWeight: "500",
-                            }}
-                          >
-                            200.00vnđ
-                          </Text>
-                        </View>
                       </View>
                     </View>
                   </TouchableOpacity>

@@ -113,20 +113,12 @@ class GroupService {
     console.log("start add group");
     try {
       const groupRef = await addDoc(collection(db, GROUP_COLLECTION), group);
-      if (imgUri) {
-        await this.uploadAvatar(groupRef.id, imgUri);
-      }
       console.log("Document written with ID: ", groupRef.id);
-
-      Alert.alert("Success", "Group created successfully", [
-        {
-          text: "OK",
-          onPress: () => navigation.navigate("Groups"),
-        },
-      ]);
-
-      // Add activity
-      ActivityService.getInstance().aCreateGroup(groupRef.id, group["name"]);
+      ActivityService.getInstance().aCreateGroup(
+        groupRef.id,
+        group["name"],
+        group["members"]
+      );
     } catch (e) {
       console.log(e);
     }
@@ -350,6 +342,25 @@ class GroupService {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  async getAllGroup() {
+    const groupList = [];
+    const querySnapshot = await getDocs(collection(db, GROUP_COLLECTION));
+    querySnapshot.forEach((doc) => {
+      groupList.push({ id: doc.id, ...doc.data() });
+    });
+    return groupList;
+  }
+
+  async getGroupOfIdAcc(idAcc) {
+    const myGroup = [];
+    for (const group of await this.getAllGroup()) {
+      if (group.members.includes(idAcc) || group.createBy.includes(idAcc)) {
+        myGroup.push(group);
+      }
+    }
+    return myGroup;
   }
 }
 

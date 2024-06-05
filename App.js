@@ -1,6 +1,8 @@
 import React from "react";
 import AppNavigation from "./navigation/AppNavigation";
 import { SafeAreaView, View, Dimensions } from "react-native";
+import DetailsExpense from "./screens/DetailsExpense";
+
 
 const App = () => {
   // Lấy kích thước của màn hình thiết bị
@@ -18,6 +20,8 @@ const App = () => {
     <SafeAreaView style={containerStyle}>
       <View style={containerStyle}>
         <AppNavigation />
+        {/* <AddImageExpense></AddImageExpense> */}
+        {/* <DetailsExpense></DetailsExpense> */}
       </View>
     </SafeAreaView>
   );
