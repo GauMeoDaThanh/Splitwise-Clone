@@ -114,6 +114,7 @@ const GroupsScreen = () => {
           for (let i = 0; i < groups.length; i++) {
             groups[i].amountOwned = differenceList[i];
           }
+          setGroups(groups);
         } catch (error) {
           console.error("Error fetching expenses:", error);
         }
@@ -239,24 +240,23 @@ const GroupsScreen = () => {
                         <Text
                           style={{
                             color:
-                              yourExpenseByGroup[index] >= 0
-                                ? "#0B9D7E"
-                                : "#990000",
+                              // yourExpenseByGroup[index] >= 0
+                              item.amountOwned >= 0 ? "#0B9D7E" : "#990000",
                             fontWeight: 500,
                           }}
                         >
-                          {yourExpenseByGroup[index] > 0
+                          {item.amountOwned > 0
                             ? "You lent " +
-                              Math.abs(
-                                yourExpenseByGroup[index]
-                              ).toLocaleString("de-DE") +
+                              Math.abs(item.amountOwned).toLocaleString(
+                                "de-DE"
+                              ) +
                               " vnd"
-                            : yourExpenseByGroup[index] == 0
+                            : item.amountOwned == 0
                             ? "settled up"
                             : "You owed " +
-                              Math.abs(
-                                yourExpenseByGroup[index]
-                              ).toLocaleString("de-De") +
+                              Math.abs(item.amountOwned).toLocaleString(
+                                "de-De"
+                              ) +
                               " vnd"}
                         </Text>
                       </View>

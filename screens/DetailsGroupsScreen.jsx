@@ -142,17 +142,6 @@ const DetailsGroupsScreen = ({ route }) => {
           >
             {group.name}
           </Text>
-          {/* <View className="flex-row space-x-1">
-            <Text className="text-gray-600">Chau N. owes you</Text>
-            <Text
-              style={{
-                color: "#0B9D7E",
-                fontWeight: 400,
-              }}
-            >
-              {amountOwed}
-            </Text>
-          </View> */}
         </View>
       </View>
       <View
@@ -161,23 +150,6 @@ const DetailsGroupsScreen = ({ route }) => {
           top: -35,
         }}
       >
-        {/* <TouchableOpacity
-          className="flex-row border border-gray-400 rounded-md px-4 py-1.5"
-          style={{
-            borderBottomWidth: 3,
-          }}
-          onPress={() => navigation.navigate("Balances")}
-        >
-          <Text
-            className="text-gray-700"
-            style={{
-              fontSize: 15,
-              fontWeight: 500,
-            }}
-          >
-            Balances
-          </Text>
-        </TouchableOpacity> */}
         <TouchableOpacity
           className="flex-row border border-gray-400 rounded-md px-4 py-1.5"
           style={{
@@ -257,8 +229,13 @@ const DetailsGroupsScreen = ({ route }) => {
           </Text>
         </TouchableOpacity>
       </View>
-      <View className="flex-col space-y-6 px-1">
-        <View className="flex-col px-2 space-y-3">
+      <View className="flex-col space-y-6 px-1 flex-1">
+        {/* <View className="flex-row justify-center space-x-3"> */}
+        <ScrollView
+          className="flex-col px-2 space-y-3 flex-1"
+          contentContainerStyle={{ paddingBottom: 200 }}
+          showsVerticalScrollIndicator={false}
+        >
           {expenses.map((expense, index) => (
             <View key={index} className="flex-row ">
               <TouchableOpacity
@@ -341,7 +318,10 @@ const DetailsGroupsScreen = ({ route }) => {
                       : ""}
                   </Text>
                 </View>
-                <View className="flex-col items-end">
+                <View
+                  className="flex-col items-end"
+                  style={{ alignItems: "flex-end" }}
+                >
                   <Text
                     className={
                       createBy[index]?.uid == auth.currentUser.uid
@@ -375,14 +355,14 @@ const DetailsGroupsScreen = ({ route }) => {
                         .slice(1)
                         .reduce((acc, curr) => acc + curr.amount, 0)
                         .toFixed(0)
-                    ).toLocaleString("de-De")}{" "}
+                    ).toLocaleString("de-De")}
                     vnd
                   </Text>
                 </View>
               </TouchableOpacity>
             </View>
           ))}
-        </View>
+        </ScrollView>
       </View>
 
       <View

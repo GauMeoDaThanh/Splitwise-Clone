@@ -9,6 +9,7 @@ import {
   updateDoc,
   getDocs,
   where,
+  orderBy,
 } from "firebase/firestore";
 import FriendService from "./friend";
 import AuthenticateService from "./authentication";
@@ -311,7 +312,8 @@ class ExpenseService {
     const querySnapshot = await getDocs(
       query(
         collection(db, "expenses"),
-        where("groupId", "array-contains", groupId)
+        where("groupId", "array-contains", groupId),
+        orderBy("createAt", "desc")
       )
     );
     querySnapshot.forEach((doc) => {
