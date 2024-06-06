@@ -67,14 +67,13 @@ const ActivityScreen = () => {
           )}
         />
       )} */}
-      {/* <ActivityAddGroup></ActivityAddGroup>
+        {/* <ActivityAddGroup></ActivityAddGroup>
         <ActivityDeleteGroup></ActivityDeleteGroup>
         <ActivityEditGroup></ActivityEditGroup>
         <ActivityAddMember></ActivityAddMember>
         <ActivityDeleteMember></ActivityDeleteMember>
         <ActivityEditWhiteboard></ActivityEditWhiteboard>
-        <ActivityAddFriends></ActivityAddFriends>
-        <ActivityDeleteFriends></ActivityDeleteFriends> */}
+        <ActivityAddFriends></ActivityAddFriends> */}
         <ActivityExpense></ActivityExpense>
         <ActivityPayment></ActivityPayment>
     </View>

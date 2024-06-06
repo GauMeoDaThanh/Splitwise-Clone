@@ -12,12 +12,13 @@ const ActivityExpense = () => {
         >
             <View className="relative">
                 <Image
-                    source={require("../assets/icons/group.png")}
+                    source={require("../assets/icons/expense_icon.png")}
                     style={{
                         width: 50,
                         height: 50,
-                        borderRadius: 25,
+                        borderRadius: 25, 
                     }}
+                    
                 />
                 <Image
                     source={require("../assets/images/avatar_image.jpg")}
