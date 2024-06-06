@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
   Text,
@@ -8,7 +8,7 @@ import {
   Image,
   ScrollView,
   FlatList,
-  LogBox
+  LogBox,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ButtonAddExpense from "../components/ButtonAddExpense";
@@ -29,33 +29,49 @@ const DetailsGroupsScreen = ({ route }) => {
   const [expenses, setExpenses] = useState([]);
   const [createBy, setCreateBy] = useState([]);
   const [showEditOptions, setShowEditOptions] = useState(false);
-  
-    LogBox.ignoreLogs([
+  const [surplus, setSurplus] = useState([]);
+
+  LogBox.ignoreLogs([
     "Possible Unhandled Promise Rejection",
     "TypeError: Cannot read property 'indexOf' of undefined",
-    ]);
-  
-  useEffect(() => {
-    GroupService.getInstance().listenToGroupDetail(groupId, async (group) => {
-      setGroup(group);
-      try {
-        const expenseList =
-          await ExpenseService.getInstance().getExpensesByGroupId(groupId);
-        setExpenses(expenseList); // Cập nhật state với dữ liệu thực
-        let paidUsers = [];
-        for (expense of expenseList) {
-          paidUsers.push(
-            await UserService.getInstance().getUserById(expense.createBy)
-          );
-        }
-        setCreateBy(paidUsers);
-      } catch (error) {
-        console.log("Error to fetch data, ", error);
-      }
-    });
-  }, [groupId]);
+  ]);
 
-    const toggleEditOptions = () => {
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        GroupService.getInstance().listenToGroupDetail(
+          groupId,
+          async (group) => {
+            setGroup(group);
+            try {
+              const expenseList =
+                await ExpenseService.getInstance().getExpensesByGroupId(
+                  groupId
+                );
+              let paidUsers = [];
+              for (expense of expenseList) {
+                paidUsers.push(
+                  await UserService.getInstance().getUserById(expense.createBy)
+                );
+              }
+              setSurplus(
+                await ExpenseService.getInstance().calculateSurplusAmounts(
+                  expenseList
+                )
+              );
+              setExpenses(expenseList); // Cập nhật state với dữ liệu thực
+              setCreateBy(paidUsers);
+            } catch (error) {
+              console.log("Error to fetch data, ", error);
+            }
+          }
+        );
+      };
+      fetchData();
+    }, [groupId])
+  );
+
+  const toggleEditOptions = () => {
     setShowEditOptions(!showEditOptions);
   };
   const handleOptionPress = (screen) => {
@@ -244,7 +260,14 @@ const DetailsGroupsScreen = ({ route }) => {
         >
           {expenses.map((expense, index) => (
             <View key={index} className="flex-row ">
-              <TouchableOpacity className="flex-row space-x-5 px-1 items-center" onPress={() => navigation.navigate("DetailExpense",{expenseId:expense.id})}>
+              <TouchableOpacity
+                className="flex-row space-x-5 px-1 items-center"
+                onPress={() =>
+                  navigation.navigate("DetailExpense", {
+                    expenseId: expense.id,
+                  })
+                }
+              >
                 <View className="flex-col items-center">
                   <Text
                     className="text-gray-600"
@@ -332,7 +355,9 @@ const DetailsGroupsScreen = ({ route }) => {
                       fontWeight: 500,
                     }}
                   >
-                    {createBy[index]?.uid
+                    {surplus[index] === "0"
+                      ? ""
+                      : createBy[index]?.uid
                       ? createBy[index]?.uid == auth.currentUser.uid
                         ? "you lent"
                         : `${createBy[index]?.username} lent`
@@ -349,13 +374,7 @@ const DetailsGroupsScreen = ({ route }) => {
                       fontWeight: 500,
                     }}
                   >
-                    {Math.abs(
-                      expense.participants
-                        .slice(1)
-                        .reduce((acc, curr) => acc + curr.amount, 0)
-                        .toFixed(0)
-                    ).toLocaleString("de-De")}
-                    vnd
+                    {surplus[index] === "0" ? "" : surplus[index] + " vnd"}
                   </Text>
                 </View>
               </TouchableOpacity>

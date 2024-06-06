@@ -99,7 +99,7 @@ setSelectedFriends((prevSelectedFriends) =>
                     for (const friend of selectedFriends) {
                       splitParticipants.push({
                         userId: friend.uid,
-                        amount: parseFloat(amounts) / selectedFriends.length.toFixed(0),
+                        amount: parseFloat((parseFloat(amounts) / selectedFriends.length).toFixed(0)),
                         settleUp: isFirstFriend
                       });
                       isFirstFriend = false; 
@@ -111,7 +111,7 @@ setSelectedFriends((prevSelectedFriends) =>
                     for (friend of friendsList) {
                         splitParticipants.push({
                             userId: friend.uid,
-                            amount: parseFloat(valueInputs[friend.uid]),
+                            amount: parseFloat(parseFloat(valueInputs[friend.uid]).toFixed(0)),
                             settleUp: isFirstFriend
                         })
                       isFirstFriend = false; 
@@ -123,7 +123,7 @@ setSelectedFriends((prevSelectedFriends) =>
                     for (friend of friendsList) {
                         splitParticipants.push({
                             userId: friend.uid,
-                            amount: parseFloat(valueInputs[friend.uid]) / 100 * amounts,
+                            amount: parseFloat((parseFloat(valueInputs[friend.uid]) / 100 * amounts).toFixed(0)),
                             settleUp: false
                         })
                       isFirstFriend = false;

@@ -27,28 +27,15 @@ const AddExpenseScreen = (props) => {
   const [money, setMoney] = useState("");
   const [isFocused, setIsFocused] = useState(0);
   const [isBothFieldsFilled, setIsBothFieldsFilled] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  let [selectedParticipants, setSelectedParticipants] = useState([
+    { userId: auth.currentUser.uid },
+  ]);
 
   useEffect(() => {
     // Focus vào TextInput khi mở trang
     textInputRef.current.focus();
   }, []); // Chỉ chạy một lần sau khi mở trang
-
-  // const handleAddImageExpense = () => {
-  //     navigation.navigate('AddImageExpense');
-  //     };
-
-  // Làm Gợi ý khi nhận mail hoặc tên user
-  const [suggestions, setSuggestions] = useState([]);
-  let [selectedParticipants, setSelectedParticipants] = useState([
-    { userId: auth.currentUser.uid },
-  ]);
-  useEffect(() => {
-    setIsBothFieldsFilled(description !== "" && money !== "");
-    if (props.route.params) {
-      setDescription(props.route.params.description);
-      setMoney(props.route.params.amounts);
-    }
-  }, [description, money]);
 
   handleInputParticipants = async (text) => {
     const filteredSuggestions = await expenseService.handleInputParticipants(
@@ -73,6 +60,14 @@ const AddExpenseScreen = (props) => {
       console.log("Friend or group is already selected!");
     }
   };
+  // Check điều kiện
+  const check = () => {
+    if (selectedParticipants.length <= 1) {
+      alert("Please choose someone to split the bill");
+      return false;
+    }
+    return true;
+  };
   // Chia hoá đơn
   const handleSplitExpense = () => {
     navigation.navigate("SplitExpenseScreen", {
@@ -81,6 +76,43 @@ const AddExpenseScreen = (props) => {
       money: money,
     });
     setSelectedParticipants([{ userId: auth.currentUser.uid }]);
+  };
+  // Tạo hoá đơn
+  const handleCreateExpense = async () => {
+    if (!check()) return;
+    let groupId = [];
+    for (par of selectedParticipants) {
+      if (par.groupId) {
+        groupId.push(par.groupId);
+      }
+    }
+    let splitParticipants = [];
+    const participantsList = await expenseService.getParticipants(
+      selectedParticipants
+    );
+    let isFirstFriend = true;
+    for (const participant of participantsList) {
+      splitParticipants.push({
+        userId: participant.uid,
+        amount: parseFloat(
+          (parseFloat(money) / participantsList.length).toFixed(0)
+        ),
+        settleUp: isFirstFriend,
+      });
+      isFirstFriend = false;
+    }
+    try {
+      await expenseService.createExpense(
+        new Date(),
+        parseFloat(money),
+        groupId,
+        description,
+        splitParticipants
+      );
+      navigation.navigate("Friends");
+    } catch (e) {
+      console.error("Fail to add expense ", e);
+    }
   };
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]} className="py-5">
@@ -91,7 +123,7 @@ const AddExpenseScreen = (props) => {
           action={"Save"}
           isDisabled={!isBothFieldsFilled}
           disabled={!isBothFieldsFilled}
-          // onPress={handleCreateExpense}
+          onPress={handleCreateExpense}
         ></AddToolBar>
       </View>
       <View

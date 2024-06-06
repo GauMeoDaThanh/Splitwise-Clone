@@ -76,10 +76,10 @@ class ExpenseService {
       participants,
     };
     try {
-      // const docRef = await addDoc(collection(db, "expenses"), expense);
-      // console.log("Add expense successfully with ID: ", docRef.id);
-      // expenseId = docRef.id;
-      // console.log("ID Exp", this.expenseId);
+      const docRef = await addDoc(collection(db, "expenses"), expense);
+      console.log("Add expense successfully with ID: ", docRef.id);
+      expenseId = docRef.id;
+      console.log("ID Exp", this.expenseId);
       const members = participants
         .filter((participant) => participant.userId !== expense.paidBy)
         .map((participant) => participant.userId);
@@ -375,10 +375,7 @@ class ExpenseService {
       const expense = await this.getExpenseById(expenseId);
       const participants = expense.participants;
       debt.push(
-        userPaidBy +
-          " paid " +
-          Math.abs(expense.amounts).toLocaleString("de-De") +
-          "vnd"
+        userPaidBy + " paid " + expense.amounts.toLocaleString("de-De") + "vnd"
       );
 
       const usernames = await Promise.all(
@@ -404,7 +401,7 @@ class ExpenseService {
             " owes " +
             userPaidBy +
             " " +
-            Math.abs(participants[i].amount).toLocaleString("de-De") +
+            participants[i].amount.toLocaleString("de-De") +
             " vnd"
         );
       }
@@ -412,6 +409,93 @@ class ExpenseService {
     } catch (e) {
       console.log(e.message);
     }
+  }
+
+  async getYourPaidByGroup(expensesByGroup) {
+    let yourOwe = 0;
+    let yourLent = 0;
+    let othersPaid = 0;
+    for (expense of expensesByGroup) {
+      // Chỉ tính những bill chưa thanh toán
+      if (!expense.isSettle) {
+        for (par of expense.participants) {
+          if (par.userId === auth.currentUser.uid) {
+            // Tiền bạn chưa trả bill họ
+            if (!par.settleUp) {
+              yourOwe += parseFloat(par.amount);
+            }
+          }
+        }
+        // Khoản bạn đã trả trong group, và người khác đã trả bill bạn
+        if (expense.paidBy === auth.currentUser.uid) {
+          yourLent += expense.amounts;
+          // Tiền phải trả cho bill mình
+          yourOwe += expense.participants[0].amount;
+          for (par of expense.participants.slice(1)) {
+            if (par.settleUp) {
+              othersPaid += par.amount;
+            }
+          }
+        }
+      }
+    }
+    //Tổng bạn trả, tổng nợ và tổng họ đã trả cho bill bạn
+    return (yourLent - yourOwe - othersPaid).toFixed(0);
+  }
+
+  async getTotalDifference(differenceList) {
+    const numberArray = differenceList.map(parseFloat);
+    const totalDifference = numberArray.reduce(
+      (sum, current) => sum + current,
+      0
+    );
+    return totalDifference;
+  }
+
+  async handlePayment(expenseId, userId) {
+    const expenseRef = doc(db, "expenses", expenseId);
+    try {
+      const expenseDoc = await getDoc(expenseRef);
+      const expenseData = expenseDoc.data();
+      const participants = expenseData.participants;
+      const participantIndex = participants.findIndex(
+        (participant) => participant.userId === userId
+      );
+      if (participantIndex === -1) {
+        throw new Error("User not found in expense participants");
+      }
+
+      const updatedParticipants = [
+        ...participants.slice(0, participantIndex),
+        { ...participants[participantIndex], settleUp: true },
+        ...participants.slice(participantIndex + 1),
+      ];
+      await updateDoc(expenseRef, {
+        participants: updatedParticipants,
+        isSettle: updatedParticipants.every(
+          (participant) => participant.settleUp === true
+        ),
+      });
+    } catch (error) {
+      console.error("Error processing payment:", error.message); // Handle errors
+    }
+  }
+
+  async calculateSurplusAmounts(expenseList) {
+    const surplusAmounts = [];
+    for (const expense of expenseList) {
+      const totalOwed = Math.abs(
+        expense.participants
+          .slice(1)
+          .reduce(
+            (acc, curr) => acc + (curr.settleUp === false ? curr.amount : 0),
+            0
+          )
+      );
+      const formattedAmount = totalOwed.toLocaleString("de-De");
+      surplusAmounts.push(formattedAmount);
+    }
+    return surplusAmounts;
   }
 
   async getYourPaidByGroup(expensesByGroup) {
