@@ -17,7 +17,6 @@ const DetailsToolBar = (props) => {
           ]
         );
       };
-    
   return (
     <View
       style={[

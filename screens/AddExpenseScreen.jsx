@@ -15,8 +15,22 @@ import ExpenseService from "../services/expense";
 
 
 const expenseService = ExpenseService.getInstance();
-import { useNavigation } from '@react-navigation/native';
 import { auth } from "../firebaseConfig";
+import { useNavigation } from "@react-navigation/native";
+import BtnAddFriendToBill from "../components/BtnAddFriendToBill";
+// Danh sách các bạn bè
+const searchFriendsList = [
+  { name: "Tấn Dũng", avatar: require("../assets/icons/account.png") },
+  { name: "John Doe", avatar: require("../assets/icons/account.png") },
+  {
+    name: "Nguyễn Đoàn Bảo Châu",
+    avatar: require("../assets/icons/account.png"),
+  },
+];
+// Danh sách các bạn bè
+const selectFriendsList = [
+  { name: "Ái Lam", avatar: require("../assets/icons/account.png") },
+];
 const AddExpenseScreen = (props) => {
     const textInputRef = useRef(null);
     const navigation = useNavigation();
@@ -181,7 +195,22 @@ const AddExpenseScreen = (props) => {
                     </View>
                 )}
             </View>
-
+         <View style={styles.buttonListContainer}>
+        {selectFriendsList.map((friend, index) => (
+          <BtnAddFriendToBill
+            name={friend.name}
+            avatar={require("../assets/icons/account.png")}
+            isSelected={true} 
+          ></BtnAddFriendToBill>
+        ))}
+        {searchFriendsList.map((friend, index) => (
+          <BtnAddFriendToBill
+            name={friend.name}
+            avatar={require("../assets/icons/account.png")}
+            isSelected={false}  // Kiểm tra xem nút này có được chọn không
+          ></BtnAddFriendToBill>
+        ))}
+      </View>
             <View
                 style={[
                     {
@@ -191,7 +220,7 @@ const AddExpenseScreen = (props) => {
                         alignItems: "center",
                     },
                 ]}
-            >
+        >
                 <View style={{ flexDirection: "row", marginVertical: 10 }}>
                     <TouchableOpacity style={styles.buttonStyle}>
                         <Image
@@ -258,28 +287,18 @@ const AddExpenseScreen = (props) => {
              <View
         style={[{ flex: 10, borderTopColor: "#EEEEEE", borderTopWidth: 1 }]}
       >
-        {/* <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: 'flex-end' }} onPress={handleAddImageExpense}>
-       
-          <Image
-            source={require("../assets/icons/camera.png")}
-            style={{ width: 60, height: 60 }}
-          />
-  
-        </TouchableOpacity> */}
+        
       </View>
-      {/* <View style={[{ isFocused === 2 ? flex: 50 : flex: 36 }]}>
-        <KeyboardAvoidingView
-          // style={{ flex: 1 }}
-          // behavior={Platform.OS === "ios" ? "padding" : "height"}
-          // keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-        ></KeyboardAvoidingView>
-      </View> */}
       {isFocused === 2 && (
-        <View style={{ flex: 36 }}>{<KeyboardAvoidingView></KeyboardAvoidingView>}</View>
+        <View style={{ flex: 36 }}>
+          {<KeyboardAvoidingView></KeyboardAvoidingView>}
+        </View>
       )}
 
       {isFocused !== 2 && (
-        <View style={{ flex: 50 }}>{<KeyboardAvoidingView></KeyboardAvoidingView>}</View>
+        <View style={{ flex: 50 }}>
+          {<KeyboardAvoidingView></KeyboardAvoidingView>}
+        </View>
       )}
     </View>
     );
@@ -298,6 +317,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 6,
     padding: 3,
+  },
+  buttonListContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    borderBottomColor: "#EEEEEE",
+    borderBottomWidth: 1,
+    flexWrap: "wrap", // Để các nút tự động xuống dòng khi hết chỗ
+    marginTop: 10,
   },
 });
 
