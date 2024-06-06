@@ -127,16 +127,16 @@ const AddExpenseScreen = (props) => {
       <View style={{ position: "fixed" }}>
         {suggestions.length > 0 ? (
           <FlatList
+            keyExtractor={(item) => item?.uid}
             data={suggestions} // Truyền trạng thái gợi ý cập nhật
             renderItem={({ item, index }) => (
               <TouchableOpacity
-                key={index}
+                key={item?.uid}
                 onPress={() => handleSuggestionSelect(item)}
               >
                 <Text>{item.type ? item.name : item.username}</Text>
               </TouchableOpacity>
             )}
-            keyExtractor={(item) => item.uid}
             style={{
               height: 100,
               borderColor: "gray",

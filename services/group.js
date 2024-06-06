@@ -205,11 +205,11 @@ class GroupService {
     }
   }
 
-    async getGroupInfo(groupId) {
-        try {
-            console.log("start get group infomation");
-            const groupRef = doc(db, GROUP_COLLECTION, groupId);
-            const groupSnap = await getDoc(groupRef);
+  async getGroupInfo(groupId) {
+    try {
+      console.log("start get group infomation");
+      const groupRef = doc(db, GROUP_COLLECTION, groupId);
+      const groupSnap = await getDoc(groupRef);
 
       let groupInfo = groupSnap.data();
       groupInfo["createAt"] = groupInfo["createAt"]?.toDate().toDateString();
@@ -238,7 +238,6 @@ class GroupService {
       console.log(e);
     }
   }
-  
 
   async setGroupName(groupId, name) {
     try {
@@ -345,24 +344,23 @@ class GroupService {
     }
   }
 
-
-     async getGroupOfIdAcc(idAcc) {
-        const myGroup = [];
-        for (const group of await this.getAllGroup()) {
-            if (group.members.includes(idAcc) || group.createBy.includes(idAcc)) {
-                myGroup.push(group);
-            }
-        }
-        return myGroup;
-  } 
-
-    async getAllGroup() {
-        const groupList = [];
-        const querySnapshot = await getDocs(collection(db, GROUP_COLLECTION));
-        querySnapshot.forEach((doc) => {
-            groupList.push({ id: doc.id, ...doc.data() });
-        });
-        return groupList;
+  async getGroupOfIdAcc(idAcc) {
+    const myGroup = [];
+    for (const group of await this.getAllGroup()) {
+      if (group.members.includes(idAcc) || group.createBy.includes(idAcc)) {
+        myGroup.push(group);
+      }
     }
+    return myGroup;
   }
+
+  async getAllGroup() {
+    const groupList = [];
+    const querySnapshot = await getDocs(collection(db, GROUP_COLLECTION));
+    querySnapshot.forEach((doc) => {
+      groupList.push({ id: doc.id, ...doc.data() });
+    });
+    return groupList;
+  }
+}
 export default GroupService;

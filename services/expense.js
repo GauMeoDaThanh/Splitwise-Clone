@@ -24,6 +24,7 @@ import {
 } from "firebase/storage";
 import { storage } from "../firebaseConfig";
 import { useRef } from "react";
+import ActivityService from "./activity";
 
 const friendService = FriendService.getInstance();
 const authenticateService = AuthenticateService.getInstance();
@@ -57,7 +58,13 @@ class ExpenseService {
     return ExpenseService.instance;
   }
 
-  async createExpense(createAt, amounts, groupId, description, participants) {
+  async createExpense(
+    createAt,
+    amounts,
+    groupId = "",
+    description,
+    participants
+  ) {
     expense = {
       ...initExpense,
       createBy: auth.currentUser.uid,
@@ -69,10 +76,35 @@ class ExpenseService {
       participants,
     };
     try {
-      const docRef = await addDoc(collection(db, "expenses"), expense);
-      console.log("Add expense successfully with ID: ", docRef.id);
-      expenseId = docRef.id;
-      console.log("ID Exp", this.expenseId);
+      // const docRef = await addDoc(collection(db, "expenses"), expense);
+      // console.log("Add expense successfully with ID: ", docRef.id);
+      // expenseId = docRef.id;
+      // console.log("ID Exp", this.expenseId);
+      const members = participants
+        .filter((participant) => participant.userId !== expense.paidBy)
+        .map((participant) => participant.userId);
+      if (groupId != "") {
+        const groupInfo = await GroupService.getInstance().getGroupInfo(
+          groupId[0]
+        );
+        ActivityService.getInstance().aAddExpense(
+          groupId[0],
+          groupInfo.name,
+          expense.paidBy,
+          expense.participants,
+          expense.description,
+          members
+        );
+      } else {
+        ActivityService.getInstance().aAddExpense(
+          "",
+          "",
+          expense.paidBy,
+          expense.participants,
+          expense.description,
+          members
+        );
+      }
     } catch (e) {
       console.error("Error adding expense ", e);
     }

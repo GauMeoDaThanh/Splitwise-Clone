@@ -49,7 +49,6 @@ const DetailsExpense = ({ route }) => {
               user.username
             )
           );
-          console.log("debt", debt);
         } catch (error) {
           console.error("Error fetching user:", error);
         }

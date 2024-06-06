@@ -24,6 +24,7 @@ const ACTIVITY_TYPES = {
     "addMember",
   ],
   friend: ["addFriend", "deleteFriend"],
+  expense: ["addExpense", "addPayment"],
 };
 
 class ActivityService {
@@ -276,6 +277,49 @@ class ActivityService {
         },
       };
       console.log("start add delete member log");
+      const activityRef = await addDoc(
+        collection(db, ACTIVITY_COLLECTION),
+        activity
+      );
+      console.log("Document written with ID: ", activityRef.id);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async aAddExpense(
+    groupId,
+    groupName,
+    createBy,
+    participants,
+    description,
+    members
+  ) {
+    try {
+      let friendName = [];
+      if (groupId === "") {
+        for (let i = 0; i < members.length; i++) {
+          friendName[i] = await UserService.getInstance().getUsername(
+            members[i]
+          );
+        }
+      }
+
+      const activity = {
+        createBy: auth.currentUser.uid,
+        createAt: serverTimestamp(),
+        type: "addExpense",
+        additionalInfo: {
+          groupId: groupId,
+          groupName: groupName,
+          createBy: createBy,
+          participants: participants,
+          description: description,
+          members: members,
+          friendName: friendName,
+        },
+      };
+      console.log("start add add expense log");
       const activityRef = await addDoc(
         collection(db, ACTIVITY_COLLECTION),
         activity

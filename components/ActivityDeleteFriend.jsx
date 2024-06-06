@@ -11,24 +11,9 @@ import {
 } from "react-native";
 import { auth } from "../firebaseConfig";
 
-const ActivityExpense = ({ data }) => {
+const ActivityDeleteFriends = ({ data }) => {
   const dateTime = data.createAt.split(", ");
-  const participants = data.additionalInfo.participants;
-  let totalAmount = 0;
-  let userAmount = 0;
-  let userId = "";
-  if (data.createBy === auth.currentUser.uid) {
-    totalAmount = participants
-      .filter((participant) => participant.userId !== auth.currentUser.uid)
-      .reduce((sum, participant) => sum + participant.amount, 0)
-      .toFixed(0);
-  } else {
-    userAmount = participants.filter(
-      (item) => item.userId === auth.currentUser.uid
-    );
-    userId = userAmount[0].userId;
-    userAmount = userAmount.length > 0 ? userAmount[0].amount.toFixed(0) : 0;
-  }
+
   return (
     <View
       className="flex-row bg-white px-2 py-2 items-center space-x-2 border-b border-gray-300"
@@ -38,7 +23,7 @@ const ActivityExpense = ({ data }) => {
     >
       <View className="relative">
         <Image
-          source={require("../assets/icons/group.png")}
+          source={require("../assets/icons/friends.png")}
           style={{
             width: 50,
             height: 50,
@@ -74,57 +59,24 @@ const ActivityExpense = ({ data }) => {
           >
             {data.createBy === auth.currentUser.uid ? "You" : data.createByName}
           </Text>
-          <Text>
-            created an expense
-            {data.additionalInfo.groupId !== "" ? " in the group" : ` with`}
-          </Text>
+          <Text className="mr-1">have unfriended with</Text>
+
           <Text
-            className="text-gray-700 ml-1"
+            className="text-gray-700"
             style={{
               fontSize: 16,
               fontWeight: "500",
             }}
           >
-            {data.additionalInfo.groupId !== ""
-              ? data.additionalInfo.groupName
-              : userId === auth.currentUser.uid
+            {data.additionalInfo.friendId === auth.currentUser.uid
               ? "You"
               : data.additionalInfo.friendName}
           </Text>
         </View>
-        {data.createBy === auth.currentUser.uid ? (
-          <View className="flex-row">
-            <Text
-              className="text-green-600"
-              style={{
-                fontSize: 12,
-                fontWeight: "500",
-              }}
-            >
-              you lend {Math.abs(totalAmount).toLocaleString("de-De")} vnd
-            </Text>
-          </View>
-        ) : (
-          <View className="flex-row">
-            <Text
-              className="text-red-600"
-              style={{
-                fontSize: 12,
-                fontWeight: "500",
-              }}
-            >
-              you owe {Math.abs(userAmount).toLocaleString("de-De")} vnd
-            </Text>
-          </View>
-        )}
-
         <View className="flex-row">
           <Text
             className="text-gray-400"
-            style={{
-              fontSize: 12,
-              fontWeight: "500",
-            }}
+            style={{ fontSize: 12, fontWeight: "500" }}
           >
             {dateTime[0]} at {dateTime[1]}
           </Text>
@@ -133,5 +85,4 @@ const ActivityExpense = ({ data }) => {
     </View>
   );
 };
-
-export default ActivityExpense;
+export default ActivityDeleteFriends;

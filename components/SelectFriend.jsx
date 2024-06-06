@@ -21,56 +21,70 @@ const SelectFriend = ({
   const [isFocused, setIsFocused] = useState(null);
   const renderSplit = () => {
     useEffect(() => {
-    setValueInput(""); // Reset valueInput to an empty string
+      setValueInput(""); // Reset valueInput to an empty string
     }, [selectedButton]);
     switch (selectedButton) {
       case 1:
         return (
           <>
-             <TextInput
+            <TextInput
               placeholder="0.0"
               keyboardType="numeric"
               value={valueInput}
               style={[
                 styles.textInputStyle,
-                { borderBottomColor: isFocused ? "#009966" : "#999999", width: "16%", },
+                {
+                  borderBottomColor: isFocused ? "#009966" : "#999999",
+                  width: "16%",
+                },
               ]}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               onChangeText={(text) => setValueInput(text)}
             ></TextInput>
-            <Text style={{
-              // fontWeight: 500,
-              fontSize: 16
-            }}>dong</Text>
+            <Text
+              style={{
+                // fontWeight: 500,
+                fontSize: 16,
+              }}
+            >
+              dong
+            </Text>
           </>
         );
       case 2:
         return (
           <>
-           <TextInput
+            <TextInput
               placeholder="0"
               keyboardType="numeric"
               value={valueInput}
               style={[
                 styles.textInputStyle,
-                { borderBottomColor: isFocused ? "#009966" : "#999999", width: "10%", },
+                {
+                  borderBottomColor: isFocused ? "#009966" : "#999999",
+                  width: "10%",
+                },
               ]}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               onChangeText={(text) => setValueInput(text)}
             ></TextInput>
-            <Text style={{
-              // fontWeight: 500,
-              fontSize: 16
-            }}>%</Text>
+            <Text
+              style={{
+                // fontWeight: 500,
+                fontSize: 16,
+              }}
+            >
+              %
+            </Text>
           </>
         );
       case 0:
       default:
         return (
           <>
-              <View
+            <View
               style={{
                 flex: 1,
                 alignItems: "flex-end",
@@ -101,7 +115,11 @@ const SelectFriend = ({
       onPress={onToggle}
     >
       <Image
-        source={{uri: avatar}}
+        source={
+          avatar
+            ? { uri: avatar }
+            : require("../assets/images/avatar_image.jpg")
+        }
         style={{
           width: 40,
           height: 40,
@@ -109,17 +127,21 @@ const SelectFriend = ({
           backgroundColor: "yellow",
         }}
       />
-        <View
+      <View
         style={{
           paddingHorizontal: 20,
           width:
             selectedButton == 0 ? "94%" : selectedButton == 1 ? "60%" : "72%",
         }}
       >
-        <Text style={{
-          fontSize: 16,
-          // fontWeight: 500
-        }}>{name}</Text>
+        <Text
+          style={{
+            fontSize: 16,
+            // fontWeight: 500
+          }}
+        >
+          {name}
+        </Text>
       </View>
       {renderSplit()}
     </TouchableOpacity>
@@ -136,11 +158,11 @@ const styles = StyleSheet.create({
     borderBottomColor: "#EEEEEE",
     borderBottomWidth: 1,
   },
-   textInputStyle: {
+  textInputStyle: {
     borderBottomWidth: 1,
     marginHorizontal: 10,
     fontSize: 16,
     // fontWeight: 500,
-    textAlign: 'right'
+    textAlign: "right",
   },
 });
