@@ -23,7 +23,7 @@ const ActivityDeleteFriends = ({ data }) => {
     >
       <View className="relative">
         <Image
-          source={require("../assets/icons/friends.png")}
+          source={require("../assets/icons/delete-friend_icon.png")}
           style={{
             width: 50,
             height: 50,

@@ -12,7 +12,7 @@ const ActivityPayment = () => {
         >
             <View className="relative">
                 <Image
-                    source={require("../assets/icons/group.png")}
+                    source={require("../assets/icons/payment_icon.png")}
                     style={{
                         width: 50,
                         height: 50,
