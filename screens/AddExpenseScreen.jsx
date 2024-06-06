@@ -19,18 +19,18 @@ import { auth } from "../firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import BtnAddFriendToBill from "../components/BtnAddFriendToBill";
 // Danh sách các bạn bè
-const searchFriendsList = [
-  { name: "Tấn Dũng", avatar: require("../assets/icons/account.png") },
-  { name: "John Doe", avatar: require("../assets/icons/account.png") },
-  {
-    name: "Nguyễn Đoàn Bảo Châu",
-    avatar: require("../assets/icons/account.png"),
-  },
-];
-// Danh sách các bạn bè
-const selectFriendsList = [
-  { name: "Ái Lam", avatar: require("../assets/icons/account.png") },
-];
+// const searchFriendsList = [
+//   { name: "Tấn Dũng", avatar: require("../assets/icons/account.png") },
+//   { name: "John Doe", avatar: require("../assets/icons/account.png") },
+//   {
+//     name: "Nguyễn Đoàn Bảo Châu",
+//     avatar: require("../assets/icons/account.png"),
+//   },
+// ];
+// // Danh sách các bạn bè
+// const selectFriendsList = [
+//   { name: "Ái Lam", avatar: require("../assets/icons/account.png") },
+// ];
 const AddExpenseScreen = (props) => {
     const textInputRef = useRef(null);
     const navigation = useNavigation();
@@ -157,18 +157,18 @@ const AddExpenseScreen = (props) => {
                     onChangeText={(text) => handleInputParticipants(text)}
                 />
             </View>
-            <View style={{ position: "fixed" }}>
-                {suggestions.length > 0 ? (
-                    <FlatList
+           {/* <View style={{ position: "fixed" }}>
+                {suggestions.length > 0 ? ( 
+                      <FlatList
                         data={suggestions} // Truyền trạng thái gợi ý cập nhật
                         renderItem={({ item, index }) => (
-                            <TouchableOpacity
+                            <TouchableOpacity 
                                 key = {index}
                                 onPress={() => handleSuggestionSelect(item)}
                             >
                                 <Text>{item.type?item.name:item.username}</Text>
                             </TouchableOpacity>
-                        )}
+                        )} 
                         keyExtractor={(item) => item.uid}
                         style={{
                             height: 100,
@@ -194,22 +194,25 @@ const AddExpenseScreen = (props) => {
                         <Text>Add new friends!</Text>
                     </View>
                 )}
-            </View>
+            </View> */}
          <View style={styles.buttonListContainer}>
-        {selectFriendsList.map((friend, index) => (
-          <BtnAddFriendToBill
-            name={friend.name}
-            avatar={require("../assets/icons/account.png")}
-            isSelected={true} 
-          ></BtnAddFriendToBill>
-        ))}
-        {searchFriendsList.map((friend, index) => (
-          <BtnAddFriendToBill
-            name={friend.name}
-            avatar={require("../assets/icons/account.png")}
-            isSelected={false}  // Kiểm tra xem nút này có được chọn không
-          ></BtnAddFriendToBill>
-        ))}
+          {selectedParticipants.slice(1).map((friend) => (
+              selectedParticipants.length > 1 ? (
+                   <BtnAddFriendToBill
+                    name={friend.username}
+                    avatar={friend.avatarUrl}
+                    isSelected={true} 
+                    ></BtnAddFriendToBill>
+            ):(<Text></Text>)
+          ))}
+          {suggestions.map((item) => (
+            suggestions.length > 0?( <BtnAddFriendToBill
+              name={item.type?item.name:item.username}
+              avatar={item.type?item.imageuri:item.avatarUrl}
+              isSelected={false}  // Kiểm tra xem nút này có được chọn không
+              onPress={handleSuggestionSelect}
+            ></BtnAddFriendToBill>):(<Text></Text>)
+          ))}
       </View>
             <View
                 style={[
@@ -325,7 +328,6 @@ const styles = StyleSheet.create({
     borderBottomColor: "#EEEEEE",
     borderBottomWidth: 1,
     flexWrap: "wrap", // Để các nút tự động xuống dòng khi hết chỗ
-    marginTop: 10,
   },
 });
 

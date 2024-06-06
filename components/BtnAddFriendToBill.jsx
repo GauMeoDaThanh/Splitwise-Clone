@@ -1,18 +1,9 @@
 import { StyleSheet, Text, Image, TouchableOpacity } from "react-native";
-// Danh sách các bạn bè
-const friendsList = [
-  { name: "Tấn Dũng", avatar: require("../assets/icons/account.png") },
-  { name: "John Doe", avatar: require("../assets/icons/account.png") },
-  {
-      name: "Nguyễn Đoàn Bảo Châu",
-      avatar: require("../assets/icons/account.png"),
-  },
-];
 const BtnAddFriendToBill = ({ name, avatar, onPress, isSelected  }) => {
   return (
     <TouchableOpacity  style={[styles.button, isSelected && styles.buttonSelected]} onPress={onPress}>
       <Image
-        source={avatar}
+        source={{uri:avatar}}
         style={styles.avatar}
       />
       <Text style={styles.text}>
