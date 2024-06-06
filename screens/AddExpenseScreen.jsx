@@ -8,6 +8,7 @@ import {
     Image,
     StyleSheet,
     FlatList,
+    Alert,
 } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import AddToolBar from "../components/AddToolBar";
@@ -18,19 +19,6 @@ const expenseService = ExpenseService.getInstance();
 import { auth } from "../firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import BtnAddFriendToBill from "../components/BtnAddFriendToBill";
-// Danh sách các bạn bè
-// const searchFriendsList = [
-//   { name: "Tấn Dũng", avatar: require("../assets/icons/account.png") },
-//   { name: "John Doe", avatar: require("../assets/icons/account.png") },
-//   {
-//     name: "Nguyễn Đoàn Bảo Châu",
-//     avatar: require("../assets/icons/account.png"),
-//   },
-// ];
-// // Danh sách các bạn bè
-// const selectFriendsList = [
-//   { name: "Ái Lam", avatar: require("../assets/icons/account.png") },
-// ];
 const AddExpenseScreen = (props) => {
     const textInputRef = useRef(null);
     const navigation = useNavigation();
@@ -46,7 +34,8 @@ const AddExpenseScreen = (props) => {
 
     // Làm Gợi ý khi nhận mail hoặc tên user
     const [suggestions, setSuggestions] = useState([]);
-    let [selectedParticipants, setSelectedParticipants] = useState([{userId: auth.currentUser.uid}]);
+    let [selectedParticipants, setSelectedParticipants] = useState([{ userId: auth.currentUser.uid }]);
+    let [fullSelected, setFullSelected] = useState([auth.currentUser])
     useEffect(() => {
         setIsBothFieldsFilled(description !== "" && money !== "" && selectedParticipants.length > 1);
         if (props.route.params) {
@@ -61,7 +50,7 @@ const AddExpenseScreen = (props) => {
     };
     // Xử lí nhấn chọn tên user
     const handleSuggestionSelect = (item) => {
-        const isExist = selectedParticipants.some(
+            const isExist = selectedParticipants.some(
             (participant) => {
                 if (participant.userId) {
                     return participant.userId === item.uid
@@ -74,8 +63,11 @@ const AddExpenseScreen = (props) => {
                 ...prevSelectedPaticipants,
                 item.uid?{userId: item.uid}:{groupId: item.id},
             ]);
+            setFullSelected((prevSelected) => [
+                ...prevSelected, item
+            ])
         } else {
-            console.log("Friend or group is already selected!");
+            alert("This person or group is already selected!");
         }
     };
     // Chia hoá đơn
@@ -114,6 +106,32 @@ const AddExpenseScreen = (props) => {
         } catch (e) {
             console.error("Fail to add expense ", e);
         }
+    };
+    
+    const handleLongPress = (item) => {
+    Alert.alert(
+      "Warning",
+      "Are you sure you want to remove this person or group from the bill sharing list?",
+      [
+        {
+          text: "No",
+          style: "cancel"
+        },
+        {
+          text: "Yes",
+            onPress: () => {
+              if (item.groupId) {
+                  setSelectedParticipants(selectedParticipants.filter(par => par.groupId !== item.groupId));
+                  setFullSelected(fullSelected.filter(par => par.groupId !== item.groupId));
+              }
+              else {
+                setSelectedParticipants(selectedParticipants.filter(par => par.userId !== item.userId));
+                setFullSelected(fullSelected.filter(par => par.userId !== item.userId));
+              }
+          }
+        }
+      ]
+    );
   };
     return (
         <View style={[{ flex: 100, backgroundColor: "white" }]} className="py-5">
@@ -196,21 +214,22 @@ const AddExpenseScreen = (props) => {
                 )}
             </View> */}
          <View style={styles.buttonListContainer}>
-          {selectedParticipants.slice(1).map((friend) => (
-              selectedParticipants.length > 1 ? (
+                {
+                fullSelected.length > 1 ?
+                (fullSelected.slice(1).map((item) => (
+               
                    <BtnAddFriendToBill
-                    name={friend.username}
-                    avatar={friend.avatarUrl}
-                    isSelected={true} 
-                    ></BtnAddFriendToBill>
-            ):(<Text></Text>)
-          ))}
+                    name={item.type?item.name:item.username}
+                    avatar={item.type?item.imageuri:item.avatarUrl}
+                    isSelected={true}
+                    onLongPress={()=>handleLongPress(item)}
+                    ></BtnAddFriendToBill>))):(<Text></Text>)}
           {suggestions.map((item) => (
             suggestions.length > 0?( <BtnAddFriendToBill
               name={item.type?item.name:item.username}
               avatar={item.type?item.imageuri:item.avatarUrl}
               isSelected={false}  // Kiểm tra xem nút này có được chọn không
-              onPress={handleSuggestionSelect}
+              onPress={()=>handleSuggestionSelect(item)}
             ></BtnAddFriendToBill>):(<Text></Text>)
           ))}
       </View>

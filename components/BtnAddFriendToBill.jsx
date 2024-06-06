@@ -1,7 +1,8 @@
-import { StyleSheet, Text, Image, TouchableOpacity } from "react-native";
-const BtnAddFriendToBill = ({ name, avatar, onPress, isSelected  }) => {
+import { StyleSheet, Text, Image, TouchableOpacity, Alert } from "react-native";
+// Danh sách các bạn bè
+const BtnAddFriendToBill = ({ name, avatar, onPress, isSelected, onLongPress}) => {
   return (
-    <TouchableOpacity  style={[styles.button, isSelected && styles.buttonSelected]} onPress={onPress}>
+    <TouchableOpacity  style={[styles.button, isSelected && styles.buttonSelected]} onPress={!isSelected?onPress:null} onLongPress={isSelected?onLongPress:null}>
       <Image
         source={{uri:avatar}}
         style={styles.avatar}

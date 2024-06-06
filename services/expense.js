@@ -441,8 +441,6 @@ class ExpenseService {
       query(
       collection(db, "expenses"),
       where("groupId", "==", []),
-      // where("participants", "array-contains", {userId: friendId}),
-      // orderBy("createAt", "desc")
     )
     );
     querySnapshot.forEach((doc) => {
