@@ -47,6 +47,7 @@ const DetailsGroupsScreen = ({ route }) => {
             setExpenses(expenseList); // Cập nhật state với dữ liệu thực
             let paidUsers = [];
             for (expense of expenseList) {
+              console.log("Expense: ", expense)
               paidUsers.push(
                 await UserService.getInstance().getUserById(expense.createBy)
               );
@@ -261,7 +262,7 @@ const DetailsGroupsScreen = ({ route }) => {
       </View>
       <View className="flex-col space-y-6 px-1">
         <View className="flex-col px-2 space-y-3">
-          {expenses.map((expense, index) => (
+          { expenses.map((expense, index) => (
             <View key={index} className="flex-row ">
               <TouchableOpacity className="flex-row space-x-5 px-1 items-center" onPress={() => navigation.navigate("DetailExpense",{expenseId:expense.id})}>
                 <View className="flex-col items-center">
@@ -298,11 +299,11 @@ const DetailsGroupsScreen = ({ route }) => {
                 </View>
                 <View className="flex-row p-2 items-center border border-gray-400 bg-gray-200">
                   <Image
-                    source={
-                      expense?.imageuri
-                        ? { uri: imageuri }
-                        : require("../assets/icons/icon_bill.png")
-                    }
+                  source={{
+                        uri: expense?.imgUrl // Use optional chaining
+                        ? expense.imgUrl
+                        : require("../assets/icons/icon_bill.png"),
+                      }}
                     style={{
                       width: 22,
                       height: 22,

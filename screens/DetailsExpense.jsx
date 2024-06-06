@@ -19,11 +19,6 @@ import * as ImagePicker from "expo-image-picker";
 import { auth } from "../firebaseConfig";
 
 const DetailsExpense = ({ route }) => {
-  const comments = [
-    { name: "You", content: "This is your comment." },
-    { name: "Tan Dung", content: "This is a comment from Tan Dung." },
-    { name: "Nhung", content: "Another comment from Nhung." },
-  ];
   const navigation = useNavigation();
   const { expenseId } = route.params;
   const [expenseInfo, setExpenseInfo] = useState([])
@@ -55,7 +50,8 @@ const DetailsExpense = ({ route }) => {
       quality: 1,
     });
     if (!result.canceled) {
-      // await UserService.getInstance().uploadAvatar(result.assets[0].uri);
+      await ExpenseService.getInstance().uploadImgExpense(expenseId,result.assets[0].uri);
+      console.log("Successfully");
     }
   };
 
@@ -63,6 +59,7 @@ const DetailsExpense = ({ route }) => {
     await ExpenseService.getInstance().handlePayment(expenseId, userId);
     alert("You settled up successfully");
   }
+
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]}>
       <View style={[{ flex: 7 }]}>
@@ -86,10 +83,14 @@ const DetailsExpense = ({ route }) => {
             },
           ]}
         >
-          <Image
-            source={require("../assets/icons/bill6.png")}
-            style={{ width: 60, height: 60 }}
-          />
+        <Image
+           source={
+                      expenseInfo.imgUrl
+                        ? { uri: expenseInfo.imgUrl}
+                        : require("../assets/icons/bill6.png")
+                    }
+          style={{ width: 60, height: 60 }}
+        />
           <View
             style={[
               {

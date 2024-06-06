@@ -229,17 +229,20 @@ class ExpenseService {
     }
   }
 
-  async getImgExpense(uid) {
-    try {
-      console.log("begin to get img expense");
-      const q = query(collection(db, "expenses"), where("uid", "==", uid));
-      const querySnapshot = await getDocs(q);
-      console.log(querySnapshot.docs[0].data().avatarUrl);
-      return querySnapshot.docs[0].data().avatarUrl;
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // async getImgExpense(uid) {
+  //   try {
+  //     console.log("IDDD: ", uid)
+  //     console.log("begin to get img expense");
+  //     const expenseRef = doc(db, "expenses", uid);
+  //     const expense = getDoc(expenseRef)
+  //     const q = query(collection(db, "expenses"), where("uid", "==", uid));
+  //     const querySnapshot = await getDoc(q);
+  //     console.log(querySnapshot.data().imgUrl);
+  //     return querySnapshot.data().imgUrl;
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   async getExpense(expenseId) {
     try {
@@ -355,7 +358,12 @@ class ExpenseService {
       }));
 
       for (let i = 1; i < participants.length; i++) {
-        debt.push(usernames[i] + " owes " + userPaidBy + " " + participants[i].amount + " vnd");
+        if (!participants[i].settleUp) {
+          debt.push(usernames[i] + " owes " + userPaidBy + " " + participants[i].amount + " vnd");
+        }
+        else {
+          debt.push(usernames[i] + " paid " + userPaidBy + " " + participants[i].amount + " vnd");
+        }
       }
       return debt;
     } catch (e) {
