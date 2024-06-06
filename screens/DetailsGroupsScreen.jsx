@@ -201,7 +201,12 @@ const DetailsGroupsScreen = ({ route }) => {
           style={{
             borderBottomWidth: 3,
           }}
-          onPress={() => navigation.navigate("Totals")}
+          onPress={() =>
+            navigation.navigate("Totals", {
+              groupName: group.name,
+              expenseList: expenses,
+            })
+          }
         >
           <Text
             className="text-gray-700"
