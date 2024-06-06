@@ -149,7 +149,8 @@ const GroupsScreen = () => {
                   fontSize: 17,
                 }}
                  >
-             {Math.abs(totalAmount)} vnd
+             {Math.abs(totalAmount).toLocaleString(
+                            "de-De")} vnd
             </Text>
             </View>
             <View className="flex-row items-center">
