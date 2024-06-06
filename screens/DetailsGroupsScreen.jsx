@@ -29,7 +29,6 @@ const DetailsGroupsScreen = ({ route }) => {
   const [expenses, setExpenses] = useState([]);
   const [createBy, setCreateBy] = useState([]);
   const [showEditOptions, setShowEditOptions] = useState(false);
-  const [lastVisible, setLastVisible] = useState(null);
   const [surplus, setSurplus] = useState([]);
 
   LogBox.ignoreLogs([
@@ -40,37 +39,35 @@ const DetailsGroupsScreen = ({ route }) => {
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
-        GroupService.getInstance().listenToGroupDetail(
-          groupId,
-          async (group) => {
-            setGroup(group);
-            try {
-              const expenseList =
-                await ExpenseService.getInstance().getExpensesByGroupId(
-                  groupId
-                );
-              let paidUsers = [];
-              for (expense of expenseList) {
-                paidUsers.push(
-                  await UserService.getInstance().getUserById(expense.createBy)
-                );
-              }
-              setSurplus(
-                await ExpenseService.getInstance().calculateSurplusAmounts(
-                  expenseList
-                )
-              );
-              setExpenses(expenseList); // Cập nhật state với dữ liệu thực
-              setCreateBy(paidUsers);
-            } catch (error) {
-              console.log("Error to fetch data, ", error);
-            }
+        try {
+          const expenseList =
+            await ExpenseService.getInstance().getExpensesByGroupId(groupId);
+          let paidUsers = [];
+          for (expense of expenseList) {
+            paidUsers.push(
+              await UserService.getInstance().getUserById(expense.createBy)
+            );
           }
-        );
+          setSurplus(
+            await ExpenseService.getInstance().calculateSurplusAmounts(
+              expenseList
+            )
+          );
+          setExpenses(expenseList); // Cập nhật state với dữ liệu thực
+          setCreateBy(paidUsers);
+        } catch (error) {
+          console.log("Error to fetch data, ", error);
+        }
       };
       fetchData();
-    }, [])
+    }, [group])
   );
+
+  useEffect(() => {
+    GroupService.getInstance().listenToGroupDetail(groupId, (group) => {
+      setGroup(group);
+    });
+  }, []);
 
   const toggleEditOptions = () => {
     setShowEditOptions(!showEditOptions);
