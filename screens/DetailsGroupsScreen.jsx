@@ -29,6 +29,7 @@ const DetailsGroupsScreen = ({ route }) => {
   const [expenses, setExpenses] = useState([]);
   const [createBy, setCreateBy] = useState([]);
   const [showEditOptions, setShowEditOptions] = useState(false);
+  const [lastVisible, setLastVisible] = useState(null);
   const [surplus, setSurplus] = useState([]);
 
   LogBox.ignoreLogs([
@@ -68,7 +69,7 @@ const DetailsGroupsScreen = ({ route }) => {
         );
       };
       fetchData();
-    }, [groupId])
+    }, [])
   );
 
   const toggleEditOptions = () => {
@@ -351,7 +352,9 @@ const DetailsGroupsScreen = ({ route }) => {
                 >
                   <Text
                     className={
-                      createBy[index]?.uid == auth.currentUser.uid
+                      surplus[index] === "settled up"
+                        ? "text-green-600"
+                        : createBy[index]?.uid == auth.currentUser.uid
                         ? "text-green-600"
                         : "text-red-600"
                     }
@@ -360,12 +363,14 @@ const DetailsGroupsScreen = ({ route }) => {
                       fontWeight: 500,
                     }}
                   >
-                    {surplus[index] === "0"
+                    {surplus[index] === 0
                       ? ""
+                      : surplus[index] === "settled up"
+                      ? "settled up"
                       : createBy[index]?.uid
                       ? createBy[index]?.uid == auth.currentUser.uid
                         ? "you lent"
-                        : `${createBy[index]?.username} lent`
+                        : "you owes"
                       : ""}
                   </Text>
                   <Text
@@ -379,7 +384,12 @@ const DetailsGroupsScreen = ({ route }) => {
                       fontWeight: 500,
                     }}
                   >
-                    {surplus[index] === "0" ? "" : surplus[index] + " vnd"}
+                    {surplus[index] === 0
+                      ? ""
+                      : surplus[index] === "settled up"
+                      ? ""
+                      : Math.abs(surplus[index]).toLocaleString("de-De") +
+                        " vnd"}
                   </Text>
                 </View>
               </TouchableOpacity>
