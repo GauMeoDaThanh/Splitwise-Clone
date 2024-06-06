@@ -100,14 +100,14 @@ const AddExpenseScreen = (props) => {
           <BtnAddFriendToBill
             name={friend.name}
             avatar={require("../assets/icons/account.png")}
-            isSelected={true} 
+            isSelected={true}
           ></BtnAddFriendToBill>
         ))}
         {searchFriendsList.map((friend, index) => (
           <BtnAddFriendToBill
             name={friend.name}
             avatar={require("../assets/icons/account.png")}
-            isSelected={false}  // Kiểm tra xem nút này có được chọn không
+            isSelected={false} // Kiểm tra xem nút này có được chọn không
           ></BtnAddFriendToBill>
         ))}
       </View>
