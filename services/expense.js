@@ -549,21 +549,21 @@ class ExpenseService {
         throw new Error("User not found in expense participants");
       }
 
-      // const updatedParticipants = [
-      //   ...participants.slice(0, participantIndex),
-      //   { ...participants[participantIndex], settleUp: true },
-      //   ...participants.slice(participantIndex + 1),
-      // ];
-      // await updateDoc(expenseRef, { participants: updatedParticipants });
-      // // Cập nhật nếu hoá đơn thanh toán hết rồi
-      // const allSettled = participants.every(
-      //   (participant) => participant.settleUp === true
-      // );
-      // if (allSettled) {
-      //   await updateDoc(expenseRef, { isSettle: true });
-      //   console.log("Expense is now fully settled");
-      // }
-      // alert("You settled up successfully");
+      const updatedParticipants = [
+        ...participants.slice(0, participantIndex),
+        { ...participants[participantIndex], settleUp: true },
+        ...participants.slice(participantIndex + 1),
+      ];
+      await updateDoc(expenseRef, { participants: updatedParticipants });
+      // Cập nhật nếu hoá đơn thanh toán hết rồi
+      const allSettled = participants.every(
+        (participant) => participant.settleUp === true
+      );
+      if (allSettled) {
+        await updateDoc(expenseRef, { isSettle: true });
+        console.log("Expense is now fully settled");
+      }
+      alert("You settled up successfully");
 
       ActivityService.getInstance().aSettleUp(expenseData, userId);
     } catch (error) {
