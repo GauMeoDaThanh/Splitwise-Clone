@@ -30,20 +30,16 @@ const AddExpenseScreen = (props) => {
         textInputRef.current.focus();
     }, []); // Chỉ chạy một lần sau khi mở trang
 
-    // const handleAddImageExpense = () => {
-    //     navigation.navigate('AddImageExpense');
-    //     };
-    
     // Làm Gợi ý khi nhận mail hoặc tên user
     const [suggestions, setSuggestions] = useState([]);
     let [selectedParticipants, setSelectedParticipants] = useState([{userId: auth.currentUser.uid}]);
     useEffect(() => {
-        setIsBothFieldsFilled(description !== "" && money !== "");
+        setIsBothFieldsFilled(description !== "" && money !== "" && selectedParticipants.length > 1);
         if (props.route.params) {
             setDescription(props.route.params.description);
             setMoney(props.route.params.amounts);
         }
-    }, [description, money]);
+    }, [description, money, selectedParticipants]);
 
     handleInputParticipants = async (text) => {
         const filteredSuggestions = await expenseService.handleInputParticipants(text);
@@ -68,14 +64,6 @@ const AddExpenseScreen = (props) => {
             console.log("Friend or group is already selected!");
         }
     };
-    // Check điều kiện
-    const check = () => {
-        if (selectedParticipants.length <= 1) {
-            alert("Please choose someone to split the bill");
-            return false;
-        }
-        return true;
-    }
     // Chia hoá đơn
     const handleSplitExpense = () => {
         navigation.navigate('SplitExpenseScreen', { selectedParticipants:selectedParticipants, description:description, money:money });
@@ -83,7 +71,6 @@ const AddExpenseScreen = (props) => {
     };
     // Tạo hoá đơn
     const handleCreateExpense = async () => {
-        if (!check()) return;
         let groupId = [];
       for (par of selectedParticipants) {
             if (par.groupId) {

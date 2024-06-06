@@ -25,7 +25,7 @@ const DetailsToolBar = (props) => {
         { borderBottomColor: "#EEEEEE", borderBottomWidth: 1 },
       ]}
     >
-      <TouchableOpacity onPress={() => navigation.navigate("DetailGroups")}>
+      <TouchableOpacity onPress={() => props.navigation.goBack()}>
         <Image
           source={require("../assets/icons/back.png")}
           style={{ width: 20, height: 20 }}

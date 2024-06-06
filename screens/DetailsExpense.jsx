@@ -17,10 +17,11 @@ import ExpenseService from "../services/expense";
 import UserService from "../services/user";
 import * as ImagePicker from "expo-image-picker";
 import { auth } from "../firebaseConfig";
+import ExpenseImage from "./ImageExpense";
 
-const DetailsExpense = ({ route }) => {
+const DetailsExpense = (props) => {
   const navigation = useNavigation();
-  const { expenseId } = route.params;
+  const { expenseId } = props.route.params;
   const [expenseInfo, setExpenseInfo] = useState([])
   const [paidByUser, setPaidByUser] = useState(); // New state to store user information
   const [debt, setDebt] = useState([]);
@@ -40,7 +41,7 @@ const DetailsExpense = ({ route }) => {
     }
 
   });
-}, []);
+}, [expenseId]);
   
   const chooseImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -61,9 +62,11 @@ const DetailsExpense = ({ route }) => {
   }
 
   return (
-    <View style={[{ flex: 100, backgroundColor: "white" }]}>
+    <View style={[{ flex: 100, backgroundColor: "white" }]} className="py-5">
       <View style={[{ flex: 7 }]}>
-        <DetailsToolBar></DetailsToolBar>
+        <DetailsToolBar
+          navigation={props.navigation}
+        ></DetailsToolBar>
       </View>
       <View style={{ flex: 76, flexDirection: "column" }}>
       <ScrollView >
@@ -72,7 +75,7 @@ const DetailsExpense = ({ route }) => {
             {
               flex: 30,
               flexDirection: "row",
-              justifyContent: "flex-start",
+              justifyContent: "center",
               alignItems: "center",
               backgroundColor: "#EEEEEE",
               borderBottomColor: "#EEEEEE",
@@ -84,11 +87,7 @@ const DetailsExpense = ({ route }) => {
           ]}
         >
         <Image
-           source={
-                      expenseInfo.imgUrl
-                        ? { uri: expenseInfo.imgUrl}
-                        : require("../assets/icons/bill6.png")
-                    }
+           source={require("../assets/icons/icon_bill.png")}
           style={{ width: 60, height: 60 }}
         />
           <View
@@ -123,12 +122,12 @@ const DetailsExpense = ({ route }) => {
                 Added by {paidByUser?.username}  {expenseInfo?.createAt? 'on ' + new Date(expenseInfo.createAt.seconds * 1000 + expenseInfo.createAt.nanoseconds / 1000000).toLocaleDateString('en-GB'):''}
             </Text>
           </View>
-          <TouchableOpacity style={{ width: 60, height: 60, position: "absolute", right: 12 }} onPress={chooseImage}>
+          {/* <TouchableOpacity style={{ width: 60, height: 60, position: "absolute", right: 12 }} onPress={chooseImage}>
           <Image
             source={require("../assets/icons/photo.png")}
             style={{ width: 60, height: 60}}
           />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View
           style={[
@@ -211,54 +210,14 @@ const DetailsExpense = ({ route }) => {
             
           </View>
         </View>
-        {/* <View
-          style={[
-            {
-              flex: 23,
-              flexDirection: "column",
-              borderTopColor: "#EEEEEE",
-              borderTopWidth: 1,
-              padding: 12,
-            },
-          ]}
-        > */}
-          {/* <Text style={{ fontSize: 15, fontWeight: "500" }}>Comments</Text>
-          {comments.map((comment, index) => (
-            <View
-              key={index}
-              style={[
-                styles.commentContainer,
-                comment.name === "You"
-                  ? styles.commentContainerYou
-                  : styles.commentContainerOther,
-              ]}
-            > */}
-              {/* <Text
-                style={[
-                  styles.commentName,
-                  comment.name === "You" ? styles.commentNameYou : null,
-                ]}
-              >
-                {comment.name}
-              </Text>
-              <Text style={styles.commentContent}>{comment.content}</Text>
-            </View> */}
-          {/* ))} */}
-        {/* </View> */}
       </ScrollView>
-      {/* </View>
-      <View style={{ flex: 7, flexDirection:'row', borderTopColor: "#EEEEEE", borderTopWidth: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <TextInput
-        style={{fontSize: 16,paddingVertical: 7, paddingHorizontal: 10, borderRadius: 30, borderColor: '#548B54', borderWidth: 1, width: 360, height: 32, }}
-        placeholder="Viết bình luận..."
-        ></TextInput>
-        <Image
-           source={require("../assets/icons/send.png")}
-          style={{ width: 26, height: 24, margin: 5, tintColor: '#32CD32' }}
-        />
-      </View> */}
-      {/* <View style={{ flex: 10, borderTopColor: "#CCCCCC", borderTopWidth: 1 }}> */}
-        {/* <BottomAppBar /> */}
+      </View>
+      <View
+        style={{ backgroundColor: "white" }}
+      >
+        <ExpenseImage
+          expenseInfo={expenseInfo}
+          onPress={chooseImage} />
       </View>
     </View>
   );

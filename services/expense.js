@@ -1,4 +1,4 @@
-import { auth, db } from "../firebaseConfig";
+import { auth, db} from "../firebaseConfig";
 import {
   collection,
   addDoc,
@@ -229,21 +229,6 @@ class ExpenseService {
     }
   }
 
-  // async getImgExpense(uid) {
-  //   try {
-  //     console.log("IDDD: ", uid)
-  //     console.log("begin to get img expense");
-  //     const expenseRef = doc(db, "expenses", uid);
-  //     const expense = getDoc(expenseRef)
-  //     const q = query(collection(db, "expenses"), where("uid", "==", uid));
-  //     const querySnapshot = await getDoc(q);
-  //     console.log(querySnapshot.data().imgUrl);
-  //     return querySnapshot.data().imgUrl;
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // }
-
   async getExpense(expenseId) {
     try {
       const q = query(
@@ -376,20 +361,20 @@ class ExpenseService {
     let yourLent = 0;
     let othersPaid = 0;
     for (expense of expensesByGroup) {
-      // Chỉ tính những bill chưa thanh toán
+      // Bill chua thanh toan
       if (!expense.isSettle) {
         for (par of expense.participants) {
           if (par.userId === auth.currentUser.uid) {
-            // Tiền bạn chưa trả bill họ
+            // Tien ban chua tra bill ho
             if (!par.settleUp) {
               yourOwe += parseFloat(par.amount);
             }
           }
         }
-        // Khoản bạn đã trả trong group, và người khác đã trả bill bạn
+        // Khoan ban tra group, khoan nguoi khac tra
         if (expense.paidBy === auth.currentUser.uid) {
           yourLent += expense.amounts;
-          // Tiền phải trả cho bill mình
+          // Tien ban tra bill ban
           yourOwe += expense.participants[0].amount
           for (par of expense.participants.slice(1)) {
             if (par.settleUp) {
@@ -399,7 +384,7 @@ class ExpenseService {
         }
       }
     }
-    //Tổng bạn trả, tổng nợ và tổng họ đã trả cho bill bạn
+    //Tong ban da tra, ban no va nguoi khac da tra
     return (yourLent - yourOwe - othersPaid).toFixed(0);
   }
     
@@ -437,17 +422,37 @@ class ExpenseService {
     }
   }
 
-    async calculateSurplusAmounts(expenseList) {
-      const surplusAmounts = []; 
-      for (const expense of expenseList) {
-        const totalOwed = Math.abs(
-          expense.participants.slice(1).reduce((acc, curr) => acc + (curr.settleUp === false ? curr.amount : 0), 0)
-        );
-        const formattedAmount = totalOwed.toLocaleString( "de-De")
-        surplusAmounts.push(formattedAmount);
-      }
-      return surplusAmounts;
+  async calculateSurplusAmounts(expenseList) {
+    const surplusAmounts = [];
+    for (const expense of expenseList) {
+      const totalOwed = Math.abs(
+        expense.participants.slice(1).reduce((acc, curr) => acc + (curr.settleUp === false ? curr.amount : 0), 0)
+      );
+      const formattedAmount = totalOwed.toLocaleString("de-De")
+      surplusAmounts.push(formattedAmount);
     }
+    return surplusAmounts;
+  }
+  
+  async getExpensesByFriendId(friendId) {
+    console.log(friendId)
+    const expenses = [];
+    const querySnapshot = await getDocs(
+      query(
+      collection(db, "expenses"),
+      where("groupId", "==", []),
+      // where("participants", "array-contains", {userId: friendId}),
+      // orderBy("createAt", "desc")
+    )
+    );
+    querySnapshot.forEach((doc) => {
+  const data = doc.data();
+  const participantUserIds = data.participants.map(participant => participant.userId);
+  if (participantUserIds.includes(friendId) && participantUserIds.includes(auth.currentUser.uid)) {
+    expenses.push({ id: doc.id, ...data });
+  }
+});
+    return expenses;
+  }
 }
-
 export default ExpenseService;

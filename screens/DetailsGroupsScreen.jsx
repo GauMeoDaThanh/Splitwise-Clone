@@ -47,7 +47,6 @@ const DetailsGroupsScreen = ({ route }) => {
             setExpenses(expenseList); // Cập nhật state với dữ liệu thực
             let paidUsers = [];
             for (expense of expenseList) {
-              console.log("Expense: ", expense)
               paidUsers.push(
                 await UserService.getInstance().getUserById(expense.createBy)
               );
@@ -299,11 +298,7 @@ const DetailsGroupsScreen = ({ route }) => {
                 </View>
                 <View className="flex-row p-2 items-center border border-gray-400 bg-gray-200">
                   <Image
-                  source={{
-                        uri: expense?.imgUrl // Use optional chaining
-                        ? expense.imgUrl
-                        : require("../assets/icons/icon_bill.png"),
-                      }}
+                  source={require("../assets/icons/icon_bill.png")}
                     style={{
                       width: 22,
                       height: 22,
