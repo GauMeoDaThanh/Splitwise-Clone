@@ -452,34 +452,37 @@ class ExpenseService {
     return totalDifference;
   }
 
-  async handlePayment(expenseId, userId) {
-    const expenseRef = doc(db, "expenses", expenseId);
-    try {
-      const expenseDoc = await getDoc(expenseRef);
-      const expenseData = expenseDoc.data();
-      const participants = expenseData.participants;
-      const participantIndex = participants.findIndex(
-        (participant) => participant.userId === userId
-      );
-      if (participantIndex === -1) {
-        throw new Error("User not found in expense participants");
-      }
+  // async handlePayment(expenseId, userId) {
+  //   const expenseRef = doc(db, "expenses", expenseId);
+  //   try {
+  //     const expenseDoc = await getDoc(expenseRef);
+  //     const expenseData = expenseDoc.data();
+  //     const participants = expenseData.participants;
+  //     const participantIndex = participants.findIndex(
+  //       (participant) => participant.userId === userId
+  //     );
+  //     if (participantIndex === -1) {
+  //       throw new Error("User not found in expense participants");
+  //     }
 
-      const updatedParticipants = [
-        ...participants.slice(0, participantIndex),
-        { ...participants[participantIndex], settleUp: true },
-        ...participants.slice(participantIndex + 1),
-      ];
-      await updateDoc(expenseRef, {
-        participants: updatedParticipants,
-        isSettle: updatedParticipants.every(
-          (participant) => participant.settleUp === true
-        ),
-      });
-    } catch (error) {
-      console.error("Error processing payment:", error.message); // Handle errors
-    }
-  }
+  //     // const updatedParticipants = [
+  //     //   ...participants.slice(0, participantIndex),
+  //     //   { ...participants[participantIndex], settleUp: true },
+  //     //   ...participants.slice(participantIndex + 1),
+  //     // ];
+  //     // await updateDoc(expenseRef, {
+  //     //   participants: updatedParticipants,
+  //     //   isSettle: updatedParticipants.every(
+  //     //     (participant) => participant.settleUp === true
+  //     //   ),
+  //     // });
+  //     // alert("You settled up successfully");
+
+  //     ActivityService.getInstance().aSettleUp(expenseData, userSettleUp);
+  //   } catch (error) {
+  //     console.error("Error processing payment:", error.message); // Handle errors
+  //   }
+  // }
 
   async calculateSurplusAmounts(expenseList) {
     const surplusAmounts = [];
@@ -546,20 +549,23 @@ class ExpenseService {
         throw new Error("User not found in expense participants");
       }
 
-      const updatedParticipants = [
-        ...participants.slice(0, participantIndex),
-        { ...participants[participantIndex], settleUp: true },
-        ...participants.slice(participantIndex + 1),
-      ];
-      await updateDoc(expenseRef, { participants: updatedParticipants });
-      // Cập nhật nếu hoá đơn thanh toán hết rồi
-      const allSettled = participants.every(
-        (participant) => participant.settleUp === true
-      );
-      if (allSettled) {
-        await updateDoc(expenseRef, { isSettle: true });
-        console.log("Expense is now fully settled");
-      }
+      // const updatedParticipants = [
+      //   ...participants.slice(0, participantIndex),
+      //   { ...participants[participantIndex], settleUp: true },
+      //   ...participants.slice(participantIndex + 1),
+      // ];
+      // await updateDoc(expenseRef, { participants: updatedParticipants });
+      // // Cập nhật nếu hoá đơn thanh toán hết rồi
+      // const allSettled = participants.every(
+      //   (participant) => participant.settleUp === true
+      // );
+      // if (allSettled) {
+      //   await updateDoc(expenseRef, { isSettle: true });
+      //   console.log("Expense is now fully settled");
+      // }
+      // alert("You settled up successfully");
+
+      ActivityService.getInstance().aSettleUp(expenseData, userId);
     } catch (error) {
       console.error("Error processing payment:", error.message); // Handle errors
     }

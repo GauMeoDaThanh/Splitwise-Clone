@@ -243,19 +243,21 @@ const GroupsScreen = () => {
                             fontWeight: 500,
                           }}
                         >
-                          {item.amountOwned > 0
-                            ? "You lent " +
-                              Math.abs(item.amountOwned).toLocaleString(
-                                "de-DE"
-                              ) +
-                              " vnd"
-                            : item.amountOwned == 0
-                            ? "settled up"
-                            : "You owed " +
-                              Math.abs(item.amountOwned).toLocaleString(
-                                "de-De"
-                              ) +
-                              " vnd"}
+                          {item.amountOwned
+                            ? item.amountOwned > 0
+                              ? "You lent " +
+                                Math.abs(item.amountOwned).toLocaleString(
+                                  "de-DE"
+                                ) +
+                                " vnd"
+                              : item.amountOwned == 0
+                              ? "settled up"
+                              : "You owed " +
+                                Math.abs(item.amountOwned).toLocaleString(
+                                  "de-De"
+                                ) +
+                                " vnd"
+                            : ""}
                         </Text>
                       </View>
                     </View>

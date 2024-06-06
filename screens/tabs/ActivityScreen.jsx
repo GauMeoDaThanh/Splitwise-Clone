@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import ActivityAddGroup from "../../components/ActivityAddGroup";
 import ActivityAddFriends from "../../components/ActivityAddFriends";
-import ActivityDeleteGroup from "../../components/ActivityDeleteGroup";
 import ActivityEditGroupName from "../../components/ActivityEditGroupName";
 import ActivityDeleteMember from "../../components/ActivityDeleteMember";
 import ActivityEditWhiteboard from "../../components/ActivityEditWhiteboard";
@@ -76,7 +75,6 @@ const ActivityScreen = () => {
 
 const notifycationMapping = {
   addGroup: ActivityAddGroup,
-  deleteGroup: ActivityDeleteGroup,
   editGroupName: ActivityEditGroupName,
   editGroupAvatar: ActivityEditGroupAvatar,
   addMember: ActivityAddMember,

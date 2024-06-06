@@ -308,7 +308,7 @@ class ActivityService {
       const activity = {
         createBy: auth.currentUser.uid,
         createAt: serverTimestamp(),
-        type: "addExpense",
+        type: ACTIVITY_TYPES["expense"][0],
         additionalInfo: {
           groupId: groupId,
           groupName: groupName,
@@ -320,6 +320,35 @@ class ActivityService {
         },
       };
       console.log("start add add expense log");
+      const activityRef = await addDoc(
+        collection(db, ACTIVITY_COLLECTION),
+        activity
+      );
+      console.log("Document written with ID: ", activityRef.id);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async aSettleUp(expense, userId) {
+    try {
+      console.log(expense, userId);
+      let members = [];
+      members.push(userId);
+      members.push(expense.paidBy);
+      const userName = await UserService.getInstance().getUsername(userId);
+      const activity = {
+        createBy: auth.currentUser.uid,
+        createAt: serverTimestamp(),
+        type: ACTIVITY_TYPES["expense"][1],
+        additionalInfo: {
+          expenseName: expense.description,
+          members: members,
+          userPaidName: userName,
+          userPaidId: userId,
+        },
+      };
+      console.log("start add add payment log");
       const activityRef = await addDoc(
         collection(db, ACTIVITY_COLLECTION),
         activity
