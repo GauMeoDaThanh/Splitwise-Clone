@@ -68,10 +68,51 @@ const AddExpenseScreen = (props) => {
             console.log("Friend or group is already selected!");
         }
     };
+    // Check điều kiện
+    const check = () => {
+        if (selectedParticipants.length <= 1) {
+            alert("Please choose someone to split the bill");
+            return false;
+        }
+        return true;
+    }
     // Chia hoá đơn
     const handleSplitExpense = () => {
         navigation.navigate('SplitExpenseScreen', { selectedParticipants:selectedParticipants, description:description, money:money });
         setSelectedParticipants([{userId: auth.currentUser.uid}])
+    };
+    // Tạo hoá đơn
+    const handleCreateExpense = async () => {
+        if (!check()) return;
+        let groupId = [];
+      for (par of selectedParticipants) {
+            if (par.groupId) {
+               groupId.push(par.groupId)
+           }
+        }
+        let splitParticipants = []
+        const participantsList = await expenseService.getParticipants(selectedParticipants);
+        let isFirstFriend = true;
+        for (const participant of participantsList) {
+            splitParticipants.push({
+            userId: participant.uid,
+            amount: parseFloat((parseFloat(money) / participantsList.length).toFixed(0)),
+            settleUp: isFirstFriend
+            });
+            isFirstFriend = false; 
+        }
+        try {
+            await expenseService.createExpense(
+            new Date(),
+            parseFloat(money),
+            groupId,
+            description,
+            splitParticipants
+            );
+            navigation.navigate('Friends');
+        } catch (e) {
+            console.error("Fail to add expense ", e);
+        }
   };
     return (
         <View style={[{ flex: 100, backgroundColor: "white" }]} className="py-5">
@@ -82,7 +123,7 @@ const AddExpenseScreen = (props) => {
                     action={"Save"}
                     isDisabled={!isBothFieldsFilled}
                     disabled={!isBothFieldsFilled}
-                    // onPress={handleCreateExpense}
+                    onPress={handleCreateExpense}
                 ></AddToolBar>
             </View>
             <View

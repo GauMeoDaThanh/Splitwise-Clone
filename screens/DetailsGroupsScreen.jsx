@@ -352,11 +352,11 @@ const DetailsGroupsScreen = ({ route }) => {
                       fontWeight: 500,
                     }}
                   >
-                    {createBy[index]?.uid
+                    {expense.participants.length > 1?(createBy[index]?.uid
                       ? createBy[index]?.uid == auth.currentUser.uid
                         ? "you lent"
                         : `${createBy[index]?.username} lent`
-                      : ""}
+                      : ""):''}
                   </Text>
                   <Text
                     className={
@@ -369,13 +369,11 @@ const DetailsGroupsScreen = ({ route }) => {
                       fontWeight: 500,
                     }}
                   >
-                    {Math.abs(
+                    {expense.participants.length > 1? (Math.abs(
                       expense.participants
                         .slice(1)
-                        .reduce((acc, curr) => acc + curr.amount, 0)
-                        .toFixed(0)
-                    ).toLocaleString("de-De")}{" "}
-                    vnd
+                        .reduce((acc, curr) => acc + (curr.settleUp === false ? curr.amount : 0), 0)
+                    ).toLocaleString("de-De") + " vnd"):''}
                   </Text>
                 </View>
               </TouchableOpacity>

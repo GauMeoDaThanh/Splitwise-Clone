@@ -364,22 +364,35 @@ class ExpenseService {
     }
 
     async getYourPaidByGroup(expensesByGroup) {
-          let sumByGr = 0;
           let yourOwe = 0;
-          let yourLent = 0
+          let yourLent = 0;
+          let othersPaid = 0;
           for (expense of expensesByGroup) {
-            sumByGr = sumByGr + parseFloat(expense.participants.reduce((acc, curr) => acc + curr.amount, 0).toFixed(2))
+            // Chỉ tính những bill chưa thanh toán
+            if (!expense.isSettle) {
             for (par of expense.participants) {
               if (par.userId === auth.currentUser.uid) {
-                yourOwe += parseFloat(par.amount);
+                  // Tiền bạn chưa trả bill họ
+                  if (!par.settleUp) {
+                  yourOwe += parseFloat(par.amount);
+                }
               }
             }
-            // Khoản bạn đã trả trong group đó
+            // Khoản bạn đã trả trong group, và người khác đã trả bill bạn
             if (expense.paidBy === auth.currentUser.uid) {
-              yourLent += parseFloat(expense.amounts);
+              yourLent += expense.amounts;
+              // Tiền phải trả cho bill mình
+              yourOwe += expense.participants[0].amount
+              for (par of expense.participants.slice(1)) {
+                 if (par.settleUp) {
+                  othersPaid +=par.amount;
+                }
+              }
             }
           }
-          return (yourLent - yourOwe).toFixed(0);
+      }
+      //Tổng bạn trả, tổng nợ và tổng họ đã trả cho bill bạn
+          return (yourLent - yourOwe - othersPaid).toFixed(0);
     }
     
     async getTotalDifference(differenceList) {
@@ -419,8 +432,7 @@ class ExpenseService {
     } catch (error) {
         console.error('Error processing payment:', error.message); // Handle errors
     }
+  }
 }
-
-    }
 
 export default ExpenseService;
