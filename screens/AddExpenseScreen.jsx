@@ -349,5 +349,3 @@ const styles = StyleSheet.create({
     flexWrap: "wrap", // Để các nút tự động xuống dòng khi hết chỗ
   },
 });
-
-

@@ -10,7 +10,8 @@ import {
   getDocs,
   where,
   orderBy,
-  onSnapshot
+  onSnapshot,
+  deleteDoc
 } from "firebase/firestore";
 import FriendService from "./friend";
 import AuthenticateService from "./authentication";
@@ -145,7 +146,7 @@ class ExpenseService {
       await deleteDoc(groupRef);
       console.log("delete expense successfully");
     } catch (e) {
-      console.error(e);
+      console.error("Error delete expense: ",e);
     }
   }
 

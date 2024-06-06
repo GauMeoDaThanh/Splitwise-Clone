@@ -9,16 +9,16 @@ import {
   Image,
   StyleSheet,
   ScrollView,
+  LogBox
 } from "react-native";
 import DetailsToolBar from "../components/DetailsToolBar";
-// import BottomAppBar from "../components/BottomAppBar";
 import { useNavigation } from "@react-navigation/native";
 import ExpenseService from "../services/expense";
 import UserService from "../services/user";
 import * as ImagePicker from "expo-image-picker";
 import { auth } from "../firebaseConfig";
 import ExpenseImage from "./ImageExpense";
-
+import { Alert } from "react-native";
 const DetailsExpense = (props) => {
   const navigation = useNavigation();
   const { expenseId } = props.route.params;
@@ -26,6 +26,7 @@ const DetailsExpense = (props) => {
   const [paidByUser, setPaidByUser] = useState(); // New state to store user information
   const [debt, setDebt] = useState([]);
   const [participants, setParticipants] = useState([]);
+  LogBox.ignoreAllLogs(true);
   useEffect(() => {
   ExpenseService.getInstance().listenToFriendDetail(expenseId, async (expenseInfo) => {
     setExpenseInfo(expenseInfo);
@@ -61,11 +62,33 @@ const DetailsExpense = (props) => {
     alert("You settled up successfully");
   }
 
+      const handleDelete = () => {
+        Alert.alert(
+          "Delete Expense",
+          "Are you sure you want to delete this expense?",
+          [
+            {
+              text: "Cancel",
+              onPress: () => {
+                
+              },
+              style: "cancel"
+            },
+            {
+              text: "OK", onPress: async () => {
+                ExpenseService.getInstance().deleteExpense(expenseId);
+                navigation.goBack();
+            } }
+          ]
+        );
+      };
+
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]} className="py-5">
       <View style={[{ flex: 7 }]}>
         <DetailsToolBar
           navigation={props.navigation}
+          onPress={handleDelete}
         ></DetailsToolBar>
       </View>
       <View style={{ flex: 76, flexDirection: "column" }}>
@@ -104,7 +127,7 @@ const DetailsExpense = (props) => {
             <Text
               style={{ fontSize: 18, fontWeight: "400", marginVertical: 2 }}
             >
-                {expenseInfo.description}
+                {expenseInfo?.description}
             </Text>
             <Text
               style={{ fontSize: 20, fontWeight: "500", marginVertical: 5 }}
@@ -122,12 +145,6 @@ const DetailsExpense = (props) => {
                 Added by {paidByUser?.username}  {expenseInfo?.createAt? 'on ' + new Date(expenseInfo.createAt.seconds * 1000 + expenseInfo.createAt.nanoseconds / 1000000).toLocaleDateString('en-GB'):''}
             </Text>
           </View>
-          {/* <TouchableOpacity style={{ width: 60, height: 60, position: "absolute", right: 12 }} onPress={chooseImage}>
-          <Image
-            source={require("../assets/icons/photo.png")}
-            style={{ width: 60, height: 60}}
-          />
-          </TouchableOpacity> */}
         </View>
         <View
           style={[
@@ -150,28 +167,7 @@ const DetailsExpense = (props) => {
             </View>
           </View>
           <View style={{ paddingStart: 60, marginTop: 10 }}>
-            {/* <Text
-              style={{
-                justifyContent: "center",
-                textAlign: "left",
-                paddingVertical: 6,
-                color: "#777777",
-              }}
-            >
-              Tan Dung owes you 35.000 đồng
-            </Text> */}
-            {/* <Text
-              style={{
-                justifyContent: "center",
-                textAlign: "left",
-                paddingVertical: 6,
-                color: "#777777",
-              }}
-            >
-              You owe Tan Dung 35.000 đồng
-            </Text> */}
-          {
-                debt.slice(1).map((debt, index) => (
+          { debt.slice(1).map((debt, index) => (
                   <View key={index}>
                    <Text
                       style={{

@@ -2,21 +2,6 @@ import { Text, TouchableOpacity, StyleSheet, View, Image, Alert } from "react-na
 import { useNavigation } from "@react-navigation/native";
 
 const DetailsToolBar = (props) => {
-  const navigation = useNavigation();
-    const handleDelete = () => {
-        Alert.alert(
-          "Delete Expense",
-          "Are you sure you want to delete this expense?",
-          [
-            {
-              text: "Cancel",
-              onPress: () => console.log("Cancel Pressed"),
-              style: "cancel"
-            },
-            { text: "OK", onPress: () => console.log("OK Pressed") }
-          ]
-        );
-      };
   return (
     <View
       style={[
@@ -32,18 +17,20 @@ const DetailsToolBar = (props) => {
       </TouchableOpacity>
       <Text style={{ fontWeight: "500", fontSize: 16, marginStart: 50 }}>Details</Text>
       <View style={{ flexDirection: 'row'}}>
-        <TouchableOpacity onPress={handleDelete}>
+       {/* <TouchableOpacity>
+       <Image
+           source={require("../assets/icons/edit.png")}
+          style={{ width: 20, height: 20, marginHorizontal: 5 }}
+        />
+        </TouchableOpacity> */}
+         <TouchableOpacity
+          onPress={props.onPress}
+        >
         <Image
           source={require("../assets/icons/delete.png")}
           style={{ width: 20, height: 20, marginHorizontal: 10, }}
         />
         </TouchableOpacity>
-       <TouchableOpacity>
-       <Image
-           source={require("../assets/icons/edit.png")}
-          style={{ width: 20, height: 20, marginHorizontal: 5 }}
-        />
-       </TouchableOpacity>
       </View>
     </View>
   );
