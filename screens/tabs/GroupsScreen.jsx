@@ -81,7 +81,7 @@ const GroupsScreen = () => {
           for (group of groups) {
             const expensesByGr = await ExpenseService.getInstance().getExpensesByGroupId(group.id);
             expensesList.push(expensesByGr);
-            differenceList.push(await ExpenseService.getInstance().getYourPaidByGroup(expensesByGr));
+            differenceList.push(await ExpenseService.getInstance().getYourPaid(expensesByGr));
           }
           setTotalAmount(await ExpenseService.getInstance().getTotalDifference(differenceList));
           setYourExpenseByGroup(differenceList);
@@ -109,7 +109,7 @@ const GroupsScreen = () => {
           for (group of groups) {
             const expensesByGr = await ExpenseService.getInstance().getExpensesByGroupId(group.id);
             expensesList.push(expensesByGr);
-            differenceList.push(await ExpenseService.getInstance().getYourPaidByGroup(expensesByGr));
+            differenceList.push(await ExpenseService.getInstance().getYourPaid(expensesByGr));
           }
           setTotalAmount(await ExpenseService.getInstance().getTotalDifference(differenceList));
           setYourExpenseByGroup(differenceList);

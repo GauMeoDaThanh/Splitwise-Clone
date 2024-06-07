@@ -367,11 +367,11 @@ class ExpenseService {
     }
   }
 
-  async getYourPaidByGroup(expensesByGroup) {
+  async getYourPaid(expenses) {
     let yourOwe = 0;
     let yourLent = 0;
     let othersPaid = 0;
-    for (expense of expensesByGroup) {
+    for (expense of expenses) {
       // Bill chua thanh toan
       if (!expense.isSettle) {
         for (par of expense.participants) {
@@ -446,7 +446,6 @@ class ExpenseService {
   }
   
   async getExpensesByFriendId(friendId) {
-    console.log(friendId)
     const expenses = [];
     const querySnapshot = await getDocs(
       query(

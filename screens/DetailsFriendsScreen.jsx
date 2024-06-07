@@ -140,14 +140,16 @@ const DetailFriendsScreen = ({ route }) => {
             {friendInfo?.username}
           </Text>
           <View className="flex-row space-x-1">
-            <Text className="text-gray-600">Chau N. owes you</Text>
+            <Text className="text-gray-600">
+              {/* Chau N. owes you */}
+            </Text>
             <Text
               style={{
                 color: "#0B9D7E",
                 fontWeight: 400,
               }}
             >
-              3.000.000vnđ
+              {/* 3.000.000vnđ */}
             </Text>
           </View>
         </View>
