@@ -61,25 +61,10 @@ const AddExpenseScreen = (props) => {
   };
   // Xử lí nhấn chọn tên user
   const handleSuggestionSelect = (item) => {
-    // Chọn cùng type
-    let tempType = selectionType;
-    if (selectedParticipants.length <= 1) {
-      if (item.uid) {
-        tempType = "user";
-        setSelectionType("user");
-      } else {
-        tempType = "group";
-        setSelectionType("group");
-      }
-    }
-    const isMatchingType = item.uid
-      ? tempType === "user"
-      : tempType === "group";
-    if (!isMatchingType) {
-      alert("Please select same user or group to split!");
+    if (selectedParticipants.length > 1) {
+      alert("Please select one user or group to split expense");
       return;
     }
-
     const isExist = selectedParticipants.some((participant) => {
       if (participant.userId) {
         return participant.userId === item.uid;
@@ -123,6 +108,7 @@ const AddExpenseScreen = (props) => {
       money: money,
     });
     setSelectedParticipants([{ userId: auth.currentUser.uid }]);
+    setFullSelected([]);
   };
   // Tạo hoá đơn
   const handleCreateExpense = async () => {
