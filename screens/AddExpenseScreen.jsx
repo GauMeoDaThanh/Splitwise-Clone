@@ -9,14 +9,16 @@ import {
   StyleSheet,
   FlatList,
   LogBox,
+  Alert,
 } from "react-native";
 import React, { useRef, useEffect, useState } from "react";
 import AddToolBar from "../components/AddToolBar";
 import ExpenseService from "../services/expense";
-
-const expenseService = ExpenseService.getInstance();
 import { useNavigation } from "@react-navigation/native";
 import { auth } from "../firebaseConfig";
+import BtnAddFriendToBill from "../components/BtnAddFriendToBill";
+
+const expenseService = ExpenseService.getInstance();
 const AddExpenseScreen = (props) => {
   LogBox.ignoreLogs([
     'Warning: Each child in a list should have a unique "key" prop.',
@@ -27,15 +29,22 @@ const AddExpenseScreen = (props) => {
   const [money, setMoney] = useState("");
   const [isFocused, setIsFocused] = useState(0);
   const [isBothFieldsFilled, setIsBothFieldsFilled] = useState(false);
+
+  // Làm Gợi ý khi nhận mail hoặc tên user
   const [suggestions, setSuggestions] = useState([]);
   let [selectedParticipants, setSelectedParticipants] = useState([
     { userId: auth.currentUser.uid },
   ]);
-
+  let [fullSelected, setFullSelected] = useState([auth.currentUser]);
   useEffect(() => {
-    // Focus vào TextInput khi mở trang
-    textInputRef.current.focus();
-  }, []); // Chỉ chạy một lần sau khi mở trang
+    setIsBothFieldsFilled(
+      description !== "" && money !== "" && selectedParticipants.length > 1
+    );
+    if (props.route.params) {
+      setDescription(props.route.params.description);
+      setMoney(props.route.params.amounts);
+    }
+  }, [description, money, selectedParticipants]);
 
   handleInputParticipants = async (text) => {
     const filteredSuggestions = await expenseService.handleInputParticipants(
@@ -56,17 +65,10 @@ const AddExpenseScreen = (props) => {
         ...prevSelectedPaticipants,
         item.uid ? { userId: item.uid } : { groupId: item.id },
       ]);
+      setFullSelected((prevSelected) => [...prevSelected, item]);
     } else {
-      console.log("Friend or group is already selected!");
+      alert("This person or group is already selected!");
     }
-  };
-  // Check điều kiện
-  const check = () => {
-    if (selectedParticipants.length <= 1) {
-      alert("Please choose someone to split the bill");
-      return false;
-    }
-    return true;
   };
   // Chia hoá đơn
   const handleSplitExpense = () => {
@@ -79,7 +81,6 @@ const AddExpenseScreen = (props) => {
   };
   // Tạo hoá đơn
   const handleCreateExpense = async () => {
-    if (!check()) return;
     let groupId = [];
     for (par of selectedParticipants) {
       if (par.groupId) {
@@ -114,6 +115,112 @@ const AddExpenseScreen = (props) => {
       console.error("Fail to add expense ", e);
     }
   };
+
+  const handleLongPress = (item) => {
+    Alert.alert(
+      "Warning",
+      "Are you sure you want to remove this person or group from the bill sharing list?",
+      [
+        {
+          text: "No",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            if (item.groupId) {
+              setSelectedParticipants(
+                selectedParticipants.filter(
+                  (par) => par.groupId !== item.groupId
+                )
+              );
+              setFullSelected(
+                fullSelected.filter((par) => par.groupId !== item.groupId)
+              );
+            } else {
+              setSelectedParticipants(
+                selectedParticipants.filter((par) => par.userId !== item.userId)
+              );
+              setFullSelected(
+                fullSelected.filter((par) => par.userId !== item.userId)
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+  // // Xử lí nhấn chọn tên user
+  // const handleSuggestionSelect = (item) => {
+  //   const isExist = selectedParticipants.some((participant) => {
+  //     if (participant.userId) {
+  //       return participant.userId === item.uid;
+  //     }
+  //     return participant.groupId === item.id;
+  //   });
+  //   if (!isExist) {
+  //     setSelectedParticipants((prevSelectedPaticipants) => [
+  //       ...prevSelectedPaticipants,
+  //       item.uid ? { userId: item.uid } : { groupId: item.id },
+  //     ]);
+  //   } else {
+  //     console.log("Friend or group is already selected!");
+  //   }
+  // };
+  // // Check điều kiện
+  // const check = () => {
+  //   if (selectedParticipants.length <= 1) {
+  //     alert("Please choose someone to split the bill");
+  //     return false;
+  //   }
+  //   return true;
+  // };
+  // // Chia hoá đơn
+  // const handleSplitExpense = () => {
+  //   navigation.navigate("SplitExpenseScreen", {
+  //     selectedParticipants: selectedParticipants,
+  //     description: description,
+  //     money: money,
+  //   });
+  //   setSelectedParticipants([{ userId: auth.currentUser.uid }]);
+  // };
+  // // Tạo hoá đơn
+  // const handleCreateExpense = async () => {
+  //   if (!check()) return;
+  //   let groupId = [];
+  //   for (par of selectedParticipants) {
+  //     if (par.groupId) {
+  //       groupId.push(par.groupId);
+  //     }
+  //   }
+  //   let splitParticipants = [];
+  //   const participantsList = await expenseService.getParticipants(
+  //     selectedParticipants
+  //   );
+  //   let isFirstFriend = true;
+  //   for (const participant of participantsList) {
+  //     splitParticipants.push({
+  //       userId: participant.uid,
+  //       amount: parseFloat(
+  //         (parseFloat(money) / participantsList.length).toFixed(0)
+  //       ),
+  //       settleUp: isFirstFriend,
+  //     });
+  //     isFirstFriend = false;
+  //   }
+  //   try {
+  //     await expenseService.createExpense(
+  //       new Date(),
+  //       parseFloat(money),
+  //       groupId,
+  //       description,
+  //       splitParticipants
+  //     );
+  //     navigation.navigate("Friends");
+  //   } catch (e) {
+  //     console.error("Fail to add expense ", e);
+  //   }
+  // };
   return (
     <View style={[{ flex: 100, backgroundColor: "white" }]} className="py-5">
       <View style={[{ flex: 7 }]}>
@@ -156,39 +263,72 @@ const AddExpenseScreen = (props) => {
           onChangeText={(text) => handleInputParticipants(text)}
         />
       </View>
-      <View style={{ position: "fixed" }}>
-        {suggestions.length > 0 ? (
-          <FlatList
-            keyExtractor={(item) => item?.uid}
-            data={suggestions} // Truyền trạng thái gợi ý cập nhật
-            renderItem={({ item, index }) => (
-              <TouchableOpacity
-                key={item?.uid}
-                onPress={() => handleSuggestionSelect(item)}
-              >
-                <Text>{item.type ? item.name : item.username}</Text>
-              </TouchableOpacity>
-            )}
-            style={{
-              height: 100,
-              borderColor: "gray",
-              borderWidth: 1,
-            }}
-            // Thêm chỉ báo tải trong khi lấy gợi ý (tùy chọn)
-            ListEmptyComponent={() => (
-              <View style={{ alignItems: "center", padding: 10 }}>
-                <Text>Không tìm thấy kết quả.</Text>
-                <TouchableOpacity onPress={() => handleInviteAddFriend()}>
-                  <Text style={{ color: "blue" }}>Thêm bạn bè</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          />
+      {/* <View style={{ position: "fixed" }}>
+                {suggestions.length > 0 ? ( 
+                      <FlatList
+                        data={suggestions} // Truyền trạng thái gợi ý cập nhật
+                        renderItem={({ item, index }) => (
+                            <TouchableOpacity 
+                                key = {index}
+                                onPress={() => handleSuggestionSelect(item)}
+                            >
+                                <Text>{item.type?item.name:item.username}</Text>
+                            </TouchableOpacity>
+                        )} 
+                        keyExtractor={(item) => item.uid}
+                        style={{
+                            height: 100,
+                            borderColor: "gray",
+                            borderWidth: 1,
+                        }}
+                        // Thêm chỉ báo tải trong khi lấy gợi ý (tùy chọn)
+                        ListEmptyComponent={() => (
+                            <View style={{ alignItems: "center", padding: 10 }}>
+                                <Text>Không tìm thấy kết quả.</Text>
+                                <TouchableOpacity
+                                    onPress={() => handleInviteAddFriend()}
+                                >
+                                    <Text style={{ color: "blue" }}>
+                                        Thêm bạn bè
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    />
+                ) : (
+                    <View style={{ alignItems: "center", padding: 10 }}>
+                        <Text>Add new friends!</Text>
+                    </View>
+                )}
+            </View> */}
+      <View style={styles.buttonListContainer}>
+        {fullSelected.length > 1 ? (
+          fullSelected
+            .slice(1)
+            .map((item) => (
+              <BtnAddFriendToBill
+                name={item.type ? item.name : item.username}
+                avatar={item.type ? item.imageuri : item.avatarUrl}
+                isSelected={true}
+                onLongPress={() => handleLongPress(item)}
+              ></BtnAddFriendToBill>
+            ))
         ) : (
-          ""
+          <Text></Text>
+        )}
+        {suggestions.map((item) =>
+          suggestions.length > 0 ? (
+            <BtnAddFriendToBill
+              name={item.type ? item.name : item.username}
+              avatar={item.type ? item.imageuri : item.avatarUrl}
+              isSelected={false} // Kiểm tra xem nút này có được chọn không
+              onPress={() => handleSuggestionSelect(item)}
+            ></BtnAddFriendToBill>
+          ) : (
+            <Text></Text>
+          )
         )}
       </View>
-
       <View
         style={[
           {
@@ -237,11 +377,7 @@ const AddExpenseScreen = (props) => {
               },
             ]}
             value={money}
-            onChangeText={(text) => {
-              if (!isNaN(text)) {
-                setMoney(text);
-              }
-            }}
+            onChangeText={(text) => setMoney(text)}
             onFocus={() => setIsFocused(2)}
             onBlur={() => setIsFocused(0)}
           ></TextInput>
@@ -253,11 +389,11 @@ const AddExpenseScreen = (props) => {
             alignItems: "center",
           }}
         >
-          {/* <Text>Paid by </Text>
+          <Text>Paid by </Text>
           <TouchableOpacity style={[styles.buttonStyle]}>
             <Text> you </Text>
-          </TouchableOpacity> */}
-          <Text> Split </Text>
+          </TouchableOpacity>
+          <Text> and split </Text>
           <TouchableOpacity
             style={[styles.buttonStyle]}
             onPress={handleSplitExpense}
@@ -270,23 +406,7 @@ const AddExpenseScreen = (props) => {
 
       <View
         style={[{ flex: 10, borderTopColor: "#EEEEEE", borderTopWidth: 1 }]}
-      >
-        {/* <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", justifyContent: 'flex-end' }} onPress={handleAddImageExpense}>
-       
-          <Image
-            source={require("../assets/icons/camera.png")}
-            style={{ width: 60, height: 60 }}
-          />
-  
-        </TouchableOpacity> */}
-      </View>
-      {/* <View style={[{ isFocused === 2 ? flex: 50 : flex: 36 }]}>
-        <KeyboardAvoidingView
-          // style={{ flex: 1 }}
-          // behavior={Platform.OS === "ios" ? "padding" : "height"}
-          // keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-        ></KeyboardAvoidingView>
-      </View> */}
+      ></View>
       {isFocused === 2 && (
         <View style={{ flex: 36 }}>
           {<KeyboardAvoidingView></KeyboardAvoidingView>}
@@ -315,5 +435,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 6,
     padding: 3,
+  },
+  buttonListContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    borderBottomColor: "#EEEEEE",
+    borderBottomWidth: 1,
+    flexWrap: "wrap", // Để các nút tự động xuống dòng khi hết chỗ
   },
 });

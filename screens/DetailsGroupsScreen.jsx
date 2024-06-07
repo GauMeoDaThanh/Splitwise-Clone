@@ -305,11 +305,7 @@ const DetailsGroupsScreen = ({ route }) => {
                 </View>
                 <View className="flex-row p-2 items-center border border-gray-400 bg-gray-200">
                   <Image
-                    source={
-                      expense?.imageuri
-                        ? { uri: imageuri }
-                        : require("../assets/icons/icon_bill.png")
-                    }
+                    source={require("../assets/icons/icon_bill.png")}
                     style={{
                       width: 22,
                       height: 22,

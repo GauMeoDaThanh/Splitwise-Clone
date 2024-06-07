@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
   Text,
@@ -12,18 +12,52 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import ButtonAddExpense from "../components/ButtonAddExpense";
 import FriendService from "../services/friend";
-
+import ExpenseService from "../services/expense";
+import { auth } from "../firebaseConfig";
+import UserService from "../services/user";
 const DetailFriendsScreen = ({ route }) => {
   const navigation = useNavigation();
   const { friendId } = route.params;
   const [friendInfo, setFriendInfo] = useState([]);
   const [showEditOptions, setShowEditOptions] = useState(false);
+  const [expenses, setExpenses] = useState([]);
+  const [surplus, setSurplus] = useState([]);
+  const [createBy, setCreateBy] = useState([]);
 
-  useEffect(() => {
-    FriendService.getInstance().listenToFriendDetail(friendId, (friendInfo) => {
-      setFriendInfo(friendInfo);
-    });
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        FriendService.getInstance().listenToFriendDetail(
+          friendId,
+          async (friendInfo) => {
+            setFriendInfo(friendInfo);
+            try {
+              const expenseList =
+                await ExpenseService.getInstance().getExpensesByFriendId(
+                  friendId
+                );
+              setExpenses(expenseList); // Cập nhật state với dữ liệu thực
+              let paidUsers = [];
+              for (expense of expenseList) {
+                paidUsers.push(
+                  await UserService.getInstance().getUserById(expense.createBy)
+                );
+              }
+              setSurplus(
+                await ExpenseService.getInstance().calculateSurplusAmounts(
+                  expenseList
+                )
+              );
+              setCreateBy(paidUsers);
+            } catch (error) {
+              console.log("Error to fetch data, ", error);
+            }
+          }
+        );
+      };
+      fetchData();
+    }, [])
+  );
 
   const toggleEditOptions = () => {
     setShowEditOptions(!showEditOptions);
@@ -127,229 +161,123 @@ const DetailFriendsScreen = ({ route }) => {
           </View>
         </View>
       </View>
-
-      {/* Viết code vô Flastlist */}
-      {/* <View className = 'flex-col space-y-6 px-1'>
-                <FlatList>
-                    <View className = 'flex-col px-2 space-y-3'>
-                        <Text className = 'text-gray-700 px-1'
-                            style = {{
-                                fontSize: 13,
-                                fontWeight: 500
-                            }}
-                        >
-                            Tháng 5 2024
-                        </Text>
-                        <View className = 'flex-row'>
-                            <TouchableOpacity flex-row space-x-5 px-1 items-center>
-                                <View className = 'flex-col items-center'>
-                                    <Text 
-                                        className = 'text-gray-600'
-                                        style = {{
-                                            fontSize: 12
-                                        }}
-                                    >
-                                        Th5
-                                    </Text>
-                                    <Text
-                                        className = 'text-gray-600'
-                                        style = {{
-                                            fontSize: 17,
-                                            fontWeight: 500
-                                        }}
-                                    >
-                                        11
-                                    </Text>
-                                </View>
-                                <View className = 'flex-row p-2 items-center border border-gray-400 bg-gray-200'>
-                                    <Image
-                                        source={require('../assets/icons/icon_bill.png')}
-                                        style = {{
-                                            width: 22,
-                                            height: 22
-                                        }} 
-                                    >
-                                    </Image>
-                                </View>
-                                <View className='flex-col items-start'>
-                                    <Text
-                                        className = 'text-gray-600'
-                                        style = {{
-                                            fontSize: 16,
-                                            fontWeight: 500
-                                        }}
-                                    >
-                                        bill share1
-                                    </Text>
-                                    <Text
-                                        className = 'text-gray-500'
-                                        style = {{
-                                            fontSize: 12
-                                        }}
-                                    >
-                                        Nhung paid 200.000vnđ
-                                    </Text>
-                                </View>
-                                <View className='flex-col items-end'>
-                                    <Text
-                                        className = 'text-red-600'
-                                        style = {{
-                                            fontSize: 12,
-                                            fontWeight: 500
-                                        }}
-                                    >
-                                        you borrowed
-                                    </Text>
-                                    <Text
-                                        className = 'text-red-600'
-                                        style = {{
-                                            fontSize: 13,
-                                            fontWeight: 500
-                                        }}
-                                    >
-                                    200.000vnđ
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </FlatList> 
-            </View> */}
-
       <View className="flex-col space-y-6 px-1">
         <View className="flex-col px-2 space-y-3">
-          <Text
-            className="text-gray-700 px-1"
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-            }}
-          >
-            Tháng 5 2024
-          </Text>
-          <View className="flex-row ">
-            <TouchableOpacity className="flex-row space-x-5 px-1 items-center">
-              <View className="flex-col items-center">
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 12,
-                  }}
-                >
-                  Th5
-                </Text>
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 500,
-                  }}
-                >
-                  11
-                </Text>
-              </View>
-              <View className="flex-row p-2 items-center border border-gray-400 bg-gray-200">
-                <Image
-                  source={require("../assets/icons/icon_bill.png")}
-                  style={{
-                    width: 22,
-                    height: 22,
-                  }}
-                ></Image>
-              </View>
-              <View className="flex-col items-start">
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 500,
-                  }}
-                >
-                  bill share1
-                </Text>
-                <Text
-                  className="text-gray-500"
-                  style={{
-                    fontSize: 12,
-                  }}
-                >
-                  Nhung paid 200.000vnđ
-                </Text>
-              </View>
-              <View className="flex-col items-end">
-                <Text
-                  className="text-red-600"
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 500,
-                  }}
-                >
-                  you borrowed
-                </Text>
-                <Text
-                  className="text-red-600"
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 500,
-                  }}
-                >
-                  200.000vnđ
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View className="flex-col px-2 space-y-3">
-          <Text
-            className="text-gray-700 px-1"
-            style={{
-              fontSize: 13,
-              fontWeight: 500,
-            }}
-          >
-            Tháng 6 2024
-          </Text>
-          <View className="flex-row">
-            <TouchableOpacity className="flex-row space-x-5 px-1 items-center">
-              <View className="flex-col items-center">
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 12,
-                  }}
-                >
-                  Th6
-                </Text>
-                <Text
-                  className="text-gray-600"
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 500,
-                  }}
-                >
-                  15
-                </Text>
-              </View>
-              <View className="flex-row p-2 items-center">
-                <Image
-                  source={require("../assets/icons/money_icon.png")}
-                  style={{
-                    width: 23,
-                    height: 23,
-                  }}
-                ></Image>
-              </View>
-              <Text
-                className="text-gray-600"
-                style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                }}
+          {expenses.map((expense, index) => (
+            <View key={index} className="flex-row ">
+              <TouchableOpacity
+                className="flex-row space-x-5 px-1 items-center"
+                onPress={() =>
+                  navigation.navigate("DetailExpense", {
+                    expenseId: expense.id,
+                  })
+                }
               >
-                Dat V. paid Nhung 200.000vnđ
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <View className="flex-col items-center">
+                  <Text
+                    className="text-gray-600"
+                    style={{
+                      fontSize: 12,
+                    }}
+                  >
+                    {"T" +
+                      (new Date(
+                        expense.createAt.seconds * 1000 +
+                          expense.createAt.nanoseconds / 1000000
+                      ).getMonth() +
+                        1) +
+                      "/" +
+                      new Date(
+                        expense.createAt.seconds * 1000 +
+                          expense.createAt.nanoseconds / 1000000
+                      ).getFullYear()}
+                  </Text>
+                  <Text
+                    className="text-gray-600"
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {new Date(
+                      expense.createAt.seconds * 1000 +
+                        expense.createAt.nanoseconds / 1000000
+                    ).getDate()}
+                  </Text>
+                </View>
+                <View className="flex-row p-2 items-center border border-gray-400 bg-gray-200">
+                  <Image
+                    source={require("../assets/icons/icon_bill.png")}
+                    style={{
+                      width: 22,
+                      height: 22,
+                    }}
+                  ></Image>
+                </View>
+                <View className="flex-col items-start">
+                  <Text
+                    className="text-gray-600"
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {expense.description}
+                  </Text>
+                  <Text
+                    className="text-gray-500"
+                    style={{
+                      fontSize: 12,
+                    }}
+                  >
+                    {createBy[index]?.uid
+                      ? createBy[index]?.uid == auth.currentUser.uid
+                        ? `you paid ${Math.abs(expense.amounts).toLocaleString(
+                            "de-De"
+                          )}`
+                        : `${createBy[index]?.username} paid ${Math.abs(
+                            expense.amounts
+                          ).toLocaleString("de-De")}`
+                      : ""}
+                  </Text>
+                </View>
+                <View className="flex-col items-end">
+                  <Text
+                    className={
+                      createBy[index]?.uid == auth.currentUser.uid
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {surplus[index] === "0"
+                      ? ""
+                      : createBy[index]?.uid
+                      ? createBy[index]?.uid == auth.currentUser.uid
+                        ? "you lent"
+                        : `${createBy[index]?.username} lent`
+                      : ""}
+                  </Text>
+                  <Text
+                    className={
+                      createBy[index]?.uid == auth.currentUser.uid
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {surplus[index] === "0" ? "" : surplus[index] + " vnd"}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
       </View>
 
