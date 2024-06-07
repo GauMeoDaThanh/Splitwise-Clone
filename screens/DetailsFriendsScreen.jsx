@@ -27,37 +27,35 @@ const DetailFriendsScreen = ({ route }) => {
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
-        FriendService.getInstance().listenToFriendDetail(
-          friendId,
-          async (friendInfo) => {
-            setFriendInfo(friendInfo);
-            try {
-              const expenseList =
-                await ExpenseService.getInstance().getExpensesByFriendId(
-                  friendId
-                );
-              setExpenses(expenseList); // Cập nhật state với dữ liệu thực
-              let paidUsers = [];
-              for (expense of expenseList) {
-                paidUsers.push(
-                  await UserService.getInstance().getUserById(expense.createBy)
-                );
-              }
-              setSurplus(
-                await ExpenseService.getInstance().calculateSurplusAmounts(
-                  expenseList
-                )
-              );
-              setCreateBy(paidUsers);
-            } catch (error) {
-              console.log("Error to fetch data, ", error);
-            }
+        try {
+          const expenseList =
+            await ExpenseService.getInstance().getExpensesByFriendId(friendId);
+          setExpenses(expenseList); // Cập nhật state với dữ liệu thực
+          let paidUsers = [];
+          for (expense of expenseList) {
+            paidUsers.push(
+              await UserService.getInstance().getUserById(expense.createBy)
+            );
           }
-        );
+          setSurplus(
+            await ExpenseService.getInstance().calculateSurplusAmounts(
+              expenseList
+            )
+          );
+          setCreateBy(paidUsers);
+        } catch (error) {
+          console.log("Error to fetch data, ", error);
+        }
       };
       fetchData();
-    }, [])
+    }, [friendInfo])
   );
+
+  useEffect(() => {
+    FriendService.getInstance().listenToFriendDetail(friendId, (friendInfo) => {
+      setFriendInfo(friendInfo);
+    });
+  }, []);
 
   const toggleEditOptions = () => {
     setShowEditOptions(!showEditOptions);

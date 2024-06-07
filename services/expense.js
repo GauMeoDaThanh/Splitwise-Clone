@@ -142,7 +142,7 @@ class ExpenseService {
   }
 
   // Handle input friend or group to share bill
-  async handleInputParticipants(text) {
+  async handleInputParticipants(text, selectedParticipants) {
     const idFr = await friendService.getFriendList(auth.currentUser?.uid);
     const users = [];
     for (id of idFr) {
@@ -165,7 +165,21 @@ class ExpenseService {
     });
 
     if (text == "") return [];
-    const filteredSuggestions = [...filteredUsers, ...filteredGroups];
+    let filteredSuggestions = [...filteredUsers, ...filteredGroups];
+    // Loại sugg nếu đã chọn
+    const selectedUserIds = new Set(
+      selectedParticipants.map((participant) => participant.userId)
+    );
+    const selectedGroupIds = new Set(
+      selectedParticipants.map((participant) => participant.groupId)
+    );
+    filteredSuggestions = filteredSuggestions.filter((sugg) => {
+      if (sugg.uid) {
+        return !selectedUserIds.has(sugg.uid);
+      } else if (sugg.id) {
+        return !selectedGroupIds.has(sugg.id);
+      }
+    });
     return filteredSuggestions;
   }
 
@@ -413,12 +427,12 @@ class ExpenseService {
     }
   }
 
-  async getYourPaidByGroup(expensesByGroup) {
+  async getYourPaid(expenses) {
     let yourOwe = 0;
     let yourLent = 0;
     let othersPaid = 0;
-    for (expense of expensesByGroup) {
-      // Chỉ tính những bill chưa thanh toán
+    for (expense of expenses) {
+      // Bill chua thanh toan
       if (!expense.isSettle) {
         for (par of expense.participants) {
           if (par.userId === auth.currentUser.uid) {
@@ -527,7 +541,6 @@ class ExpenseService {
   }
 
   async getExpensesByFriendId(friendId) {
-    console.log(friendId);
     const expenses = [];
     const querySnapshot = await getDocs(
       query(

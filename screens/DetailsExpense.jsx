@@ -101,6 +101,7 @@ const DetailsExpense = (props) => {
         <DetailsToolBar
           navigation={props.navigation}
           onPress={handleDelete}
+          expenseInfo={expenseInfo}
         ></DetailsToolBar>
       </View>
       <View style={{ flex: 76, flexDirection: "column" }}>

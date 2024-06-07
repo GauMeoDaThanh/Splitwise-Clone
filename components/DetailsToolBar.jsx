@@ -1,5 +1,13 @@
-import { Text, TouchableOpacity, StyleSheet, View, Image, Alert } from "react-native";
+import {
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  View,
+  Image,
+  Alert,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { auth } from "../firebaseConfig";
 
 const DetailsToolBar = (props) => {
   return (
@@ -15,22 +23,24 @@ const DetailsToolBar = (props) => {
           style={{ width: 20, height: 20 }}
         />
       </TouchableOpacity>
-      <Text style={{ fontWeight: "500", fontSize: 16, marginStart: 50 }}>Details</Text>
-      <View style={{ flexDirection: 'row'}}>
-       {/* <TouchableOpacity>
+      <Text style={{ fontWeight: "500", fontSize: 16 }}>Details</Text>
+      <View style={{ flexDirection: "row" }}>
+        {/* <TouchableOpacity>
        <Image
            source={require("../assets/icons/edit.png")}
           style={{ width: 20, height: 20, marginHorizontal: 5 }}
         />
         </TouchableOpacity> */}
-         <TouchableOpacity
-          onPress={props.onPress}
-        >
-        <Image
-          source={require("../assets/icons/delete.png")}
-          style={{ width: 20, height: 20, marginHorizontal: 10, }}
-        />
-        </TouchableOpacity>
+        {props.expenseInfo.paidBy === auth.currentUser.uid ? (
+          <TouchableOpacity onPress={props.onPress}>
+            <Image
+              source={require("../assets/icons/delete.png")}
+              style={{ width: 20, height: 20, marginHorizontal: 10 }}
+            />
+          </TouchableOpacity>
+        ) : (
+          ""
+        )}
       </View>
     </View>
   );

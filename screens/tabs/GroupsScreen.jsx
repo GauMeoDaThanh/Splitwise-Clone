@@ -81,9 +81,7 @@ const GroupsScreen = () => {
               await ExpenseService.getInstance().getExpensesByGroupId(group.id);
             expensesList.push(expensesByGr);
             differenceList.push(
-              await ExpenseService.getInstance().getYourPaidByGroup(
-                expensesByGr
-              )
+              await ExpenseService.getInstance().getYourPaid(expensesByGr)
             );
           }
           setTotalAmount(
@@ -123,9 +121,7 @@ const GroupsScreen = () => {
               await ExpenseService.getInstance().getExpensesByGroupId(group.id);
             expensesList.push(expensesByGr);
             differenceList.push(
-              await ExpenseService.getInstance().getYourPaidByGroup(
-                expensesByGr
-              )
+              await ExpenseService.getInstance().getYourPaid(expensesByGr)
             );
           }
           setTotalAmount(
@@ -219,7 +215,7 @@ const GroupsScreen = () => {
                         source={
                           item.imageuri
                             ? { uri: item.imageuri }
-                            : require("../../assets/images/avatar_image.jpg")
+                            : require("../../assets/icons/account.png")
                         }
                         style={{
                           width: 90,
