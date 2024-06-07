@@ -110,7 +110,7 @@ class ExpenseService {
   }
 
   // Handle input friend or group to share bill
-  async handleInputParticipants(text) {
+  async handleInputParticipants(text, selectedParticipants) {
     const idFr = await friendService.getFriendList(auth.currentUser?.uid);
     const users = [];
     for (id of idFr) {
@@ -135,7 +135,17 @@ class ExpenseService {
     });
 
     if (text == "") return [];
-    const filteredSuggestions = [...filteredUsers, ...filteredGroups];
+    let filteredSuggestions = [...filteredUsers, ...filteredGroups];
+    // Loại sugg nếu đã chọn
+    const selectedUserIds = new Set(selectedParticipants.map(participant => participant.userId));
+    const selectedGroupIds = new Set(selectedParticipants.map(participant => participant.groupId));
+    filteredSuggestions = filteredSuggestions.filter(sugg => {
+      if (sugg.uid) {
+          return !selectedUserIds.has(sugg.uid);
+     } else if (sugg.id) {
+          return !selectedGroupIds.has(sugg.id);
+      }
+    });
     return filteredSuggestions;
   }
 

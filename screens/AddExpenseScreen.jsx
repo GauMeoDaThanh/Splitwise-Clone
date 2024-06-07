@@ -26,6 +26,7 @@ const AddExpenseScreen = (props) => {
     const [money, setMoney] = useState("");
     const [isFocused, setIsFocused] = useState(0);
     const [isBothFieldsFilled, setIsBothFieldsFilled] = useState(false);
+    const [selectionType, setSelectionType] = useState();
     
     useEffect(() => {
         // Focus vào TextInput khi mở trang
@@ -35,7 +36,7 @@ const AddExpenseScreen = (props) => {
     // Làm Gợi ý khi nhận mail hoặc tên user
     const [suggestions, setSuggestions] = useState([]);
     let [selectedParticipants, setSelectedParticipants] = useState([{ userId: auth.currentUser.uid }]);
-    let [fullSelected, setFullSelected] = useState([auth.currentUser])
+    let [fullSelected, setFullSelected] = useState([])
     useEffect(() => {
         setIsBothFieldsFilled(description !== "" && money !== "" && selectedParticipants.length > 1);
         if (props.route.params) {
@@ -45,11 +46,29 @@ const AddExpenseScreen = (props) => {
     }, [description, money, selectedParticipants]);
 
     handleInputParticipants = async (text) => {
-        const filteredSuggestions = await expenseService.handleInputParticipants(text);
+        const filteredSuggestions = await expenseService.handleInputParticipants(text, selectedParticipants);
         setSuggestions(filteredSuggestions);    
     };
     // Xử lí nhấn chọn tên user
     const handleSuggestionSelect = (item) => {
+        // Chọn cùng type
+        let tempType = selectionType;
+        if (selectedParticipants.length <= 1) {
+            if (item.uid) {
+                tempType = 'user';
+                setSelectionType('user');
+            }
+            else {
+                tempType = 'group';
+                setSelectionType('group');
+            }
+        }
+        const isMatchingType = item.uid ? tempType === 'user' : tempType === 'group';
+        if (!isMatchingType) {
+            alert("Please select same user or group to split!");
+            return;
+        }
+
             const isExist = selectedParticipants.some(
             (participant) => {
                 if (participant.userId) {
@@ -64,12 +83,20 @@ const AddExpenseScreen = (props) => {
                 item.uid?{userId: item.uid}:{groupId: item.id},
             ]);
             setFullSelected((prevSelected) => [
-                ...prevSelected, item
-            ])
+                ...prevSelected, item.uid ? { userId: item.uid, username: item.username, avatarUrl: item.avatarUrl } : { groupId: item.id, name: item.name, imageuri: item.imageuri }
+            ]);
+            setSuggestions(suggestions.filter((fr) => {
+                if (fr.uid !== undefined) {
+                    return fr.uid !== item.uid;
+                } else {
+                    return fr.id !== item.id;
+                }
+            }));
         } else {
             alert("This person or group is already selected!");
         }
     };
+
     // Chia hoá đơn
     const handleSplitExpense = () => {
         navigation.navigate('SplitExpenseScreen', { selectedParticipants:selectedParticipants, description:description, money:money });
@@ -120,14 +147,14 @@ const AddExpenseScreen = (props) => {
         {
           text: "Yes",
             onPress: () => {
-              if (item.groupId) {
+                if (item.groupId) {
                   setSelectedParticipants(selectedParticipants.filter(par => par.groupId !== item.groupId));
                   setFullSelected(fullSelected.filter(par => par.groupId !== item.groupId));
               }
-              else {
+                else if(item.userId){
                 setSelectedParticipants(selectedParticipants.filter(par => par.userId !== item.userId));
                 setFullSelected(fullSelected.filter(par => par.userId !== item.userId));
-              }
+                }
           }
         }
       ]
@@ -175,52 +202,13 @@ const AddExpenseScreen = (props) => {
                     onChangeText={(text) => handleInputParticipants(text)}
                 />
             </View>
-           {/* <View style={{ position: "fixed" }}>
-                {suggestions.length > 0 ? ( 
-                      <FlatList
-                        data={suggestions} // Truyền trạng thái gợi ý cập nhật
-                        renderItem={({ item, index }) => (
-                            <TouchableOpacity 
-                                key = {index}
-                                onPress={() => handleSuggestionSelect(item)}
-                            >
-                                <Text>{item.type?item.name:item.username}</Text>
-                            </TouchableOpacity>
-                        )} 
-                        keyExtractor={(item) => item.uid}
-                        style={{
-                            height: 100,
-                            borderColor: "gray",
-                            borderWidth: 1,
-                        }}
-                        // Thêm chỉ báo tải trong khi lấy gợi ý (tùy chọn)
-                        ListEmptyComponent={() => (
-                            <View style={{ alignItems: "center", padding: 10 }}>
-                                <Text>Không tìm thấy kết quả.</Text>
-                                <TouchableOpacity
-                                    onPress={() => handleInviteAddFriend()}
-                                >
-                                    <Text style={{ color: "blue" }}>
-                                        Thêm bạn bè
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                    />
-                ) : (
-                    <View style={{ alignItems: "center", padding: 10 }}>
-                        <Text>Add new friends!</Text>
-                    </View>
-                )}
-            </View> */}
          <View style={styles.buttonListContainer}>
                 {
-                fullSelected.length > 1 ?
-                (fullSelected.slice(1).map((item) => (
-               
+                fullSelected.length > 0 ?
+                (fullSelected.map((item) => (
                    <BtnAddFriendToBill
-                    name={item.type?item.name:item.username}
-                    avatar={item.type?item.imageuri:item.avatarUrl}
+                    name={item.groupId?item.name:item.username}
+                    avatar={item.groupId?item.imageuri:item.avatarUrl}
                     isSelected={true}
                     onLongPress={()=>handleLongPress(item)}
                     ></BtnAddFriendToBill>))):(<Text></Text>)}
