@@ -142,7 +142,7 @@ const DetailsGroupsScreen = ({ route }) => {
             source={
               group.imageuri
                 ? { uri: group.imageuri }
-                : require("../assets/images/avatar_image.jpg")
+                : require("../assets/icons/account.png")
             }
             style={{
               borderRadius: 15,

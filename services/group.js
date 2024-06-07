@@ -114,6 +114,13 @@ class GroupService {
     try {
       const groupRef = await addDoc(collection(db, GROUP_COLLECTION), group);
       console.log("Document written with ID: ", groupRef.id);
+
+      if (imgUri) {
+        await this.uploadAvatar(groupRef.id, imgUri);
+      }
+
+      navigation.navigate("DetailGroups", { groupInfo: groupRef.id });
+
       ActivityService.getInstance().aCreateGroup(
         groupRef.id,
         group["name"],

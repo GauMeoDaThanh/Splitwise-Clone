@@ -141,7 +141,7 @@ const AddExpenseScreen = (props) => {
         description,
         splitParticipants
       );
-      navigation.navigate("Friends");
+      navigation.goBack();
     } catch (e) {
       console.error("Fail to add expense ", e);
     }
