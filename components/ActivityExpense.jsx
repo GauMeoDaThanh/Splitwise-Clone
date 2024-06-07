@@ -113,7 +113,7 @@ const ActivityExpense = ({ data }) => {
                 fontWeight: "500",
               }}
             >
-              you owe {Math.abs(userAmount).toLocaleString("de-De")} vnd
+              you owed {Math.abs(userAmount).toLocaleString("de-De")} vnd
             </Text>
           </View>
         )}

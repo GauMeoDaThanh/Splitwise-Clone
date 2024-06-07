@@ -265,6 +265,7 @@ const DetailsGroupsScreen = ({ route }) => {
             <View key={index} className="flex-row ">
               <TouchableOpacity
                 className="flex-row space-x-5 px-1 items-center"
+                style={{ justifyContent: "space-between", width: "100%" }}
                 onPress={() =>
                   navigation.navigate("DetailExpense", {
                     expenseId: expense.id,
@@ -312,7 +313,13 @@ const DetailsGroupsScreen = ({ route }) => {
                     }}
                   ></Image>
                 </View>
-                <View className="flex-col items-start">
+                <View
+                  className="flex-col items-start"
+                  style={{
+                    width: 110,
+                    flexWrap: "wrap",
+                  }}
+                >
                   <Text
                     className="text-gray-600"
                     style={{
@@ -340,8 +347,12 @@ const DetailsGroupsScreen = ({ route }) => {
                   </Text>
                 </View>
                 <View
-                  className="flex-col items-end"
-                  style={{ alignItems: "flex-end" }}
+                  className="flex-col"
+                  style={{
+                    // alignItems: "flex-end",
+                    width: 80,
+                    flexWrap: "wrap",
+                  }}
                 >
                   <Text
                     className={

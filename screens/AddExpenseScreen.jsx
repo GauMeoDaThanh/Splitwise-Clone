@@ -389,11 +389,11 @@ const AddExpenseScreen = (props) => {
             alignItems: "center",
           }}
         >
-          <Text>Paid by </Text>
+          {/* <Text>Paid by </Text>
           <TouchableOpacity style={[styles.buttonStyle]}>
             <Text> you </Text>
-          </TouchableOpacity>
-          <Text> and split </Text>
+          </TouchableOpacity> */}
+          <Text> Split </Text>
           <TouchableOpacity
             style={[styles.buttonStyle]}
             onPress={handleSplitExpense}

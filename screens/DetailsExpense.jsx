@@ -26,6 +26,7 @@ const DetailsExpense = (props) => {
   const [paidByUser, setPaidByUser] = useState(); // New state to store user information
   const [debt, setDebt] = useState([]);
   const [participants, setParticipants] = useState([]);
+  const [user, setUser] = useState();
   LogBox.ignoreAllLogs(true);
   useEffect(() => {
     ExpenseService.getInstance().listenToFriendDetail(
@@ -122,33 +123,92 @@ const DetailsExpense = (props) => {
           >
             <Image
               source={require("../assets/icons/icon_bill.png")}
+              //     style={{ width: 60, height: 60 }}
+              //   />
+              //   <View
+              //     style={[
+              //       {
+              //         flex: 30,
+              //         flexDirection: "row",
+              //         justifyContent: "flex-start",
+              //         alignItems: "center",
+              //         backgroundColor: "#EEEEEE",
+              //         borderBottomColor: "#EEEEEE",
+              //         borderBottomWidth: 1,
+              //         paddingHorizontal: 12,
+              //         paddingVertical: 16,
+              //         position: "relative",
+              //       },
+              //     ]}
+              //   >
+              //     <Text
+              //       style={{ fontSize: 18, fontWeight: "400", marginVertical: 2 }}
+              //     >
+              //       {expenseInfo?.description}
+              //     </Text>
+              //     <Text
+              //       style={{ fontSize: 20, fontWeight: "500", marginVertical: 5 }}
+              //     >
+              //       {expenseInfo.amounts} vnd
+              //     </Text>
+              //     <Text
+              //       style={{
+              //         fontSize: 14,
+              //         fontWeight: "400",
+              //         marginVertical: 8,
+              //         width: 250,
+              //       }}
+              //     >
+              //       Added by {paidByUser?.username}{" "}
+              //       {expenseInfo?.createAt
+              //         ? "on " +
+              //           new Date(
+              //             expenseInfo.createAt.seconds * 1000 +
+              //               expenseInfo.createAt.nanoseconds / 1000000
+              //           ).toLocaleDateString("en-GB")
+              //         : ""}
+              //     </Text>
+              //   </View>
+              // </View>
+              // <View
+              //   style={[
+              //     {
+              //       flex: 30,
+              //       flexDirection: "column",
+              //       justifyContent: "flex-start",
+              //       alignItems: "flex-start",
+              //       padding: 12,
+              //     },
+              //   ]}
+              // >
+              //   <View style={{ flexDirection: "row", alignItems: "center" }}>
+              //     <Image
+              //       source={require("../assets/icons/bill6.png")}
               style={{ width: 60, height: 60 }}
             />
             <View
               style={[
                 {
-                  flex: 30,
-                  flexDirection: "row",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                  backgroundColor: "#EEEEEE",
-                  borderBottomColor: "#EEEEEE",
-                  borderBottomWidth: 1,
-                  paddingHorizontal: 12,
-                  paddingVertical: 16,
-                  position: "relative",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "flex-start",
+                  marginStart: 10,
+                  marginEnd: 10,
                 },
               ]}
             >
               <Text
                 style={{ fontSize: 18, fontWeight: "400", marginVertical: 2 }}
               >
-                {expenseInfo?.description}
+                {expenseInfo.description}
               </Text>
               <Text
                 style={{ fontSize: 20, fontWeight: "500", marginVertical: 5 }}
               >
-                {expenseInfo.amounts} vnd
+                {Math.abs(expenseInfo.amounts?.toFixed(0)).toLocaleString(
+                  "de-De"
+                )}{" "}
+                vnd
               </Text>
               <Text
                 style={{
@@ -168,6 +228,20 @@ const DetailsExpense = (props) => {
                   : ""}
               </Text>
             </View>
+            <TouchableOpacity
+              style={{
+                width: 60,
+                height: 60,
+                position: "absolute",
+                right: 12,
+              }}
+              onPress={chooseImage}
+            >
+              <Image
+                source={require("../assets/icons/photo.png")}
+                style={{ width: 60, height: 60 }}
+              />
+            </TouchableOpacity>
           </View>
           <View
             style={[
@@ -182,65 +256,18 @@ const DetailsExpense = (props) => {
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Image
-                source={require("../assets/icons/bill6.png")}
-                style={{ width: 60, height: 60 }}
+                source={
+                  user?.avatarUrl
+                    ? { uri: user.avatarUrl }
+                    : require("../assets/icons/account.png")
+                }
+                style={{ width: 40, height: 40, borderRadius: 20 }}
               />
-              <View
-                style={[
-                  {
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "flex-start",
-                    marginStart: 10,
-                    marginEnd: 10,
-                  },
-                ]}
-              >
-                <Text
-                  style={{ fontSize: 18, fontWeight: "400", marginVertical: 2 }}
-                >
-                  {expenseInfo.description}
-                </Text>
-                <Text
-                  style={{ fontSize: 20, fontWeight: "500", marginVertical: 5 }}
-                >
-                  {Math.abs(expenseInfo.amounts?.toFixed(0)).toLocaleString(
-                    "de-De"
-                  )}{" "}
-                  vnd
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: "400",
-                    marginVertical: 8,
-                    width: 250,
-                  }}
-                >
-                  Added by {paidByUser?.username}{" "}
-                  {expenseInfo?.createAt
-                    ? "on " +
-                      new Date(
-                        expenseInfo.createAt.seconds * 1000 +
-                          expenseInfo.createAt.nanoseconds / 1000000
-                      ).toLocaleDateString("en-GB")
-                    : ""}
+              <View style={{ paddingHorizontal: 20, width: "68%" }}>
+                <Text style={{ fontSize: 18, fontWeight: "500" }}>
+                  {debt[0]}
                 </Text>
               </View>
-              <TouchableOpacity
-                style={{
-                  width: 60,
-                  height: 60,
-                  position: "absolute",
-                  right: 12,
-                }}
-                onPress={chooseImage}
-              >
-                <Image
-                  source={require("../assets/icons/photo.png")}
-                  style={{ width: 60, height: 60 }}
-                />
-              </TouchableOpacity>
             </View>
             <View style={{ paddingStart: 60, marginTop: 10 }}>
               {debt.slice(1).map((debt, index) => (

@@ -525,6 +525,31 @@ class ExpenseService {
       console.error("Error processing payment:", error.message); // Handle errors
     }
   }
+
+  async getExpensesByFriendId(friendId) {
+    console.log(friendId);
+    const expenses = [];
+    const querySnapshot = await getDocs(
+      query(
+        collection(db, "expenses"),
+        where("groupId", "==", []),
+        orderBy("createAt", "desc")
+      )
+    );
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const participantUserIds = data.participants.map(
+        (participant) => participant.userId
+      );
+      if (
+        participantUserIds.includes(friendId) &&
+        participantUserIds.includes(auth.currentUser.uid)
+      ) {
+        expenses.push({ id: doc.id, ...data });
+      }
+    });
+    return expenses;
+  }
 }
 
 export default ExpenseService;
