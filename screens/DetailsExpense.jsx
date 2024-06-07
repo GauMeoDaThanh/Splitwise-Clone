@@ -81,6 +81,11 @@ const DetailsExpense = (props) => {
             } }
           ]
         );
+  };
+  
+  const handleEdit = () => {
+
+       navigation.navigate('EditExpense',{expenseId: expenseId, groupId: expenseInfo.groupId, amounts: ''+ expenseInfo.amounts, selectedParticipants: expenseInfo.participants, description: expenseInfo.description})
       };
 
   return (
@@ -89,6 +94,7 @@ const DetailsExpense = (props) => {
         <DetailsToolBar
           navigation={props.navigation}
           onPress={handleDelete}
+          press = {handleEdit}
         ></DetailsToolBar>
       </View>
       <View style={{ flex: 76, flexDirection: "column" }}>

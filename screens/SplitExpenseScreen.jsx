@@ -25,6 +25,7 @@ const SplitExpenseScreen = (props) => {
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedParticipants, setSelectedParticipants] = useState([])
   const [friendsList, setFriendsList] = useState([])
+  const [action, setAction] = useState()
   
 // use FocusEffect to get all the expense when focus
   useFocusEffect(

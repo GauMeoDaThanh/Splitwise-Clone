@@ -17,7 +17,8 @@ const DetailsToolBar = (props) => {
       </TouchableOpacity>
       <Text style={{ fontWeight: "500", fontSize: 16, marginStart: 50 }}>Details</Text>
       <View style={{ flexDirection: 'row'}}>
-       {/* <TouchableOpacity>
+        {/* <TouchableOpacity
+        onPress={props.press}>
        <Image
            source={require("../assets/icons/edit.png")}
           style={{ width: 20, height: 20, marginHorizontal: 5 }}
