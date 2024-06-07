@@ -41,7 +41,7 @@ const AddFriendScreen = (props) => {
           title={"Add new contact"}
           action={"Add"}
           isDisabled={!isBothFieldsFilled}
-          onAddPress={handleAddFriend}
+          onPress={handleAddFriend}
         ></AddToolBar>
       </View>
       <View style={{ flex: 93, backgroundColor: "white" }}>

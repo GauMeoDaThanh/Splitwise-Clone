@@ -126,7 +126,7 @@ const AppNavigation = () => {
           component={EditGroupsScreen}
           options={{ headerShown: false }}
         ></Stack.Screen>
-          <Stack.Screen
+        <Stack.Screen
           name="DetailExpense"
           component={DetailsExpense}
           options={{ headerShown: false }}
@@ -310,7 +310,7 @@ const TabNavigator = () => {
                   source={
                     imageUri
                       ? { uri: imageUri }
-                      : require("../assets/icons/account_icon.png")
+                      : require("../assets/icons/account.png")
                   }
                   style={{ width: 25, height: 25, borderRadius: 25 }}
                 />
