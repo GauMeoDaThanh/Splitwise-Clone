@@ -20,35 +20,42 @@ const DetailFriendsScreen = ({ route }) => {
   const { friendId } = route.params;
   const [friendInfo, setFriendInfo] = useState([]);
   const [showEditOptions, setShowEditOptions] = useState(false);
-  const [expenses, setExpenses] = useState([])
-  const [surplus, setSurplus] = useState([])
-  const [createBy, setCreateBy] = useState([])
+  const [expenses, setExpenses] = useState([]);
+  const [surplus, setSurplus] = useState([]);
+  const [createBy, setCreateBy] = useState([]);
 
-    useFocusEffect(
+  useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
-        FriendService.getInstance().listenToFriendDetail(friendId, async (friendInfo) => {
-          setFriendInfo(friendInfo);
-          try {
-            const expenseList =
-              await ExpenseService.getInstance().getExpensesByFriendId(friendId);
-            setExpenses(expenseList); // Cập nhật state với dữ liệu thực
-            let paidUsers = [];
-            for (expense of expenseList) {
-              paidUsers.push(
-                await UserService.getInstance().getUserById(expense.createBy)
-              );
-            }
-            setSurplus(await ExpenseService.getInstance().calculateSurplusAmounts(expenseList));
-            setCreateBy(paidUsers);
-          } catch (error) {
-            console.log("Error to fetch data, ", error);
+        try {
+          const expenseList =
+            await ExpenseService.getInstance().getExpensesByFriendId(friendId);
+          setExpenses(expenseList); // Cập nhật state với dữ liệu thực
+          let paidUsers = [];
+          for (expense of expenseList) {
+            paidUsers.push(
+              await UserService.getInstance().getUserById(expense.createBy)
+            );
           }
-        })
+          setSurplus(
+            await ExpenseService.getInstance().calculateSurplusAmounts(
+              expenseList
+            )
+          );
+          setCreateBy(paidUsers);
+        } catch (error) {
+          console.log("Error to fetch data, ", error);
+        }
       };
       fetchData();
-    }, [])
+    }, [friendInfo])
   );
+
+  useEffect(() => {
+    FriendService.getInstance().listenToFriendDetail(friendId, (friendInfo) => {
+      setFriendInfo(friendInfo);
+    });
+  }, []);
 
   const toggleEditOptions = () => {
     setShowEditOptions(!showEditOptions);
@@ -69,7 +76,7 @@ const DetailFriendsScreen = ({ route }) => {
           }}
         >
           <Image
-            source={require("../assets/images/background.png")}
+            source={require("../assets/images/background - Copy.png")}
             style={{
               width: "100%",
               height: "100%",
@@ -139,26 +146,25 @@ const DetailFriendsScreen = ({ route }) => {
           >
             {friendInfo?.username}
           </Text>
-          <View className="flex-row space-x-1">
-            <Text className="text-gray-600">
-              {/* Chau N. owes you */}
-            </Text>
-            <Text
-              style={{
-                color: "#0B9D7E",
-                fontWeight: 400,
-              }}
-            >
-              {/* 3.000.000vnđ */}
-            </Text>
-          </View>
         </View>
       </View>
-         <View className="flex-col space-y-6 px-1">
-        <View className="flex-col px-2 space-y-3">
-          { expenses.map((expense, index) => (
+      <View className="flex-col space-y-6 px-1 flex-1" style={{ top: -30 }}>
+        <ScrollView
+          className="flex-col px-2 space-y-3 flex-1"
+          contentContainerStyle={{ paddingBottom: 200 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {expenses.map((expense, index) => (
             <View key={index} className="flex-row ">
-              <TouchableOpacity className="flex-row space-x-5 px-1 items-center" onPress={() => navigation.navigate("DetailExpense",{expenseId:expense.id})}>
+              <TouchableOpacity
+                className="flex-row space-x-5 px-1 items-center"
+                style={{ justifyContent: "space-between", width: "100%" }}
+                onPress={() =>
+                  navigation.navigate("DetailExpense", {
+                    expenseId: expense.id,
+                  })
+                }
+              >
                 <View className="flex-col items-center">
                   <Text
                     className="text-gray-600"
@@ -200,7 +206,13 @@ const DetailFriendsScreen = ({ route }) => {
                     }}
                   ></Image>
                 </View>
-                <View className="flex-col items-start">
+                <View
+                  className="flex-col items-start"
+                  style={{
+                    width: 110,
+                    flexWrap: "wrap",
+                  }}
+                >
                   <Text
                     className="text-gray-600"
                     style={{
@@ -227,10 +239,19 @@ const DetailFriendsScreen = ({ route }) => {
                       : ""}
                   </Text>
                 </View>
-                <View className="flex-col items-end">
+                <View
+                  className="flex-col"
+                  style={{
+                    // alignItems: "flex-end",
+                    width: 80,
+                    flexWrap: "wrap",
+                  }}
+                >
                   <Text
                     className={
-                      createBy[index]?.uid == auth.currentUser.uid
+                      surplus[index] === "settled up"
+                        ? "text-green-600"
+                        : createBy[index]?.uid == auth.currentUser.uid
                         ? "text-green-600"
                         : "text-red-600"
                     }
@@ -239,13 +260,15 @@ const DetailFriendsScreen = ({ route }) => {
                       fontWeight: 500,
                     }}
                   >
-                    {
-                      surplus[index] === '0'?'':((createBy[index]?.uid
+                    {surplus[index] === 0
+                      ? ""
+                      : surplus[index] === "settled up"
+                      ? "settled up"
+                      : createBy[index]?.uid
                       ? createBy[index]?.uid == auth.currentUser.uid
                         ? "you lent"
-                        : `${createBy[index]?.username} lent`
-                      : ""))
-                    }
+                        : "you owes"
+                      : ""}
                   </Text>
                   <Text
                     className={
@@ -258,15 +281,18 @@ const DetailFriendsScreen = ({ route }) => {
                       fontWeight: 500,
                     }}
                   >
-                 {
-                   surplus[index] === '0' ? '' : surplus[index] + " vnd"
-                 }
+                    {surplus[index] === 0
+                      ? ""
+                      : surplus[index] === "settled up"
+                      ? ""
+                      : Math.abs(surplus[index]).toLocaleString("de-De") +
+                        " vnd"}
                   </Text>
                 </View>
               </TouchableOpacity>
             </View>
           ))}
-        </View>
+        </ScrollView>
       </View>
 
       <View

@@ -8,7 +8,7 @@ import {
   Image,
   ScrollView,
   FlatList,
-  LogBox
+  LogBox,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ButtonAddExpense from "../components/ButtonAddExpense";
@@ -29,40 +29,47 @@ const DetailsGroupsScreen = ({ route }) => {
   const [expenses, setExpenses] = useState([]);
   const [createBy, setCreateBy] = useState([]);
   const [showEditOptions, setShowEditOptions] = useState(false);
-  const [surplus, setSurplus] = useState([])
-  
-    LogBox.ignoreLogs([
+  const [surplus, setSurplus] = useState([]);
+
+  LogBox.ignoreLogs([
     "Possible Unhandled Promise Rejection",
     "TypeError: Cannot read property 'indexOf' of undefined",
-    ]);
-  
+  ]);
+
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
-        GroupService.getInstance().listenToGroupDetail(groupId, async (group) => {
-          setGroup(group);
-          try {
-            const expenseList =
-              await ExpenseService.getInstance().getExpensesByGroupId(groupId);
-            setExpenses(expenseList); // Cập nhật state với dữ liệu thực
-            let paidUsers = [];
-            for (expense of expenseList) {
-              paidUsers.push(
-                await UserService.getInstance().getUserById(expense.createBy)
-              );
-            }
-            setSurplus(await ExpenseService.getInstance().calculateSurplusAmounts(expenseList));
-            setCreateBy(paidUsers);
-          } catch (error) {
-            console.log("Error to fetch data, ", error);
+        try {
+          const expenseList =
+            await ExpenseService.getInstance().getExpensesByGroupId(groupId);
+          let paidUsers = [];
+          for (expense of expenseList) {
+            paidUsers.push(
+              await UserService.getInstance().getUserById(expense.createBy)
+            );
           }
-        })
+          setSurplus(
+            await ExpenseService.getInstance().calculateSurplusAmounts(
+              expenseList
+            )
+          );
+          setExpenses(expenseList); // Cập nhật state với dữ liệu thực
+          setCreateBy(paidUsers);
+        } catch (error) {
+          console.log("Error to fetch data, ", error);
+        }
       };
       fetchData();
-    }, [groupId])
+    }, [group])
   );
 
-    const toggleEditOptions = () => {
+  useEffect(() => {
+    GroupService.getInstance().listenToGroupDetail(groupId, (group) => {
+      setGroup(group);
+    });
+  }, []);
+
+  const toggleEditOptions = () => {
     setShowEditOptions(!showEditOptions);
   };
   const handleOptionPress = (screen) => {
@@ -163,23 +170,6 @@ const DetailsGroupsScreen = ({ route }) => {
           top: -35,
         }}
       >
-        {/* <TouchableOpacity
-          className="flex-row border border-gray-400 rounded-md px-4 py-1.5"
-          style={{
-            borderBottomWidth: 3,
-          }}
-          onPress={() => navigation.navigate("Balances")}
-        >
-          <Text
-            className="text-gray-700"
-            style={{
-              fontSize: 15,
-              fontWeight: 500,
-            }}
-          >
-            Balances
-          </Text>
-        </TouchableOpacity> */}
         <TouchableOpacity
           className="flex-row border border-gray-400 rounded-md px-4 py-1.5"
           style={{
@@ -209,7 +199,12 @@ const DetailsGroupsScreen = ({ route }) => {
           style={{
             borderBottomWidth: 3,
           }}
-          onPress={() => navigation.navigate("Totals")}
+          onPress={() =>
+            navigation.navigate("Totals", {
+              groupName: group.name,
+              expenseList: expenses,
+            })
+          }
         >
           <Text
             className="text-gray-700"
@@ -259,11 +254,24 @@ const DetailsGroupsScreen = ({ route }) => {
           </Text>
         </TouchableOpacity>
       </View>
-      <View className="flex-col space-y-6 px-1">
-        <View className="flex-col px-2 space-y-3">
-          { expenses.map((expense, index) => (
+      <View className="flex-col space-y-6 px-1 flex-1">
+        {/* <View className="flex-row justify-center space-x-3"> */}
+        <ScrollView
+          className="flex-col px-2 space-y-3 flex-1"
+          contentContainerStyle={{ paddingBottom: 200 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {expenses.map((expense, index) => (
             <View key={index} className="flex-row ">
-              <TouchableOpacity className="flex-row space-x-5 px-1 items-center" onPress={() => navigation.navigate("DetailExpense",{expenseId:expense.id})}>
+              <TouchableOpacity
+                className="flex-row space-x-5 px-1 items-center"
+                style={{ justifyContent: "space-between", width: "100%" }}
+                onPress={() =>
+                  navigation.navigate("DetailExpense", {
+                    expenseId: expense.id,
+                  })
+                }
+              >
                 <View className="flex-col items-center">
                   <Text
                     className="text-gray-600"
@@ -298,14 +306,20 @@ const DetailsGroupsScreen = ({ route }) => {
                 </View>
                 <View className="flex-row p-2 items-center border border-gray-400 bg-gray-200">
                   <Image
-                  source={require("../assets/icons/icon_bill.png")}
+                    source={require("../assets/icons/icon_bill.png")}
                     style={{
                       width: 22,
                       height: 22,
                     }}
                   ></Image>
                 </View>
-                <View className="flex-col items-start">
+                <View
+                  className="flex-col items-start"
+                  style={{
+                    width: 110,
+                    flexWrap: "wrap",
+                  }}
+                >
                   <Text
                     className="text-gray-600"
                     style={{
@@ -332,10 +346,19 @@ const DetailsGroupsScreen = ({ route }) => {
                       : ""}
                   </Text>
                 </View>
-                <View className="flex-col items-end">
+                <View
+                  className="flex-col"
+                  style={{
+                    // alignItems: "flex-end",
+                    width: 80,
+                    flexWrap: "wrap",
+                  }}
+                >
                   <Text
                     className={
-                      createBy[index]?.uid == auth.currentUser.uid
+                      surplus[index] === "settled up"
+                        ? "text-green-600"
+                        : createBy[index]?.uid == auth.currentUser.uid
                         ? "text-green-600"
                         : "text-red-600"
                     }
@@ -344,13 +367,15 @@ const DetailsGroupsScreen = ({ route }) => {
                       fontWeight: 500,
                     }}
                   >
-                    {
-                      surplus[index] === '0'?'':((createBy[index]?.uid
+                    {surplus[index] === 0
+                      ? ""
+                      : surplus[index] === "settled up"
+                      ? "settled up"
+                      : createBy[index]?.uid
                       ? createBy[index]?.uid == auth.currentUser.uid
                         ? "you lent"
-                        : `${createBy[index]?.username} lent`
-                      : ""))
-                    }
+                        : "you owes"
+                      : ""}
                   </Text>
                   <Text
                     className={
@@ -363,15 +388,18 @@ const DetailsGroupsScreen = ({ route }) => {
                       fontWeight: 500,
                     }}
                   >
-                 {
-                   surplus[index] === '0' ? '' : surplus[index] + " vnd"
-                 }
+                    {surplus[index] === 0
+                      ? ""
+                      : surplus[index] === "settled up"
+                      ? ""
+                      : Math.abs(surplus[index]).toLocaleString("de-De") +
+                        " vnd"}
                   </Text>
                 </View>
               </TouchableOpacity>
             </View>
           ))}
-        </View>
+        </ScrollView>
       </View>
 
       <View

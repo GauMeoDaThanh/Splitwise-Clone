@@ -15,11 +15,14 @@ import ButtonAddExpense from "../../components/ButtonAddExpense";
 import { auth } from "../../firebaseConfig";
 // import UserService from "../services/UserService";
 import FriendService from "../../services/friend";
-import { useIsFocused, useNavigation, useFocusEffect } from "@react-navigation/native";
+import {
+  useIsFocused,
+  useNavigation,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { list } from "firebase/storage";
 import { useState } from "react";
 import ExpenseService from "../../services/expense";
-
 
 const FriendsScreen = () => {
   const isForcused = useIsFocused();
@@ -31,7 +34,7 @@ const FriendsScreen = () => {
   const [showFilterOptions, setShowFilterOptions] = React.useState(false);
   const [selectedFilter, setSelectedFilter] = React.useState("All friends");
   const [totalAmount, setTotalAmount] = useState(0);
-  const [yourExpenseByFriends, setYourExpenseByFriends] = useState([])
+  const [yourExpenseByFriends, setYourExpenseByFriends] = useState([]);
 
   const filterOptions = [
     "All friends",
@@ -55,19 +58,6 @@ const FriendsScreen = () => {
     return unsubscribe;
   }, []);
 
-  React.useEffect(() => {
-    FriendService.getInstance().listenToFriendList((friends) => {
-      setListFriends(friends);
-    });
-  }, [userId]);
-
-  React.useEffect(() => {
-    if (isForcused) {
-      setSearchTerm("");
-    }
-  }, [isForcused]);
-
-    // use FocusEffect to get all the expense when focus
   useFocusEffect(
     React.useCallback(() => {
       const fetchExpenses = async () => {
@@ -79,11 +69,64 @@ const FriendsScreen = () => {
           let differenceList = [];
           expensesList = [];
           for (friend of listFriends) {
-            const expensesByFr = await ExpenseService.getInstance().getExpensesByFriendId(friend.id);
+            const expensesByFr =
+              await ExpenseService.getInstance().getExpensesByFriendId(
+                friend.id
+              );
             expensesList.push(expensesByFr);
-            differenceList.push(await ExpenseService.getInstance().getYourPaid(expensesByFr));
+            differenceList.push(
+              await ExpenseService.getInstance().getYourPaid(expensesByFr)
+            );
           }
-          setTotalAmount(await ExpenseService.getInstance().getTotalDifference(differenceList));
+          setTotalAmount(
+            await ExpenseService.getInstance().getTotalDifference(
+              differenceList
+            )
+          );
+          setYourExpenseByFriends(differenceList);
+          for (let i = 0; i < listFriends?.length; i++) {
+            listFriends[i].amountOwned = differenceList[i];
+          }
+          setListFriends(listFriends);
+        } catch (error) {
+          console.error("Error fetching expenses:", error);
+        }
+      };
+      fetchExpenses();
+    }, [listFriends])
+  );
+
+  React.useEffect(() => {
+    FriendService.getInstance().listenToFriendList((friends) => {
+      setListFriends(friends);
+    });
+  }, [userId]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchExpenses = async () => {
+        try {
+          if (!listFriends || listFriends.length === 0) {
+            return;
+          }
+          // Tổng chi phí đã trả trong group
+          let differenceList = [];
+          expensesList = [];
+          for (friend of listFriends) {
+            const expensesByFr =
+              await ExpenseService.getInstance().getExpensesByFriendId(
+                friend.id
+              );
+            expensesList.push(expensesByFr);
+            differenceList.push(
+              await ExpenseService.getInstance().getYourPaid(expensesByFr)
+            );
+          }
+          setTotalAmount(
+            await ExpenseService.getInstance().getTotalDifference(
+              differenceList
+            )
+          );
           setYourExpenseByFriends(differenceList);
         } catch (error) {
           console.error("Error fetching expenses:", error);
@@ -92,6 +135,11 @@ const FriendsScreen = () => {
       fetchExpenses();
     }, [listFriends])
   );
+  React.useEffect(() => {
+    if (isForcused) {
+      setSearchTerm("");
+    }
+  }, [isForcused]);
 
   return (
     <TouchableWithoutFeedback onPress={() => setShowFilterOptions(false)}>
@@ -138,12 +186,12 @@ const FriendsScreen = () => {
                 fontWeight: "bold",
               }}
             >
-               {totalAmount > 0 ? 'Friends owe you ' : 'You owe friends '}
+              {totalAmount > 0 ? "Friends owe you " : "You owe friends "}
             </Text>
             <Text
               style={{
                 paddingHorizontal: 10,
-                color: "#00CC99",
+                color: totalAmount > 0 ? "#00CC99" : "#FF0000",
                 paddingTop: 5,
                 fontSize: 18,
                 fontWeight: "500",
@@ -163,25 +211,33 @@ const FriendsScreen = () => {
           </TouchableOpacity>
         </View>
         {/* Danh sách bạn bè */}
-        <View style={{ flex: 70, position: "relative" }}>
+        <View style={{ flex: 70, position: "relative" }} className="mt-1">
           <FlatList
-            data={listFriends?.filter((friend) => {
-              return friend.name
-                .toLowerCase()
-                .includes(searchTerm.trim().toLowerCase());
-            })}
+            data={listFriends?.filter(
+              (friend) =>
+                selectedFilter === "All friends" ||
+                (selectedFilter === "Friends you owe" &&
+                  friend.amountOwned < 0) ||
+                (selectedFilter === "Friends that owe you" &&
+                  friend.amountOwned > 0 &&
+                  friend.name
+                    .toLowerCase()
+                    .includes(searchTerm.trim().toLowerCase()))
+            )}
             keyExtractor={(item) => item.id}
-            renderItem={({ item, index}) => {
+            renderItem={({ item, index }) => {
               return (
                 <View>
                   <CardFriend
-                  name={item.name}
-                  avatar={item.avatar}
-                  onPress={() => {
-                    navigation.navigate("FriendDetail", { friendId: item.id });
-                    setShowFilterOptions(false);
-                  }}
-                  data = {yourExpenseByFriends[index]}
+                    name={item.name}
+                    avatar={item.avatar}
+                    onPress={() => {
+                      navigation.navigate("FriendDetail", {
+                        friendId: item.id,
+                      });
+                      setShowFilterOptions(false);
+                    }}
+                    data={item.amountOwned}
                   />
                   {/* <View style={{ paddingStart: 60, marginTop: 10 }}>
                     <Text
@@ -198,9 +254,37 @@ const FriendsScreen = () => {
                         : "You owed " + Math.abs(yourExpenseByFriends[index]).toLocaleString("de-DE") + " vnd"}
                     </Text>
                 </View> */}
-              </View>
+                </View>
               );
             }}
+            ListFooterComponent={() => (
+              <View className="flex-row justify-center">
+                <TouchableOpacity
+                  className="flex-row items-center space-x-2 border py-1 px-3 rounded-md mt-3"
+                  style={{
+                    borderColor: "#0B9D7E",
+                  }}
+                  onPress={() => navigation.navigate("AddFriendScreen")}
+                >
+                  <Image
+                    source={require("../../assets/icons/addGroups_icon.png")}
+                    style={{
+                      width: 25,
+                      height: 25,
+                      tintColor: "#0B9D7E",
+                    }}
+                  ></Image>
+                  <Text
+                    style={{
+                      color: "#0B9D7E",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Add new friend
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
             contentContainerStyle={{ paddingBottom: 200 }}
             showsVerticalScrollIndicator={false}
           />

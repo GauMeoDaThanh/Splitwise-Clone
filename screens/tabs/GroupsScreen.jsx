@@ -34,8 +34,7 @@ const GroupsScreen = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [userId, setUserId] = useState(auth.currentUser.uid);
   const [totalAmount, setTotalAmount] = useState(0);
-  const [yourExpenseByGroup, setYourExpenseByGroup] = useState([])
-
+  const [yourExpenseByGroup, setYourExpenseByGroup] = useState([]);
 
   const radioButtons = [
     "All groups",
@@ -61,7 +60,6 @@ const GroupsScreen = () => {
     return unsubscribe;
   }, []);
 
-
   useEffect(() => {
     if (!isFocused) {
       setSelectedId("All groups");
@@ -79,12 +77,24 @@ const GroupsScreen = () => {
           let differenceList = [];
           expensesList = [];
           for (group of groups) {
-            const expensesByGr = await ExpenseService.getInstance().getExpensesByGroupId(group.id);
+            const expensesByGr =
+              await ExpenseService.getInstance().getExpensesByGroupId(group.id);
             expensesList.push(expensesByGr);
-            differenceList.push(await ExpenseService.getInstance().getYourPaid(expensesByGr));
+            differenceList.push(
+              await ExpenseService.getInstance().getYourPaid(expensesByGr)
+            );
           }
-          setTotalAmount(await ExpenseService.getInstance().getTotalDifference(differenceList));
+          setTotalAmount(
+            await ExpenseService.getInstance().getTotalDifference(
+              differenceList
+            )
+          );
           setYourExpenseByGroup(differenceList);
+          // add amount owned property to each group
+          for (let i = 0; i < groups.length; i++) {
+            groups[i].amountOwned = differenceList[i];
+          }
+          setGroups(groups);
         } catch (error) {
           console.error("Error fetching expenses:", error);
         }
@@ -94,9 +104,9 @@ const GroupsScreen = () => {
   );
 
   useEffect(() => {
-      GroupService.getInstance().listenToGroupList(async (groups) => {
-        setGroups(groups);
-      });
+    GroupService.getInstance().listenToGroupList(async (groups) => {
+      setGroups(groups);
+    });
   }, [userId]);
 
   useFocusEffect(
@@ -107,11 +117,18 @@ const GroupsScreen = () => {
           let differenceList = [];
           expensesList = [];
           for (group of groups) {
-            const expensesByGr = await ExpenseService.getInstance().getExpensesByGroupId(group.id);
+            const expensesByGr =
+              await ExpenseService.getInstance().getExpensesByGroupId(group.id);
             expensesList.push(expensesByGr);
-            differenceList.push(await ExpenseService.getInstance().getYourPaid(expensesByGr));
+            differenceList.push(
+              await ExpenseService.getInstance().getYourPaid(expensesByGr)
+            );
           }
-          setTotalAmount(await ExpenseService.getInstance().getTotalDifference(differenceList));
+          setTotalAmount(
+            await ExpenseService.getInstance().getTotalDifference(
+              differenceList
+            )
+          );
           setYourExpenseByGroup(differenceList);
         } catch (error) {
           console.error("Error fetching expenses:", error);
@@ -139,19 +156,18 @@ const GroupsScreen = () => {
         <View className="flex-cols px-3">
           <View className="flex-row space-x-40">
             <View className="flex-col py-4">
-               <Text className="font-bold text-xl">
-              {totalAmount > 0 ? 'Groups owe you ' : 'You owe groups '}
-            </Text>
+              <Text className="font-bold text-xl">
+                {totalAmount > 0 ? "Groups owe you " : "You owe groups "}
+              </Text>
               <Text
                 className="font-bold"
                 style={{
                   color: "#0B9D7E",
                   fontSize: 17,
                 }}
-                 >
-             {Math.abs(totalAmount).toLocaleString(
-                            "de-De")} vnd
-            </Text>
+              >
+                {Math.abs(totalAmount).toLocaleString("de-DE")} vnd
+              </Text>
             </View>
             <View className="flex-row items-center">
               <TouchableOpacity
@@ -184,7 +200,7 @@ const GroupsScreen = () => {
                     .includes(searchTerm.trim().toLowerCase())
               )}
               keyExtractor={(item) => item.id}
-              renderItem={({ item,index}) => {
+              renderItem={({ item, index }) => {
                 return (
                   <TouchableOpacity
                     onPress={() => {
@@ -199,7 +215,7 @@ const GroupsScreen = () => {
                         source={
                           item.imageuri
                             ? { uri: item.imageuri }
-                            : require("../../assets/images/avatar_image.jpg")
+                            : require("../../assets/icons/account.png")
                         }
                         style={{
                           width: 90,
@@ -218,25 +234,26 @@ const GroupsScreen = () => {
                         <Text
                           style={{
                             color:
-                              yourExpenseByGroup[index] >= 0
-                                ? "#0B9D7E"
-                                : "#990000",
+                              // yourExpenseByGroup[index] >= 0
+                              item.amountOwned >= 0 ? "#0B9D7E" : "#990000",
                             fontWeight: 500,
                           }}
                         >
-                          {yourExpenseByGroup[index] > 0
-                            ? "You lent " +
-                              Math.abs(
-                                yourExpenseByGroup[index]
-                              ).toLocaleString("de-DE") +
-                              " vnd"
-                            : yourExpenseByGroup[index] == 0
-                            ? "Settled up"
-                            : "You owed " +
-                              Math.abs(
-                                yourExpenseByGroup[index]
-                              ).toLocaleString("de-De") +
-                              " vnd"}
+                          {item.amountOwned
+                            ? item.amountOwned > 0
+                              ? "You lent " +
+                                Math.abs(item.amountOwned).toLocaleString(
+                                  "de-DE"
+                                ) +
+                                " vnd"
+                              : item.amountOwned == 0
+                              ? "settled up"
+                              : "You owed " +
+                                Math.abs(item.amountOwned).toLocaleString(
+                                  "de-De"
+                                ) +
+                                " vnd"
+                            : ""}
                         </Text>
                       </View>
                     </View>

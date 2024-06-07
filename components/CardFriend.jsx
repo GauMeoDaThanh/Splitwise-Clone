@@ -42,9 +42,9 @@ const CardFriend = (props) => {
           source={
             props.avatar
               ? { uri: props.avatar }
-              : require("../assets/icons/account.png")
+              : require("../assets/images/avatar_image.jpg")
           }
-          style={{ width: 40, height: 40, borderRadius: 20 }}
+          style={{ width: 60, height: 60, borderRadius: 20 }}
         />
         <View style={{ paddingHorizontal: 20, width: "68%" }}>
           <Text style={{ fontSize: 18, fontWeight: 500 }}>{props.name}</Text>
@@ -59,41 +59,33 @@ const CardFriend = (props) => {
             style={{
               justifyContent: "center",
               textAlign: "right",
-               color: props.data >= 0
-                                ? "#0B9D7E"
-                                : "#990000",
+              color: props.data >= 0 ? "#0B9D7E" : "#990000",
             }}
           >
-            {renderColoredText(props.data > 0
-              ? "You lent "
-              : props.data == 0
+            {renderColoredText(
+              props.data > 0
+                ? "You lent "
+                : props.data == 0
                 ? "Settled up"
-                : "You owed " )}
+                : "You owed "
+            )}
           </Text>
           <Text
             style={{
               justifyContent: "center",
               textAlign: "right",
-               color:props.data >= 0
-                                ? "#0B9D7E"
-                                : "#990000",
+              color: props.data >= 0 ? "#0B9D7E" : "#990000",
               fontWeight: 500,
             }}
           >
-             {renderColoredText(props.data > 0
-                            ?  Math.abs(
-                                props.data
-                              ).toLocaleString("de-DE") +
-                              " vnd"
-                            : props.data == 0
-                            ? ""
-                            : Math.abs(
-                                props.data
-                              ).toLocaleString("de-De") +
-                              " vnd")} 
+            {renderColoredText(
+              props.data > 0
+                ? Math.abs(props.data).toLocaleString("de-DE") + " vnd"
+                : props.data == 0
+                ? ""
+                : Math.abs(props.data).toLocaleString("de-De") + " vnd"
+            )}
           </Text>
-          {/* <Text style={{ justifyContent: "center", textAlign: 'right', color: '#990000' }}>you owe</Text>
-          <Text style={{ justifyContent: "center", textAlign: 'right', color: '#990000', fontWeight: 500 }}>35.000 đồng</Text> */}
         </View>
       </View>
       <View style={{ paddingStart: 60, marginTop: 0 }}>
@@ -104,9 +96,7 @@ const CardFriend = (props) => {
             paddingVertical: 0,
             color: "#777777",
           }}
-        >
-        </Text>
-
+        ></Text>
       </View>
     </TouchableOpacity>
   );
@@ -118,6 +108,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingVertical: 5,
+    paddingVertical: 1,
   },
 });

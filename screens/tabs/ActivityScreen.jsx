@@ -12,14 +12,16 @@ import {
 } from "react-native";
 import ActivityAddGroup from "../../components/ActivityAddGroup";
 import ActivityAddFriends from "../../components/ActivityAddFriends";
-import ActivityDeleteGroup from "../../components/ActivityDeleteGroup";
 import ActivityEditGroupName from "../../components/ActivityEditGroupName";
 import ActivityDeleteMember from "../../components/ActivityDeleteMember";
 import ActivityEditWhiteboard from "../../components/ActivityEditWhiteboard";
 import ActivityAddMember from "../../components/ActivityAddMember";
 import ActivityEditGroupAvatar from "../../components/ActivityEditGroupAvatar";
+import ActivityDeleteFriend from "../../components/ActivityDeleteFriend";
 import ActivityService from "../../services/activity";
 import { auth } from "../../firebaseConfig";
+import ActivityExpense from "../../components/ActivityExpense";
+import ActivityPayment from "../../components/ActivityPayment";
 
 const ActivityScreen = () => {
   const navigation = useNavigation();
@@ -65,27 +67,23 @@ const ActivityScreen = () => {
           )}
         />
       )}
-      {/* <ActivityAddGroup></ActivityAddGroup>
-        <ActivityDeleteGroup></ActivityDeleteGroup>
-        <ActivityEditGroup></ActivityEditGroup>
-        <ActivityAddMember></ActivityAddMember>
-        <ActivityDeleteMember></ActivityDeleteMember>
-        <ActivityEditWhiteboard></ActivityEditWhiteboard>
-        <ActivityAddFriends></ActivityAddFriends>
-        <ActivityDeleteFriends></ActivityDeleteFriends> */}
+      {/* <ActivityExpense></ActivityExpense>
+      <ActivityPayment></ActivityPayment> */}
     </View>
   );
 };
 
 const notifycationMapping = {
   addGroup: ActivityAddGroup,
-  deleteGroup: ActivityDeleteGroup,
   editGroupName: ActivityEditGroupName,
   editGroupAvatar: ActivityEditGroupAvatar,
   addMember: ActivityAddMember,
   deleteMember: ActivityDeleteMember,
   editWhiteboard: ActivityEditWhiteboard,
   addFriend: ActivityAddFriends,
+  deleteFriend: ActivityDeleteFriend,
+  addExpense: ActivityExpense,
+  addPayment: ActivityPayment,
 };
 
 const NotificationRender = ({ type, data }) => {

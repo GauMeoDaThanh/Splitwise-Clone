@@ -1,4 +1,4 @@
-import { auth, db} from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 import {
   collection,
   addDoc,
@@ -11,7 +11,7 @@ import {
   where,
   orderBy,
   onSnapshot,
-  deleteDoc
+  limit,
 } from "firebase/firestore";
 import FriendService from "./friend";
 import AuthenticateService from "./authentication";
@@ -21,10 +21,11 @@ import {
   ref,
   getStorage,
   getDownloadURL,
-    uploadBytesResumable,
+  uploadBytesResumable,
 } from "firebase/storage";
 import { storage } from "../firebaseConfig";
 import { useRef } from "react";
+import ActivityService from "./activity";
 
 const friendService = FriendService.getInstance();
 const authenticateService = AuthenticateService.getInstance();
@@ -58,7 +59,13 @@ class ExpenseService {
     return ExpenseService.instance;
   }
 
-  async createExpense(createAt, amounts, groupId, description, participants) {
+  async createExpense(
+    createAt,
+    amounts,
+    groupId = "",
+    description,
+    participants
+  ) {
     expense = {
       ...initExpense,
       createBy: auth.currentUser.uid,
@@ -74,6 +81,31 @@ class ExpenseService {
       console.log("Add expense successfully with ID: ", docRef.id);
       expenseId = docRef.id;
       console.log("ID Exp", this.expenseId);
+      const members = participants
+        .filter((participant) => participant.userId !== expense.paidBy)
+        .map((participant) => participant.userId);
+      if (groupId != "") {
+        const groupInfo = await GroupService.getInstance().getGroupInfo(
+          groupId[0]
+        );
+        ActivityService.getInstance().aAddExpense(
+          groupId[0],
+          groupInfo.name,
+          expense.paidBy,
+          expense.participants,
+          expense.description,
+          members
+        );
+      } else {
+        ActivityService.getInstance().aAddExpense(
+          "",
+          "",
+          expense.paidBy,
+          expense.participants,
+          expense.description,
+          members
+        );
+      }
     } catch (e) {
       console.error("Error adding expense ", e);
     }
@@ -116,9 +148,7 @@ class ExpenseService {
     for (id of idFr) {
       users.push(await userService.getUserById(id));
     }
-    groupList = await groupService.getGroupOfIdAcc(
-      auth.currentUser?.uid
-    );
+    groupList = await groupService.getGroupOfIdAcc(auth.currentUser?.uid);
     const searchTerm = text.toLowerCase().trim();
 
     // Filter users based on search term
@@ -137,13 +167,17 @@ class ExpenseService {
     if (text == "") return [];
     let filteredSuggestions = [...filteredUsers, ...filteredGroups];
     // Loại sugg nếu đã chọn
-    const selectedUserIds = new Set(selectedParticipants.map(participant => participant.userId));
-    const selectedGroupIds = new Set(selectedParticipants.map(participant => participant.groupId));
-    filteredSuggestions = filteredSuggestions.filter(sugg => {
+    const selectedUserIds = new Set(
+      selectedParticipants.map((participant) => participant.userId)
+    );
+    const selectedGroupIds = new Set(
+      selectedParticipants.map((participant) => participant.groupId)
+    );
+    filteredSuggestions = filteredSuggestions.filter((sugg) => {
       if (sugg.uid) {
-          return !selectedUserIds.has(sugg.uid);
-     } else if (sugg.id) {
-          return !selectedGroupIds.has(sugg.id);
+        return !selectedUserIds.has(sugg.uid);
+      } else if (sugg.id) {
+        return !selectedGroupIds.has(sugg.id);
       }
     });
     return filteredSuggestions;
@@ -156,7 +190,7 @@ class ExpenseService {
       await deleteDoc(groupRef);
       console.log("delete expense successfully");
     } catch (e) {
-      console.error("Error delete expense: ",e);
+      console.error(e);
     }
   }
 
@@ -205,6 +239,18 @@ class ExpenseService {
           });
         }
       );
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async getImgExpense(uid) {
+    try {
+      console.log("begin to get img expense");
+      const q = query(collection(db, "expenses"), where("uid", "==", uid));
+      const querySnapshot = await getDocs(q);
+      console.log(querySnapshot.docs[0].data().avatarUrl);
+      return querySnapshot.docs[0].data().avatarUrl;
     } catch (e) {
       console.error(e);
     }
@@ -280,11 +326,14 @@ class ExpenseService {
 
   async getExpensesByGroupId(groupId) {
     const expenses = [];
-    const querySnapshot = await getDocs(query(collection(db, "expenses"),
-      where("groupId", "array-contains", groupId),
-      orderBy("createAt", "desc")
-    )
+    const querySnapshot = await getDocs(
+      query(
+        collection(db, "expenses"),
+        where("groupId", "array-contains", groupId),
+        orderBy("createAt", "desc")
+      )
     );
+
     querySnapshot.forEach((doc) => {
       expenses.push({ id: doc.id, ...doc.data() });
     });
@@ -293,7 +342,7 @@ class ExpenseService {
 
   async getExpenseById(expenseId) {
     const expenseRef = doc(db, "expenses", expenseId);
-    const expense = await getDoc(expenseRef, expenseId)
+    const expense = await getDoc(expenseRef, expenseId);
     return expense.data();
   }
 
@@ -305,31 +354,42 @@ class ExpenseService {
     });
     return () => unsubscribe();
   }
-    
+
   async getDebtInfo(expenseId, userPaidBy) {
     try {
       const debt = [];
       const expense = await this.getExpenseById(expenseId);
       const participants = expense.participants;
-      debt.push(userPaidBy + " paid " + expense.amounts + " vnd");
+      debt.push(
+        userPaidBy + " paid " + expense.amounts.toLocaleString("de-De") + "vnd"
+      );
 
-      const usernames = await Promise.all(participants.map(async (participant) => {
-        const user = await UserService.getInstance().getUserById(participant.userId);
-        if (user) {
-          return user.username;
-        } else {
-          console.warn("Error fetching user data for participant:", participant.userId);
-          return null;
-        }
-      }));
+      const usernames = await Promise.all(
+        participants.map(async (participant) => {
+          const user = await UserService.getInstance().getUserById(
+            participant.userId
+          );
+          if (user) {
+            return user.username;
+          } else {
+            console.warn(
+              "Error fetching user data for participant:",
+              participant.userId
+            );
+            return null;
+          }
+        })
+      );
 
       for (let i = 1; i < participants.length; i++) {
-        if (!participants[i].settleUp) {
-          debt.push(usernames[i] + " owes " + userPaidBy + " " + participants[i].amount + " vnd");
-        }
-        else {
-          debt.push(usernames[i] + " paid " + userPaidBy + " " + participants[i].amount + " vnd");
-        }
+        debt.push(
+          usernames[i] +
+            " owes " +
+            userPaidBy +
+            " " +
+            participants[i].amount.toLocaleString("de-De") +
+            " vnd"
+        );
       }
       return debt;
     } catch (e) {
@@ -346,17 +406,17 @@ class ExpenseService {
       if (!expense.isSettle) {
         for (par of expense.participants) {
           if (par.userId === auth.currentUser.uid) {
-            // Tien ban chua tra bill ho
+            // Tiền bạn chưa trả bill họ
             if (!par.settleUp) {
               yourOwe += parseFloat(par.amount);
             }
           }
         }
-        // Khoan ban tra group, khoan nguoi khac tra
+        // Khoản bạn đã trả trong group, và người khác đã trả bill bạn
         if (expense.paidBy === auth.currentUser.uid) {
           yourLent += expense.amounts;
-          // Tien ban tra bill ban
-          yourOwe += expense.participants[0].amount
+          // Tiền phải trả cho bill mình
+          yourOwe += expense.participants[0].amount;
           for (par of expense.participants.slice(1)) {
             if (par.settleUp) {
               othersPaid += par.amount;
@@ -365,10 +425,46 @@ class ExpenseService {
         }
       }
     }
-    //Tong ban da tra, ban no va nguoi khac da tra
+    //Tổng bạn trả, tổng nợ và tổng họ đã trả cho bill bạn
     return (yourLent - yourOwe - othersPaid).toFixed(0);
   }
-    
+
+  async getTotalDifference(differenceList) {
+    const numberArray = differenceList.map(parseFloat);
+    const totalDifference = numberArray.reduce(
+      (sum, current) => sum + current,
+      0
+    );
+    return totalDifference;
+  }
+
+  async calculateSurplusAmounts(expenseList) {
+    const surplusAmounts = [];
+
+    for (const expense of expenseList) {
+      const userParticipant = expense.participants.find(
+        (participant) => participant.userId === auth.currentUser.uid
+      );
+
+      let totalOwed = 0;
+      if (expense.isSettle) totalOwed = "settled up";
+      else if (expense.paidBy === auth.currentUser.uid) {
+        totalOwed += expense.amounts;
+        totalOwed -= userParticipant.amount;
+      } else if (userParticipant) {
+        if (userParticipant.settleUp) {
+          totalOwed = "settled up";
+        } else {
+          totalOwed = -userParticipant.amount;
+        }
+      }
+
+      surplusAmounts.push(totalOwed);
+    }
+
+    return surplusAmounts;
+  }
+
   async getTotalDifference(differenceList) {
     const numberArray = differenceList.map(parseFloat);
     const totalDifference = numberArray.reduce(
@@ -379,14 +475,17 @@ class ExpenseService {
   }
 
   async handlePayment(expenseId, userId) {
-    const expenseRef = doc(db, 'expenses', expenseId);
+    const expenseRef = doc(db, "expenses", expenseId);
     try {
       const expenseDoc = await getDoc(expenseRef);
       const expenseData = expenseDoc.data();
       const participants = expenseData.participants;
-      const participantIndex = participants.findIndex((participant) => participant.userId === userId);
+
+      const participantIndex = participants.findIndex(
+        (participant) => participant.userId === userId
+      );
       if (participantIndex === -1) {
-        throw new Error('User not found in expense participants');
+        throw new Error("User not found in expense participants");
       }
 
       const updatedParticipants = [
@@ -394,43 +493,46 @@ class ExpenseService {
         { ...participants[participantIndex], settleUp: true },
         ...participants.slice(participantIndex + 1),
       ];
-      await updateDoc(expenseRef, {
-        participants: updatedParticipants,
-        isSettle: updatedParticipants.every(participant => participant.settleUp === true)
-      });
+      await updateDoc(expenseRef, { participants: updatedParticipants });
+      // Cập nhật nếu hoá đơn thanh toán hết rồi
+      const allSettled = updatedParticipants.every(
+        (participant) => participant.settleUp == true
+      );
+      if (allSettled) {
+        await updateDoc(expenseRef, { isSettle: true });
+        console.log("Expense is now fully settled");
+      }
+      alert("You settled up successfully");
+
+      ActivityService.getInstance().aSettleUp(expenseData, userId);
     } catch (error) {
-      console.error('Error processing payment:', error.message); // Handle errors
+      console.error("Error processing payment:", error.message); // Handle errors
     }
   }
 
-  async calculateSurplusAmounts(expenseList) {
-    const surplusAmounts = [];
-    for (const expense of expenseList) {
-      const totalOwed = Math.abs(
-        expense.participants.slice(1).reduce((acc, curr) => acc + (curr.settleUp === false ? curr.amount : 0), 0)
-      );
-      const formattedAmount = totalOwed.toLocaleString("de-De")
-      surplusAmounts.push(formattedAmount);
-    }
-    return surplusAmounts;
-  }
-  
   async getExpensesByFriendId(friendId) {
     const expenses = [];
     const querySnapshot = await getDocs(
       query(
-      collection(db, "expenses"),
-      where("groupId", "==", []),
-    )
+        collection(db, "expenses"),
+        where("groupId", "==", []),
+        orderBy("createAt", "desc")
+      )
     );
     querySnapshot.forEach((doc) => {
-  const data = doc.data();
-  const participantUserIds = data.participants.map(participant => participant.userId);
-  if (participantUserIds.includes(friendId) && participantUserIds.includes(auth.currentUser.uid)) {
-    expenses.push({ id: doc.id, ...data });
-  }
-});
+      const data = doc.data();
+      const participantUserIds = data.participants.map(
+        (participant) => participant.userId
+      );
+      if (
+        participantUserIds.includes(friendId) &&
+        participantUserIds.includes(auth.currentUser.uid)
+      ) {
+        expenses.push({ id: doc.id, ...data });
+      }
+    });
     return expenses;
   }
 }
+
 export default ExpenseService;
