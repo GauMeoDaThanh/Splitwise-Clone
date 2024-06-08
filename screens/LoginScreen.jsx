@@ -33,7 +33,7 @@ const LoginScreen = () => {
     setShowPassword(!showPassword);
   };
   return (
-    <ScrollView>
+    <ScrollView showsVerticalScrollIndicator={false}>
       <View className="flex-1 bg-white" style={{ backgroundColor: "#ACE4D6" }}>
         <SafeAreaView className="flex">
           <View className="flex-row justify-center">

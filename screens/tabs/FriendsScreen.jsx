@@ -99,6 +99,7 @@ const FriendsScreen = () => {
   React.useEffect(() => {
     FriendService.getInstance().listenToFriendList((friends) => {
       setListFriends(friends);
+      console.log(friends);
     });
   }, [userId]);
 
@@ -215,14 +216,14 @@ const FriendsScreen = () => {
           <FlatList
             data={listFriends?.filter(
               (friend) =>
-                selectedFilter === "All friends" ||
-                (selectedFilter === "Friends you owe" &&
-                  friend.amountOwned < 0) ||
-                (selectedFilter === "Friends that owe you" &&
-                  friend.amountOwned > 0 &&
-                  friend.name
-                    .toLowerCase()
-                    .includes(searchTerm.trim().toLowerCase()))
+                (selectedFilter === "All friends" ||
+                  (selectedFilter === "Friends you owe" &&
+                    friend.amountOwned < 0) ||
+                  (selectedFilter === "Friends that owe you" &&
+                    friend.amountOwned > 0)) &&
+                friend.name
+                  ?.toLowerCase()
+                  .includes(searchTerm.trim().toLowerCase())
             )}
             keyExtractor={(item) => item.id}
             renderItem={({ item, index }) => {
