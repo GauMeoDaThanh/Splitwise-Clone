@@ -17,16 +17,16 @@ const ActivityExpense = ({ data }) => {
   let totalAmount = 0;
   let userAmount = 0;
   let userId = "";
-  if (data.createBy === auth.currentUser.uid) {
+  if (data.createBy === auth?.currentUser?.uid) {
     totalAmount = participants
-      .filter((participant) => participant.userId !== auth.currentUser.uid)
+      .filter((participant) => participant?.userId !== auth?.currentUser?.uid)
       .reduce((sum, participant) => sum + participant.amount, 0)
       .toFixed(0);
   } else {
     userAmount = participants.filter(
-      (item) => item.userId === auth.currentUser.uid
+      (item) => item?.userId === auth?.currentUser?.uid
     );
-    userId = userAmount[0].userId;
+    userId = userAmount[0]?.userId;
     userAmount = userAmount.length > 0 ? userAmount[0].amount.toFixed(0) : 0;
   }
   return (

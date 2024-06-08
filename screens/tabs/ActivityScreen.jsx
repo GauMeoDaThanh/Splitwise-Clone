@@ -26,23 +26,26 @@ import ActivityPayment from "../../components/ActivityPayment";
 const ActivityScreen = () => {
   const navigation = useNavigation();
   const [activityData, setActivityData] = useState([]);
-  // const [userId, setUserId] = useState(auth.currentUser?.uid);
-
-  // useEffect(() => {
-  //   const unsubscribe = auth.onAuthStateChanged((user) => {
-  //     if (user) {
-  //       setUserId(user.uid);
-  //     }
-  //   });
-
-  //   return unsubscribe;
-  // }, []);
+  const [userId, setUserId] = useState(auth?.currentUser?.uid);
 
   useEffect(() => {
-    ActivityService.getInstance().listenActivity((data) => {
-      setActivityData(data);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log(user.uid);
+        setUserId(user.uid);
+      }
     });
+
+    return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (userId) {
+      ActivityService.getInstance().listenActivity((data) => {
+        setActivityData(data);
+      });
+    }
+  }, [userId]);
 
   return (
     <View className="flex-1 bg-white py-5">
