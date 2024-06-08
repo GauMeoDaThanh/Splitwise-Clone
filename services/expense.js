@@ -12,6 +12,7 @@ import {
   orderBy,
   onSnapshot,
   limit,
+  deleteDoc
 } from "firebase/firestore";
 import FriendService from "./friend";
 import AuthenticateService from "./authentication";

@@ -114,6 +114,7 @@ class GroupService {
     try {
       const groupRef = await addDoc(collection(db, GROUP_COLLECTION), group);
       console.log("Document written with ID: ", groupRef.id);
+      navigation.navigate('Groups');
       ActivityService.getInstance().aCreateGroup(
         groupRef.id,
         group["name"],

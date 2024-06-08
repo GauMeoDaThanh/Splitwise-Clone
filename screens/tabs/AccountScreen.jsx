@@ -41,7 +41,11 @@ const AccountScreen = () => {
     navigation.setOptions({
       tabBarIcon: () => (
         <Image
-          source={{ uri: imageUri }}
+          source={
+            imageUri
+              ? { uri: imageUri }
+              : require("../../assets/icons/account.png")
+          }
           style={{ width: 25, height: 25, borderRadius: 25 }}
         />
       ),
@@ -77,7 +81,11 @@ const AccountScreen = () => {
         <View className="flex-row justify-center space-x-5">
           <View className="relative items-center">
             <Image
-              source={{ uri: imageUri }}
+              source={
+                imageUri
+                  ? { uri: imageUri }
+                  : require("../../assets/icons/account.png")
+              }
               style={{
                 width: 80,
                 height: 80,
