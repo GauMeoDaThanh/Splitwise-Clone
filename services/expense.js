@@ -195,51 +195,21 @@ class ExpenseService {
     }
   }
 
-  async updateExpenseInformation(
-    expenseId,
-    createAt,
-    imgUrl,
-    amounts,
-    description,
-    participants
-  ) {
-    members = [];
-    groupId = [];
-    // console.log("Participants: ", participants);
-    for (participant of participants) {
-      if (participant.type) {
-        groupId.push(participant.id);
-        const group = await groupService.getGroupInfo(participant.id);
-        const membersId = group.members;
-        for (id of membersId) {
-          members.push({ userId: id, amount: 50000 });
-        }
-      } else {
-        // Share money for friends
-        members.push({ userId: participant.uid, amount: 50000 });
-      }
-    }
-    participants = [...members];
-    expense = {
-      ...initExpense,
-      createAt,
-      groupId,
-      imgUrl,
-      amounts,
-      description,
-      participants,
-    };
-    try {
-      console.log("start set expense information");
-      const groupRef = doc(db, "expenses", groupId);
-      await setDoc(groupRef, { ...expense }, { merge: true });
-      console.log(
-        `Document with ID ${groupId} updated with username ${auth.currentUser?.uid}`
-      );
-    } catch (e) {
-      console.log(e);
-    }
-  }
+//   async updateExpense(expenseId, data) {
+//   try {
+//     const docRef = doc(db, "expenses", expenseId); 
+//     const docSnapshot = await getDoc(docRef);
+
+//     if (!docSnapshot.exists) {
+//       throw new Error(`Expense with ID '${expenseId}' not found`);
+//     }
+
+//     await updateDoc(docRef, data);
+//     console.log(`Expense '${expenseId}' updated successfully`);
+//   } catch (error) {
+//     console.error("Error updating expense:", error);
+//   }
+// }
 
   // img for expense
   async uploadImgExpense(uid, imgUri) {
