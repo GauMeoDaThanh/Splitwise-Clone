@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
   Text,
@@ -26,23 +26,23 @@ import ActivityPayment from "../../components/ActivityPayment";
 const ActivityScreen = () => {
   const navigation = useNavigation();
   const [activityData, setActivityData] = useState([]);
-  const [userId, setUserId] = useState(auth.currentUser.uid);
+  // const [userId, setUserId] = useState(auth.currentUser?.uid);
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUserId(user.uid);
-      }
-    });
+  // useEffect(() => {
+  //   const unsubscribe = auth.onAuthStateChanged((user) => {
+  //     if (user) {
+  //       setUserId(user.uid);
+  //     }
+  //   });
 
-    return unsubscribe;
-  }, []);
+  //   return unsubscribe;
+  // }, []);
 
   useEffect(() => {
     ActivityService.getInstance().listenActivity((data) => {
       setActivityData(data);
     });
-  }, [userId]);
+  }, []);
 
   return (
     <View className="flex-1 bg-white py-5">

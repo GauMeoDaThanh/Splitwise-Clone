@@ -43,37 +43,43 @@ class ActivityService {
 
   async listenActivity(callback) {
     try {
-      const userId = auth.currentUser.uid;
-      const activitiesRef = collection(db, ACTIVITY_COLLECTION);
-      const q = query(
-        activitiesRef,
-        or(
-          where("createBy", "==", userId),
-          where("additionalInfo.members", "array-contains", userId)
-        ),
-        orderBy("createAt", "desc"),
-        limit(30)
-      );
-      const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-        const activityData = await Promise.all(
-          querySnapshot.docs.map(async (doc) => {
-            let activity = doc.data();
-            if (activity["createAt"]) {
-              activity["createAt"] = formatDate(activity["createAt"].toDate());
-              activity["createByAvatar"] =
-                await UserService.getInstance().getAvatar(activity["createBy"]);
-              activity["createByName"] =
-                await UserService.getInstance().getUsername(
-                  activity["createBy"]
-                );
-              return activity;
-            }
-          })
+      const userId = auth.currentUser?.uid;
+      if (userId) {
+        const activitiesRef = collection(db, ACTIVITY_COLLECTION);
+        const q = query(
+          activitiesRef,
+          or(
+            where("createBy", "==", userId),
+            where("additionalInfo.members", "array-contains", userId)
+          ),
+          orderBy("createAt", "desc"),
+          limit(30)
         );
-        callback(activityData);
-      });
+        const unsubscribe = onSnapshot(q, async (querySnapshot) => {
+          const activityData = await Promise.all(
+            querySnapshot.docs.map(async (doc) => {
+              let activity = doc.data();
+              if (activity["createAt"]) {
+                activity["createAt"] = formatDate(
+                  activity["createAt"].toDate()
+                );
+                activity["createByAvatar"] =
+                  await UserService.getInstance().getAvatar(
+                    activity["createBy"]
+                  );
+                activity["createByName"] =
+                  await UserService.getInstance().getUsername(
+                    activity["createBy"]
+                  );
+                return activity;
+              }
+            })
+          );
+          callback(activityData);
+        });
 
-      return () => unsubscribe();
+        return () => unsubscribe();
+      }
     } catch (e) {
       console.error(e);
     }
