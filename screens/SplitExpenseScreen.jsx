@@ -241,10 +241,11 @@ const SplitExpenseScreen = (props) => {
               }}
             >
               <Text style={{ fontSize: 16, fontWeight: 600 }}>
-                {totalValueInput} dong of {amounts} dong
+                {totalValueInput.toLocaleString("de-De")} dong of{" "}
+                {Math.abs(amounts).toLocaleString("de-De")} dong
               </Text>
               <Text style={{ fontSize: 14, fontWeight: 400 }}>
-                {leftAmount} dong left
+                {leftAmount.toLocaleString("de-De")} dong left
               </Text>
             </View>
           </>
