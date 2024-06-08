@@ -15,6 +15,10 @@ const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = React.useState("");
   const sendPasswordResetEmail = async () => {
+    if (email === '') {
+      alert('Please enter complete information')
+      return;
+    }
     authenticateService.handleSendPasswordReset(email, navigation);
   };
   return (

@@ -19,6 +19,10 @@ const LoginScreen = () => {
   const [password, setPassword] = React.useState("");
 
   const signIn = async () => {
+    if (email === '' || password === '') {
+      alert('Please enter complete information');
+      return;
+    }
     authenticateService.handleSignIn(email, password, navigation);
     setEmail("");
     setPassword("");
