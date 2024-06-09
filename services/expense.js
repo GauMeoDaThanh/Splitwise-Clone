@@ -195,21 +195,21 @@ class ExpenseService {
     }
   }
 
-//   async updateExpense(expenseId, data) {
-//   try {
-//     const docRef = doc(db, "expenses", expenseId); 
-//     const docSnapshot = await getDoc(docRef);
+  //   async updateExpense(expenseId, data) {
+  //   try {
+  //     const docRef = doc(db, "expenses", expenseId);
+  //     const docSnapshot = await getDoc(docRef);
 
-//     if (!docSnapshot.exists) {
-//       throw new Error(`Expense with ID '${expenseId}' not found`);
-//     }
+  //     if (!docSnapshot.exists) {
+  //       throw new Error(`Expense with ID '${expenseId}' not found`);
+  //     }
 
-//     await updateDoc(docRef, data);
-//     console.log(`Expense '${expenseId}' updated successfully`);
-//   } catch (error) {
-//     console.error("Error updating expense:", error);
-//   }
-// }
+  //     await updateDoc(docRef, data);
+  //     console.log(`Expense '${expenseId}' updated successfully`);
+  //   } catch (error) {
+  //     console.error("Error updating expense:", error);
+  //   }
+  // }
 
   // img for expense
   async uploadImgExpense(uid, imgUri) {
@@ -383,14 +383,16 @@ class ExpenseService {
       );
 
       for (let i = 1; i < participants.length; i++) {
-        debt.push(
-          usernames[i] +
-            " owes " +
-            userPaidBy +
-            " " +
-            participants[i].amount.toLocaleString("de-De") +
-            " vnd"
-        );
+        if (participants[i].amount > 0) {
+          debt.push(
+            usernames[i] +
+              " owes " +
+              userPaidBy +
+              " " +
+              participants[i].amount.toLocaleString("de-De") +
+              " vnd"
+          );
+        }
       }
       return debt;
     } catch (e) {

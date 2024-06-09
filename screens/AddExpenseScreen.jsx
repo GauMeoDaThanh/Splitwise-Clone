@@ -182,13 +182,10 @@ const AddExpenseScreen = (props) => {
     );
   };
 
-   const handleInputChange = (text) => {
-    const regex = /^\d+$/; // Regex to match only digits
-
+  const handleInputChange = (text) => {
+    const regex = /^(\d+)?$/; // Regex to match only digits or empty string
     if (regex.test(text)) {
       setMoney(text);
-    } else {
-      alert('Please enter only numbers.');
     }
   };
 
@@ -298,20 +295,20 @@ const AddExpenseScreen = (props) => {
               style={{ width: 40, height: 40 }}
             ></Image>
           </TouchableOpacity>
-         <TextInput
-          placeholder="Enter amounts"
-          keyboardType="numeric"
-          style={[
-            styles.textInputStyle,
-            {
-              borderBottomColor: isFocused === 2 ? "#009966" : "#999999",
-            },
-          ]}
-          value={money}
-          onChangeText={handleInputChange}
-          onFocus={() => setIsFocused(2)}
-          onBlur={() => setIsFocused(0)}
-        />
+          <TextInput
+            placeholder="Enter amounts"
+            keyboardType="numeric"
+            style={[
+              styles.textInputStyle,
+              {
+                borderBottomColor: isFocused === 2 ? "#009966" : "#999999",
+              },
+            ]}
+            value={money}
+            onChangeText={handleInputChange}
+            onFocus={() => setIsFocused(2)}
+            onBlur={() => setIsFocused(0)}
+          />
         </View>
         <View
           style={{

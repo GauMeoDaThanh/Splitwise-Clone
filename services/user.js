@@ -55,7 +55,8 @@ class UserService {
   async createUser(uid, username, email) {
     console.log("start add user");
     this.user = {
-      ...this.user,
+      avatarUrl: "",
+      friends: [],
       username,
       email,
       uid,
@@ -166,20 +167,20 @@ class UserService {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  async getUserById(uid) {
+    // console.log(`start get user ${uid}`);
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      // console.log(userSnap.data());
+      return userSnap.data();
+    } else {
+      console.log("Khong tim thay");
+      return null;
     }
-    
-     async getUserById(uid) {
-        // console.log(`start get user ${uid}`);
-        const userRef = doc(db, "users", uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-            // console.log(userSnap.data());
-            return userSnap.data();
-        } else {
-            console.log("Khong tim thay");
-            return null;
-        }
-    }
+  }
 }
 
 export default UserService;

@@ -65,14 +65,18 @@ const SplitExpenseScreen = (props) => {
     );
   };
 
+  function handleNaNValues(obj) {
+    for (const key in obj) {
+      if (isNaN(parseFloat(obj[key]))) {
+        obj[key] = 0;
+      }
+    }
+  }
+
   const checkInput = (valueInputs, fullNumber) => {
     // Kiểm tra chia không đủ
     let sum = 0;
     for (const [key, value] of Object.entries(valueInputs)) {
-      if (isNaN(value)) {
-        alert("Please fill in the complete division number");
-        return;
-      }
       sum += parseFloat(value);
     }
     if (sum != fullNumber) {
@@ -117,18 +121,24 @@ const SplitExpenseScreen = (props) => {
         }
         break;
       case "unequally":
+        handleNaNValues(valueInputs);
         if (!checkInput(valueInputs, amounts)) return;
         isFirstFriend = true;
         for (friend of friendsList) {
           splitParticipants.push({
             userId: friend.uid,
             amount: parseFloat(parseFloat(valueInputs[friend.uid]).toFixed(0)),
-            settleUp: isFirstFriend,
+            settleUp:
+              (parseFloat(valueInputs[friend.uid]) / 100) * amounts === 0
+                ? true
+                : isFirstFriend,
           });
           isFirstFriend = false;
         }
         break;
       case "percent":
+        handleNaNValues(valueInputs);
+        console.log("value: ", valueInputs);
         if (!checkInput(valueInputs, 100)) return;
         isFirstFriend = true;
         for (friend of friendsList) {
@@ -137,7 +147,10 @@ const SplitExpenseScreen = (props) => {
             amount: parseFloat(
               ((parseFloat(valueInputs[friend.uid]) / 100) * amounts).toFixed(0)
             ),
-            settleUp: false,
+            settleUp:
+              (parseFloat(valueInputs[friend.uid]) / 100) * amounts === 0
+                ? true
+                : isFirstFriend,
           });
           isFirstFriend = false;
         }

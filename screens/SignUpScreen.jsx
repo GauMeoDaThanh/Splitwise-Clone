@@ -11,20 +11,16 @@ import {
 } from "react-native";
 import AuthenticateService from "../services/authentication";
 import { Alert } from "react-native";
- 
+
 const SignUpScreen = () => {
   const navigation = useNavigation();
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState();
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
   const handleSignUp = async () => {
-     if (email === '' || password === '' || name === '') {
-        alert('Please enter complete information');
-        return;
-    }
     try {
-       const authenticateService = new AuthenticateService();
+      const authenticateService = new AuthenticateService();
       await authenticateService.handleSignUpAndCreateUser(
         email,
         password,
@@ -32,7 +28,8 @@ const SignUpScreen = () => {
         navigation
       );
     } catch (e) {
-      console.log('Failed to sign up for this account')
+      console.error("Sign up failed:", error);
+      Alert.alert("Sign up failed:", "An error occurred during sign up.");
     }
   };
   const toggleShowPassword = () => {
@@ -90,7 +87,7 @@ const SignUpScreen = () => {
               </TouchableOpacity>
             </View>
             {/* <Text className = "text-gray-700">Phone</Text>
-                        <TextInput 
+<TextInput 
                             className = "p-2 bg-gray-100 text-gray-700 rounded-2xl mb-8"
                             placeholder="Enter Phone"
                         /> */}
@@ -145,5 +142,5 @@ const SignUpScreen = () => {
     </ScrollView>
   );
 };
- 
+
 export default SignUpScreen;

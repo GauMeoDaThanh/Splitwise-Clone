@@ -11,18 +11,16 @@ import { GoogleAuthProvider } from "firebase/auth";
 import { signInWithPopup } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import UserService from "./user";
-import { Alert, useState} from "react-native";
+import { Alert, useState } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-
-
 class AuthenticateService {
-     constructor() {
-        if (AuthenticateService.instance == null) {
-            AuthenticateService.instance = this;
-        }
-        return AuthenticateService.instance;
+  constructor() {
+    if (AuthenticateService.instance == null) {
+      AuthenticateService.instance = this;
     }
+    return AuthenticateService.instance;
+  }
   static getInstance() {
     if (!AuthenticateService.instance) {
       AuthenticateService.instance = new AuthenticateService();
@@ -34,54 +32,54 @@ class AuthenticateService {
     console.log(auth.currentUser?.uid);
     return auth.currentUser != null;
   }
-    static getInstance() {
-        if (!AuthenticateService.instance) {
-            AuthenticateService.instance = new AuthenticateService();
-        }
-        return AuthenticateService.instance;
+  static getInstance() {
+    if (!AuthenticateService.instance) {
+      AuthenticateService.instance = new AuthenticateService();
     }
+    return AuthenticateService.instance;
+  }
 
-    async handleSignUpAndCreateUser(email, password, userName, navigation) {
-        try {
-            const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                email,
-                password
-            );
-            const user = userCredential.user;
-            await sendEmailVerification(user);
-            Alert.alert(
-                "Alert",
-                "Check your authentication email to log in with your registered account"
-            );
-            await UserService.getInstance().createUser(
-                user.uid,
-                userName,
-                user.email
-            );
-            navigation.navigate("Login");
-        } catch (e) {
-            switch (e.code) {
-                case "auth/email-already-in-use":
-                    alert(`Email address ${email} already in use.`);
-                    break;
-                case "auth/invalid-email":
-                    alert(`Email address ${email} is invalid.`);
-                    break;
-                case "auth/operation-not-allowed":
-                    alert(`Error during sign up.`);
-                    break;
-                case "auth/weak-password":
-                    alert(
-                        "Password is not strong enough. Add additional characters including special characters and numbers."
-                    );
-                    break;
-                default:
-                    alert(e.message);
-                    break;
-            }
-        }
+  async handleSignUpAndCreateUser(email, password, userName, navigation) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      await sendEmailVerification(user);
+      Alert.alert(
+        "Alert",
+        "Check your authentication email to log in with your registered account"
+      );
+      await UserService.getInstance().createUser(
+        user.uid,
+        userName,
+        user.email
+      );
+      navigation.navigate("Login");
+    } catch (e) {
+      switch (e.code) {
+        case "auth/email-already-in-use":
+          alert(`Email address ${email} already in use.`);
+          break;
+        case "auth/invalid-email":
+          alert(`Email address ${email} is invalid.`);
+          break;
+        case "auth/operation-not-allowed":
+          alert(`Error during sign up.`);
+          break;
+        case "auth/weak-password":
+          alert(
+            "Password is not strong enough. Add additional characters including special characters and numbers."
+          );
+          break;
+        default:
+          alert(e.message);
+          break;
+      }
     }
+  }
 
   async handleSignIn(email, password, navigation) {
     try {
@@ -107,22 +105,22 @@ class AuthenticateService {
       alert("Login failed");
     }
   }
-  
-    async handleSendPasswordReset(email, navigation) {
-        try {
-            userId = await UserService.getInstance().getUserIDWithMail(email);
-            if (userId != null) {
-                await sendPasswordResetEmail(auth, email);
-                alert("Check your email to reset your password");
-            } else {
-                alert("Email does not exist ");
-            }
-            navigation.navigate("Login");
-        } catch (err) {
-            console.error(err);
-            alert(err.message);
-        }
+
+  async handleSendPasswordReset(email, navigation) {
+    try {
+      userId = await UserService.getInstance().getUserIDWithMail(email);
+      if (userId != null) {
+        await sendPasswordResetEmail(auth, email);
+        alert("Check your email to reset your password");
+      } else {
+        alert("Email does not exist ");
+      }
+      navigation.navigate("Login");
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
     }
+  }
 
   async handleSignOut(navigate) {
     try {
